@@ -20,7 +20,12 @@
         {% endif %}
     </h2>
 <hr>
-    <p>A crash was detected on {{date}} at {{time}}.</p>
+    {% if user is none %}
+        <p>A crash was detected on {{date}} at {{time}}.</p>
+    {% else %}
+        <p>A crash was detected on {{date}} at {{time}} from user {{user}}.</p>
+    {% endif %}
+
 </div>
 
 <div style="width: 800px;">
@@ -30,7 +35,7 @@
         <DL style="background-color:#FFF099; border-style:solid; border-width: 1px; padding: 10px;" >
             File {{tb['file']|e}}, line: {{tb['line']|e}} in {{tb['module']|e}}
             <DD>
-                {{tb['code']|e}}
+                {{tb['error_line']|e}}
             </DD>
         </DL>
     {% endfor %}
@@ -41,15 +46,20 @@
 
     <hr>
 
-    <h4>Source Code</h4>
-    <div style="background-color:#FFF099; border-style:solid; border-width: 1px; padding: 10px;">
-        <ol start="{{source_code[0][0]}}">
-            <li style="padding-left"> {{source_code[0][2]}}</li>
-            {% for n, indent, line in source_code[1:] %}
-                {% if n == traceback[-1]['line'] %}
-                    <li style="background-color:#BB0000; padding-left: {{indent}}px;">{{line}}</li>
+    <h4>Source Code: {{traceback[-1]['file']}}</h4>
+
+    <div style="width: 800px; background-color:#FFF099; border-style:solid; border-width: 1px; padding: 10px;">
+        <ol start="{{traceback[-1]['func_line']}}">
+            {% for n, line in traceback[-1]['source'] %}
+                {% set stripped_line = line.replace('    ', '') %}
+                {% set indent = 30 * (line.count('    ')-1) %}
+                {% if n == traceback[-1]['error_lineno'] %}
+                    <li style="background-color:#BB0000; padding-left:{{indent}}px;">
+                        {{stripped_line}}
+                    </li>
                 {% else %}
-                    <li style="padding-left: {{indent}}px;">{{line}}</li>
+                    <li style="padding-left: {{indent}}px;">{{stripped_line}}</li>
+
                 {% endif %}
             {% endfor %}
         </ol>
@@ -59,13 +69,24 @@
 
     <h4>Local Variables in the scope of {{traceback[-1]['module']|e}}</h4>
     <table border="1" style="width:800px">
-        {% for field, value in localvars %}
+        {% for field, value in traceback[-1]['local_vars'] %}
             <tr>
                 <td style="width:30%">{{ field|e }}</td>
                 <td>{{ value|e }}</td>
             </tr>
         {% endfor %}
     </table>
+
+    <h4>Object Inspection in the scope of {{traceback[-1]['module']|e}}</h4>
+    <table border="1" style="width:800px">
+        {% for field, value in traceback[-1]['object_vars'] %}
+            <tr>
+                <td style="width:30%">{{ field|e }}</td>
+                <td>{{ value|e }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+
 
 </div>
 
