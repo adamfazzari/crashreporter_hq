@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Crash Reporter HQ</title>
+</head>
+
+
+<body>
+
+<h1>Crash Reporter HQ</h1>
+
+<table border="1" style="width:800px">
+    <tr>
+        <td>Report Number</td>
+        <td>Date</td>
+    </tr>
+    {% for r in reports %}
+        <tr>
+            <td><a href="{{ url_for('view_report', report_number=r['number']) }}">{{ r['number'] }}</a></td>
+            <td>{{ r['date'] }}</td>
+        </tr>
+    {% endfor %}
+
+</table>
+</body>
+</html>

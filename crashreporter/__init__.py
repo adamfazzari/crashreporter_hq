@@ -4,3 +4,5 @@ try:
     from crashreporter import CrashReporter
 except ImportError:
     pass
+
+from hq import run_hq
