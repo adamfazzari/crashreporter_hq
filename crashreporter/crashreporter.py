@@ -8,6 +8,8 @@ import glob
 import datetime
 import shutil
 import smtplib
+import requests
+import json
 import time
 import logging
 import ftplib
@@ -119,6 +121,10 @@ class CrashReporter(object):
         self._ftp.update({'host': host, 'port': port, 'user': user, 'passwd': passwd, 'path': path, 'timeout': timeout,
                           'acct': acct})
 
+    def setup_hq(self, server, **kwargs):
+        self._hq = kwargs
+        self._hq.update({'server': server})
+
     def enable(self):
         """
         Enable the crash reporter. CrashReporter is defaulted to be enabled on creation.
@@ -228,6 +234,9 @@ class CrashReporter(object):
                 if 'port' in self._ftp:
                     self._ftp['port'] = int(self._ftp['port'])
 
+            if cfg.has_section('HQ'):
+                self.setup_hq(**dict(cfg.items('HQ')))
+
     def subject(self):
         """
         Return a string to be used as the email subject line.
@@ -323,15 +332,13 @@ class CrashReporter(object):
         return smtp_success, ftp_success
 
     def _hq_submit(self):
-        import requests
-        import json
         tb_info = []
         for tb in self.tb_info:
             tb_copy = tb.copy()
             tb_copy.pop('traceback')
             tb_info.append(tb_copy)
         data = json.dumps(tb_info)
-        r = requests.post("http://127.0.0.1:5000/upload", data=data)
+        r = requests.post(self._hq['server'], data=data)
         return r
 
     def _ftp_submit(self, path):
