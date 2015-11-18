@@ -5,4 +5,3 @@ try:
 except ImportError:
     pass
 
-from hq import run_hq
