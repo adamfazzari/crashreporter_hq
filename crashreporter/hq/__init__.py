@@ -1,7 +1,7 @@
 __author__ = 'calvin'
 
 import os
-import time
+import glob
 import re
 import json
 from collections import OrderedDict
@@ -22,6 +22,15 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
+
+def get_metadata():
+    metadata_fp = os.path.join(UPLOAD_FOLDER, '.metadata')
+    if os.path.isfile(metadata_fp):
+        with open(metadata_fp, 'r') as metadata_file:
+            metadata = json.load(metadata_file)
+            return metadata
+
+
 @app.route('/reports/<int:report_number>')
 def view_report(report_number):
     with open(os.path.join(UPLOAD_FOLDER, 'crash_report_%d.json' % report_number)) as r:
@@ -32,7 +41,7 @@ def view_report(report_number):
 @app.route('/')
 def home():
     reports = []
-    for r in os.listdir(UPLOAD_FOLDER):
+    for r in glob.glob(os.path.join(UPLOAD_FOLDER, 'crash_report_*.json')):
         fullpath = os.path.join(UPLOAD_FOLDER, r)
         with open(fullpath) as _f:
             payload = json.load(_f)
@@ -54,8 +63,16 @@ def home():
 def upload_file():
     if request.method == 'POST':
         tb_info = json.loads(request.data)
-        num = len(os.listdir(UPLOAD_FOLDER)) + 1
-        with open(os.path.join(UPLOAD_FOLDER, 'crash_report_%d.json' % num), 'w') as cr:
+        metadata = get_metadata()
+        if metadata is not None:
+            metadata['report_count'] += 1
+        else:
+            metadata = {'report_count': 1}
+
+        with open(os.path.join(UPLOAD_FOLDER, '.metadata'), 'w') as metadata_file:
+            json.dump(metadata, metadata_file)
+
+        with open(os.path.join(UPLOAD_FOLDER, 'crash_report_%d.json' % metadata['report_count']), 'w') as cr:
             json.dump(tb_info, cr,  sort_keys=True, indent=4)
             return 'Upload successful'
     return ''
