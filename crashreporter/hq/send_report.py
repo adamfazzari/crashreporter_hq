@@ -10,6 +10,6 @@ def upload_to_hq(fileobject):
 
 if __name__ == '__main__':
 
-    f = open('./crashreport117.html', 'rb')
+    f = open('./crashreport99.txt', 'rb')
     r = upload_to_hq(f)
     aqsd=3

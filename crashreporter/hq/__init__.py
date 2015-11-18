@@ -3,6 +3,7 @@ __author__ = 'calvin'
 import os
 import time
 import re
+from collections import OrderedDict
 from flask import Flask, request, redirect, url_for, send_from_directory, render_template
 from werkzeug import secure_filename
 
@@ -11,7 +12,7 @@ cr_number_regex = re.compile('crashreport(\d+)\..*')
 HQ_FOLDER = os.path.dirname(os.path.realpath(__file__))
 TEMPLATE_FOLDER = os.path.join(HQ_FOLDER, 'templates')
 UPLOAD_FOLDER = os.path.join(HQ_FOLDER, 'reports')
-ALLOWED_EXTENSIONS = set(['html', 'txt'])
+ALLOWED_EXTENSIONS = set(['html'])
 
 app = Flask('hq', template_folder=TEMPLATE_FOLDER)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -31,9 +32,13 @@ def home():
     reports = []
     for r in os.listdir(UPLOAD_FOLDER):
         fullpath = os.path.join(UPLOAD_FOLDER, r)
-        reports.append({'number': cr_number_regex.findall(r)[0],
-                        'filename': r,
-                        'date': time.ctime(os.path.getmtime(fullpath))})
+        d = (OrderedDict((('Report Number', cr_number_regex.findall(r)[0]),
+                         ('filename', r),
+                         ('Date', time.ctime(os.path.getmtime(fullpath))),
+                         ('Version', ''),
+                         ('Error', ''))
+                         ))
+        reports.append(d)
     html = render_template('index.html', reports=reports)
     return html
 

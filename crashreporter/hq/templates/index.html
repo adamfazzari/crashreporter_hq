@@ -10,15 +10,21 @@
 
 <h1>Crash Reporter HQ</h1>
 
+
 <table border="1" style="width:800px">
     <tr>
-        <td>Report Number</td>
-        <td>Date</td>
+        {% for header in reports[0].iterkeys() %}
+            <td>{{ header }}</td>
+        {% endfor %}
     </tr>
+
     {% for r in reports %}
         <tr>
-            <td><a href="{{ url_for('view_report', report_number=r['number']) }}">{{ r['number'] }}</a></td>
-            <td>{{ r['date'] }}</td>
+            {% for value in r.itervalues() %}
+                <td>{{ value }}</td>
+            {% endfor %}
+            <td><a href="{{ url_for('view_report', report_number=r['Report Number']) }}">Open</a></td>
+
         </tr>
     {% endfor %}
 
