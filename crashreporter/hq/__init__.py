@@ -3,11 +3,12 @@ __author__ = 'calvin'
 import os
 import time
 import re
+import json
 from collections import OrderedDict
 from flask import Flask, request, redirect, url_for, send_from_directory, render_template
 from werkzeug import secure_filename
 
-cr_number_regex = re.compile('crashreport(\d+)\..*')
+cr_number_regex = re.compile('crash_report_(\d+)\.json')
 
 HQ_FOLDER = os.path.dirname(os.path.realpath(__file__))
 TEMPLATE_FOLDER = os.path.join(HQ_FOLDER, 'templates')
@@ -23,8 +24,17 @@ def allowed_file(filename):
 
 @app.route('/reports/<int:report_number>')
 def view_report(report_number):
-    with open(os.path.join(UPLOAD_FOLDER, 'crashreport%d.html' % report_number)) as r:
-        html = r.read()
+    with open(os.path.join(UPLOAD_FOLDER, 'crash_report_%d.json' % report_number)) as r:
+        report = json.load(r)
+        fields = {'date': 'TEMP',
+                  'time': 'TEMP',
+                  'traceback': report,
+                  'error': 'SOME ERROR',
+                  'app_name': 'TEST APP',
+                  'app_version': 'ALPHA 1',
+                  'user': 'CALVIN'
+                  }
+        html = render_template('crashreport.html', **fields)
         return html
 
 @app.route('/')
@@ -45,12 +55,11 @@ def home():
 @app.route('/upload', methods=['POST'])
 def upload_file():
     if request.method == 'POST':
-        fileobject = request.files['files']
-        if fileobject and allowed_file(fileobject.filename):
-            filename = secure_filename(fileobject.filename)
-
-            fileobject.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            return redirect(url_for('uploaded_file', filename=filename))
+        tb_info = json.loads(request.data)
+        num = len(os.listdir(UPLOAD_FOLDER)) + 1
+        with open(os.path.join(UPLOAD_FOLDER, 'crash_report_%d.json' % num), 'w') as cr:
+            json.dump(tb_info, cr,  sort_keys=True, indent=4)
+            return 'Upload successful'
     return ''
 
 @app.route('/uploads/<filename>')

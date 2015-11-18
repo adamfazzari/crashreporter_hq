@@ -80,6 +80,7 @@ class CrashReporter(object):
         self.tb_info = None
         self._excepthook = None
         # Load the configuration from a file if specified
+        self._hq = {}
         if os.path.isfile(config):
             self.load_configuration(config)
         else:
@@ -190,6 +191,8 @@ class CrashReporter(object):
                 # Save the offline report. If the upload of the report is successful, then delete the report.
                 report_path = self._save_report()
                 great_success = False
+                if self._hq is not None:
+                    self._hq_submit()
                 if self._smtp is not None:
                     # Send the report via email
                     with open(report_path, 'r') as _cr:
@@ -318,6 +321,18 @@ class CrashReporter(object):
                 logging.error(e)
 
         return smtp_success, ftp_success
+
+    def _hq_submit(self):
+        import requests
+        import json
+        tb_info = []
+        for tb in self.tb_info:
+            tb_copy = tb.copy()
+            tb_copy.pop('traceback')
+            tb_info.append(tb_copy)
+        data = json.dumps(tb_info)
+        r = requests.post("http://127.0.0.1:5000/upload", data=data)
+        return r
 
     def _ftp_submit(self, path):
         """
