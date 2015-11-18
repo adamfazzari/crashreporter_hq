@@ -56,7 +56,7 @@ class CrashReporter(object):
 
     """
     _report_name = "crashreport%02d"
-    html_template = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'crashreport.html')
+    html_template = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'hq', 'templates', 'crashreport.html')
     active = False
     application_name = None
     application_version = None
@@ -68,7 +68,7 @@ class CrashReporter(object):
 
     def __init__(self, report_dir=None, html=True, config='', logger=None, activate=True,
                  watcher=True, check_interval=5*60):
-        self.html = html
+        self.html = True
         self.logger = logger if logger else logging.getLogger(__name__)
         # Setup the directory used to store offline crash reports
         self.report_dir = report_dir
@@ -79,7 +79,7 @@ class CrashReporter(object):
         self.etype = None
         self.evalue = None
         self.tb = None
-        self.tb_info = None
+        self.payload = None
         self._excepthook = None
         # Load the configuration from a file if specified
         self._hq = {}
@@ -193,7 +193,7 @@ class CrashReporter(object):
                 self.etype = etype
                 self.evalue = evalue
                 self.tb = tb
-                self.tb_info = analyze_traceback(tb)
+                self.payload = self.generate_payload()
                 # Save the offline report. If the upload of the report is successful, then delete the report.
                 report_path = self._save_report()
                 great_success = False
@@ -214,6 +214,19 @@ class CrashReporter(object):
 
         # Call the default exception hook
         sys.__excepthook__(etype, evalue, tb)
+
+    def generate_payload(self):
+        dt = datetime.datetime.now()
+        payload = {'Error Type': self.etype.__name__,
+                   'Error Message': '%s' % self.evalue,
+                   'Application Name': self.application_name,
+                   'Application Version': self.application_version,
+                   'User': self.user_identifier,
+                   'Date': dt.strftime('%d %B %Y'),
+                   'Time': dt.strftime('%I:%M %p'),
+                   'Traceback': analyze_traceback(self.tb),
+                   }
+        return payload
 
     def load_configuration(self, config):
         cfg = ConfigParser.ConfigParser()
@@ -251,46 +264,35 @@ class CrashReporter(object):
         """
         Return a string to be used as the email body. Can be html if html is turned on.
         """
-        dt = datetime.datetime.now()
-        error = traceback.format_exception_only(self.etype, self.evalue)[0].strip()
-        fields = {'date': dt.strftime('%d %B %Y'),
-                  'time': dt.strftime('%I:%M %p'),
-                  'traceback': self.tb_info,
-                  'error': error,
-                  'app_name': self.application_name,
-                  'app_version': self.application_version,
-                  'user': self.user_identifier
-                  }
-
         with open(self.html_template, 'r') as _f:
             template = jinja2.Template(_f.read())
-        html_body = template.render(**fields)
+        html_body = template.render(info=self.payload)
         return html_body
 
     def raw_body(self):
 
-        body = datetime.datetime.now().strftime('%d %B %Y, %I:%M %p\n')
+        body = self.payload['Date'] + self.payload['Time'] + '\n'
         body += '\n'.join(traceback.format_exception(self.etype, self.evalue, self.tb))
         body += '\n'
         # Print the source code in the local scope of the error
         body += 'Source Code:\n\n'
-        scope_lines = self.tb_info[-1]['source']
+        scope_lines = self.payload['Traceback'][-1]['Source Code']
         for ln, line in scope_lines:
             body += "{ln}.{line}".format(ln=ln, line=line)
-        body += '\nLocal Variables in the scope of {}\n'.format(self.tb_info[-1]['module'])
+        body += '\nLocal Variables in the scope of {}\n'.format(self.payload['Traceback'][-1]['Module'])
         # Print a table of local variables
         fmt = "{name:<25s}{value:<25s}\n"
         body += '-' * 90 + '\n'
         body += fmt.format(name='Variable', value='Value')
         body += '-' * 90 + '\n'
-        for name, value in self.tb_info[-1]['local_vars']:
+        for name, value in self.payload['Traceback'][-1]['Local Variables']:
             body += fmt.format(name=name, value=value)
-        body += '\nObject Inspection in the scope of {}\n'.format(self.tb_info[-1]['module'])
+        body += '\nObject Inspection in the scope of {}\n'.format(self.payload['Traceback'][-1]['Module'])
         # Print a table of object attribute references
         body += '-' * 90 + '\n'
         body += fmt.format(name='Variable', value='Value')
         body += '-' * 90 + '\n'
-        for name, value in self.tb_info[-1]['object_vars']:
+        for name, value in self.payload['Traceback'][-1]['Object Variables']:
             body += fmt.format(name=name, value=value)
         return body
 
@@ -332,12 +334,7 @@ class CrashReporter(object):
         return smtp_success, ftp_success
 
     def _hq_submit(self):
-        tb_info = []
-        for tb in self.tb_info:
-            tb_copy = tb.copy()
-            tb_copy.pop('traceback')
-            tb_info.append(tb_copy)
-        data = json.dumps(tb_info)
+        data = json.dumps(self.payload)
         r = requests.post(self._hq['server'], data=data)
         return r
 

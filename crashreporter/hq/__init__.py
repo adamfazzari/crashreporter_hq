@@ -25,16 +25,8 @@ def allowed_file(filename):
 @app.route('/reports/<int:report_number>')
 def view_report(report_number):
     with open(os.path.join(UPLOAD_FOLDER, 'crash_report_%d.json' % report_number)) as r:
-        report = json.load(r)
-        fields = {'date': 'TEMP',
-                  'time': 'TEMP',
-                  'traceback': report,
-                  'error': 'SOME ERROR',
-                  'app_name': 'TEST APP',
-                  'app_version': 'ALPHA 1',
-                  'user': 'CALVIN'
-                  }
-        html = render_template('crashreport.html', **fields)
+        payload = json.load(r)
+        html = render_template('crashreport.html', info=payload)
         return html
 
 @app.route('/')
@@ -42,10 +34,16 @@ def home():
     reports = []
     for r in os.listdir(UPLOAD_FOLDER):
         fullpath = os.path.join(UPLOAD_FOLDER, r)
+        with open(fullpath) as _f:
+            payload = json.load(_f)
         d = (OrderedDict((('Report Number', cr_number_regex.findall(r)[0]),
-                         ('filename', r),
-                         ('Date', time.ctime(os.path.getmtime(fullpath))),
-                         ('Version', ''),
+                         ('Application Name', payload['Application Name']),
+                         ('Application Version', payload['Application Version']),
+                         ('User', payload['User']),
+                         ('Error Type', payload['Error Type']),
+                         ('Error Message', payload['Error Message']),
+                         ('Date', payload['Date']),
+                         ('Time', payload['Time']),
                          ('Error', ''))
                          ))
         reports.append(d)

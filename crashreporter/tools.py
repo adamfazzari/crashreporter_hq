@@ -94,17 +94,17 @@ def analyze_traceback(tb, inspection_level=1):
     for ii, (filepath, line, module, code) in enumerate(extracted_tb):
         func_source, func_lineno = inspect.getsourcelines(tb_level.tb_frame)
 
-        d = dict(file=filepath,
-                 error_lineno=line,
-                 module=module,
-                 error_line=code,
-                 traceback=tb_level,
-                 func_line=func_lineno, source='')
+        d = {"File": filepath,
+             "Error Line Number": line,
+             "Module": module,
+             "Error Line": code,
+             "Function Line": func_lineno,
+             "Source Code": ''}
         if len(extracted_tb) - ii <= inspection_level:
             # Perform advanced inspection on the last `inspection_level` tracebacks.
-            d['source'] = zip(xrange(func_lineno, func_lineno+len(func_source)), func_source)
-            d['local_vars'] = get_local_references(tb_level)
-            d['object_vars'] = get_object_references(tb_level, d['source'])
+            d['Source Code'] = zip(xrange(func_lineno, func_lineno+len(func_source)), func_source)
+            d['Local Variables'] = get_local_references(tb_level)
+            d['Object Variables'] = get_object_references(tb_level, d['Source Code'])
         tb_level = getattr(tb_level, 'tb_next', None)
         info.append(d)
 
