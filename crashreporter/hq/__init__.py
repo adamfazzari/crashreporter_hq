@@ -4,9 +4,10 @@ import os
 import glob
 import re
 import json
+import logging
 from collections import OrderedDict
-from flask import Flask, request, redirect, url_for, send_from_directory, render_template
-from werkzeug import secure_filename
+from flask import Flask, request, redirect, url_for, render_template
+
 
 cr_number_regex = re.compile('crash_report_(\d+)\.json')
 
@@ -21,6 +22,20 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
+
+
+@app.route('/reports/delete', methods=['POST'])
+def delete_report():
+    if request.method == 'POST':
+        report_number = json.loads(request.data)
+        path = os.path.join(UPLOAD_FOLDER, 'crash_report_%d.json' % report_number)
+        if os.path.isfile(path):
+            os.remove(path)
+            response = 'Success. Crash report #%d deleted' % report_number
+        else:
+            response = 'Failed. Crash report #%d does not exist.' % report_number
+        logging.info(response)
+        return response
 
 
 def get_metadata():
@@ -38,6 +53,7 @@ def view_report(report_number):
         html = render_template('crashreport.html', info=payload)
         return html
 
+
 @app.route('/')
 def home():
     reports = []
@@ -45,24 +61,24 @@ def home():
         fullpath = os.path.join(UPLOAD_FOLDER, r)
         with open(fullpath) as _f:
             payload = json.load(_f)
-        d = (OrderedDict((('Report Number', cr_number_regex.findall(r)[0]),
+        d = OrderedDict((('Report Number', cr_number_regex.findall(r)[0]),
                          ('Application Name', payload['Application Name']),
                          ('Application Version', payload['Application Version']),
                          ('User', payload['User']),
                          ('Error Type', payload['Error Type']),
                          ('Error Message', payload['Error Message']),
                          ('Date', payload['Date']),
-                         ('Time', payload['Time']),
-                         ('Error', ''))
+                         ('Time', payload['Time'])
                          ))
         reports.append(d)
     html = render_template('index.html', reports=reports)
     return html
 
-@app.route('/upload', methods=['POST'])
+
+@app.route('/reports/upload', methods=['POST'])
 def upload_file():
     if request.method == 'POST':
-        tb_info = json.loads(request.data)
+        error_info = json.loads(request.data)
         metadata = get_metadata()
         if metadata is not None:
             metadata['report_count'] += 1
@@ -73,17 +89,14 @@ def upload_file():
             json.dump(metadata, metadata_file)
 
         with open(os.path.join(UPLOAD_FOLDER, 'crash_report_%d.json' % metadata['report_count']), 'w') as cr:
-            json.dump(tb_info, cr,  sort_keys=True, indent=4)
+            json.dump(error_info, cr,  sort_keys=True, indent=4)
             return 'Upload successful'
     return ''
 
-@app.route('/uploads/<filename>')
-def uploaded_file(filename):
-    return send_from_directory(app.config['UPLOAD_FOLDER'],
-                               filename)
 
 def run_hq(debug):
     app.run(debug=debug)
+
 
 if __name__ == '__main__':
     run_hq(True)
