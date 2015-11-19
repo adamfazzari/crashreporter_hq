@@ -24,7 +24,11 @@
                     <td>{{ value }}</td>
                 {% endfor %}
                 <td><a href="{{ url_for('view_report', report_number=r['Report Number']) }}">Open</a></td>
-
+                <td>
+                    <form method='POST' action="{{ url_for('delete_report', report_number=r['Report Number']) }}" class="DeleteForm">
+                        <input type="submit" value="Delete" >
+                    </form>
+                </td>
             </tr>
         {% endfor %}
 {% endif %}

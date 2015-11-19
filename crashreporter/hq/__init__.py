@@ -8,7 +8,6 @@ import logging
 from collections import OrderedDict
 from flask import Flask, request, redirect, url_for, render_template
 
-
 cr_number_regex = re.compile('crash_report_(\d+)\.json')
 
 HQ_FOLDER = os.path.dirname(os.path.realpath(__file__))
@@ -24,18 +23,22 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
 
-@app.route('/reports/delete', methods=['POST'])
-def delete_report():
-    if request.method == 'POST':
-        report_number = json.loads(request.data)
-        path = os.path.join(UPLOAD_FOLDER, 'crash_report_%d.json' % report_number)
-        if os.path.isfile(path):
-            os.remove(path)
-            response = 'Success. Crash report #%d deleted' % report_number
-        else:
-            response = 'Failed. Crash report #%d does not exist.' % report_number
-        logging.info(response)
-        return response
+def _delete_report(number):
+    path = os.path.join(UPLOAD_FOLDER, 'crash_report_%d.json' % number)
+    if os.path.isfile(path):
+        os.remove(path)
+        return True
+    else:
+        return False
+
+@app.route('/reports/delete/<int:report_number>', methods=['POST'])
+def delete_report(report_number):
+    success = _delete_report(report_number)
+    if success:
+        response = 'Success. Crash report #%d deleted' % report_number
+    else:
+        response = 'Failed. Crash report #%d does not exist.' % report_number
+    return response
 
 
 def get_metadata():
