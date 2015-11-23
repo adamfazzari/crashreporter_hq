@@ -81,7 +81,7 @@ def get_local_references(tb, max_string_length=1000):
     return _locals
 
 
-def analyze_traceback(tb, inspection_level=1):
+def analyze_traceback(tb, inspection_level=None):
     """
     Extract trace back information into a list of dictionaries.
 
@@ -100,7 +100,7 @@ def analyze_traceback(tb, inspection_level=1):
              "Error Line": code,
              "Function Line": func_lineno,
              "Source Code": ''}
-        if len(extracted_tb) - ii <= inspection_level:
+        if inspection_level is None or len(extracted_tb) - ii <= inspection_level:
             # Perform advanced inspection on the last `inspection_level` tracebacks.
             d['Source Code'] = zip(xrange(func_lineno, func_lineno+len(func_source)), func_source)
             d['Local Variables'] = get_local_references(tb_level)
