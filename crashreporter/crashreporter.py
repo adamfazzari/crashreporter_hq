@@ -12,7 +12,6 @@ import requests
 import json
 import time
 import logging
-import ftplib
 import ConfigParser
 from threading import Thread
 from email.mime.multipart import MIMEMultipart
@@ -21,13 +20,14 @@ from email.mime.text import MIMEText
 from email import encoders
 
 import jinja2
+from .hq import STATIC_FOLDER
 
 from tools import analyze_traceback
 
 
 class CrashReporter(object):
     """
-    Create a context manager that emails or uploads a report by FTP with the traceback on a crash.
+    Create a context manager that emails or uploads a report to a webserver (HQ) with the traceback on a crash.
     It can be setup to do both, or just one of the upload methods.
 
     If a crash report fails to upload, the report is saved locally to the `report_dir` directory. The next time the
@@ -50,20 +50,19 @@ class CrashReporter(object):
     :param watcher: Enable a thread that periodically checks for any stored offline reports and attempts to send them.
     :param check_interval: How often the watcher will attempt to send offline reports.
     :param logger: Optional logger to use.
-    :param config: Path to configuration file that defines the arguments to setup_smtp and setup_ftp. The file has the
-                   format of a ConfigParser file with sections [SMTP] and [FTP]
+    :param config: Path to configuration file that defines the arguments to setup_smtp and setup_hq. The file has the
+                   format of a ConfigParser file with sections [SMTP] and [HQ]
     :param html: Create HTML reports (True) or plain text (False).
 
     """
     _report_name = "crashreport%02d"
-    html_template = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'hq', 'templates', 'crashreport.html')
+    html_template = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'hq', 'templates', 'email.html')
     active = False
     application_name = None
     application_version = None
     user_identifier = None
     offline_report_limit = 10
     max_string_length = 1000
-    inspection_level = 1
     obj_ref_regex = re.compile("[A-z]+[0-9]*\.(?:[A-z]+[0-9]*\.?)+(?!\')")
 
     def __init__(self, report_dir=None, html=True, config='', logger=None, activate=True,
@@ -81,13 +80,12 @@ class CrashReporter(object):
         self.tb = None
         self.payload = None
         self._excepthook = None
+        self.inspection_level = 1
+        self._smtp = None
+        self._hq = None
         # Load the configuration from a file if specified
-        self._hq = {}
         if os.path.isfile(config):
             self.load_configuration(config)
-        else:
-            self._smtp = None
-            self._ftp = None
         if activate:
             self.enable()
 
@@ -105,22 +103,6 @@ class CrashReporter(object):
         self._smtp.update({'host': host, 'port': port, 'user': user, 'passwd': passwd, 'recipients': recipients})
         self._smtp['from'] = kwargs.get('from', user)
 
-    def setup_ftp(self, host, user, passwd, path, port=21, acct='', timeout=5, **kwargs):
-        """
-        Set up the crash reporter to upload reports via FTP.
-
-        :param host: FTP host
-        :param user: FTP user
-        :param passwd: FTP password for user
-        :param path: path to directory on the FTP server to upload files to
-        :param port: FTP port
-        :param acct: FTP account
-        :param timeout: FTP timeout
-        """
-        self._ftp = kwargs
-        self._ftp.update({'host': host, 'port': port, 'user': user, 'passwd': passwd, 'path': path, 'timeout': timeout,
-                          'acct': acct})
-
     def setup_hq(self, server, **kwargs):
         self._hq = kwargs
         self._hq.update({'server': server})
@@ -137,9 +119,9 @@ class CrashReporter(object):
             self.logger.info('CrashReporter: Enabled')
             if self.report_dir:
                 if os.path.exists(self.report_dir):
-                    if self._get_offline_reports():
+                    if self.get_offline_reports():
                         # First attempt to send the reports, if that fails then start the watcher
-                        if any(self.submit_offline_reports(smtp=True, ftp=True)):
+                        if any(self.submit_offline_reports(smtp=True, hq=True)):
                             self.delete_offline_reports()
                         elif self.watcher_enabled:
                             self.start_watcher()
@@ -195,19 +177,14 @@ class CrashReporter(object):
                 self.tb = tb
                 self.payload = self.generate_payload()
                 # Save the offline report. If the upload of the report is successful, then delete the report.
-                report_path = self._save_report()
-                great_success = False
+                report_path = self.store_report()
+                success = False
                 if self._hq is not None:
-                    self._hq_submit()
+                    success |= self.hq_submit(self.payload)
                 if self._smtp is not None:
                     # Send the report via email
-                    with open(report_path, 'r') as _cr:
-                        body = _cr.read()
-                    great_success |= self._sendmail(self.subject(), body, self.attachments(), html=self.html)
-                if self._ftp is not None:
-                    # Send the report via FTP
-                    great_success |= self._ftp_submit(report_path)
-                if great_success:  # Very nice..
+                    success |= self.smtp_submit(self.subject(), self.body(), self.attachments(), html=self.html)
+                if success:
                     os.remove(report_path)
             else:
                 self.logger.info('CrashReporter: No crashes detected.')
@@ -240,13 +217,6 @@ class CrashReporter(object):
                 if 'recipients' in self._smtp:
                     self._smtp['recipients'] = self._smtp['recipients'].split(',')
 
-            if cfg.has_section('FTP'):
-                self.setup_ftp(**dict(cfg.items('FTP')))
-                if 'timeout' in self._ftp:
-                    self._ftp['timeout'] = int(self._ftp['timeout'])
-                if 'port' in self._ftp:
-                    self._ftp['port'] = int(self._ftp['port'])
-
             if cfg.has_section('HQ'):
                 self.setup_hq(**dict(cfg.items('HQ')))
 
@@ -260,13 +230,14 @@ class CrashReporter(object):
         else:
             return 'Crash Report'
 
+    def body(self):
+        return self.html_body() if self.html else self.raw_body()
+
     def html_body(self):
         """
         Return a string to be used as the email body. Can be html if html is turned on.
         """
-        with open(self.html_template, 'r') as _f:
-            template = jinja2.Template(_f.read())
-        html_body = template.render(info=self.payload)
+        html_body = self.render_report(inspection_level=self.inspection_level)
         return html_body
 
     def raw_body(self):
@@ -296,6 +267,11 @@ class CrashReporter(object):
             body += fmt.format(name=name, value=value)
         return body
 
+    def render_report(self, inspection_level=1):
+        with open(self.html_template, 'r') as _f:
+            template = jinja2.Template(_f.read())
+        return template.render(info=self.payload, inspection_level=inspection_level)
+
     def attachments(self):
         """
         Generate and return a list of attachments to send with the report.
@@ -307,83 +283,52 @@ class CrashReporter(object):
         """
         Delete all stored offline reports
         """
-        for report in self._get_offline_reports():
+        for report in self.get_offline_reports():
             try:
                 os.remove(report)
             except OSError as e:
                 logging.error(e)
 
-    def submit_offline_reports(self, smtp=True, ftp=True):
+    def submit_offline_reports(self, smtp=True, hq=True):
         """
-        Submit offline reports using the enabled methods (SMTP and/or FTP)
-        Returns a tuple of booleans specifying which methods passed (smtp_success, ftp_success)
+        Submit offline reports using the enabled methods (SMTP and/or HQ)
+        Returns a list of booleans signifying upload method success (smtp_success, hq_success)
         """
-        ftp_success = smtp_success = False
-
+        hq_success = smtp_success = False
         if smtp and self._smtp is not None:
             try:
                 smtp_success = self._smtp_send_offline_reports()
             except Exception as e:
                 logging.error(e)
-        if ftp and self._ftp is not None:
+        if hq and self._hq is not None:
             try:
-                ftp_success = self._ftp_send_offline_reports()
+                hq_success = self._hq_send_offline_reports()
             except Exception as e:
                 logging.error(e)
 
-        return smtp_success, ftp_success
+        return smtp_success, hq_success
 
-    def _hq_submit(self):
-        data = json.dumps(self.payload)
+    def hq_submit(self, payload):
+        data = json.dumps(payload)
         r = requests.post(self._hq['server'], data=data)
         return r
 
-    def _ftp_submit(self, path):
-        """
-        Upload the database to the FTP server. Only submit new information contained in the partial database.
-        Merge the partial database back into master after a successful upload.
-        """
-        info = self._ftp
-        try:
-            ftp = ftplib.FTP()
-            ftp.connect(host=info['host'], port=info['port'], timeout=info['timeout'])
-            ftp.login(user=info['user'], passwd=info['passwd'], acct=info['acct'])
-        except ftplib.all_errors as e:
-            self.logger.error(e)
-            self.stop_watcher()
-            return False
-        extension = os.path.splitext(path)[1]
-        ftp.cwd(info['path'])
-        with open(path, 'rb') as _f:
-            new_filename = self._report_name % (len(ftp.nlst()) + 1) + extension
-            ftp.storlines('STOR %s' % new_filename, _f)
-            self.logger.info('CrashReporter: FTP submission to %s successful.' % info['host'])
+    def _hq_send_offline_reports(self):
+        offline_reports = self.get_offline_reports()
+        payloads = []
+        if offline_reports:
+            for report in offline_reports:
+                with open(report, 'r') as _f:
+                    payloads.append(json.load(_f))
+
+            data = json.dumps(payloads)
+            r = requests.post(self._hq['server'], data=data)
+
             return True
-
-    def _ftp_send_offline_reports(self):
-        """
-        Upload the database to the FTP server. Only submit new information contained in the partial database.
-        Merge the partial database back into master after a successful upload.
-        """
-        info = self._ftp
-        try:
-            ftp = ftplib.FTP()
-            ftp.connect(host=info['host'], port=info['port'], timeout=info['timeout'])
-            ftp.login(user=info['user'], passwd=info['passwd'], acct=info['acct'])
-        except ftplib.all_errors as e:
-            self.logger.error(e)
+        else:
             return False
 
-        ftp.cwd(info['path'])
-        for report in self._get_offline_reports():
-            with open(report, 'rb') as _f:
-                ext = os.path.splitext(report)[1]
-                new_filename = self._report_name % (len(ftp.nlst()) + 1) + ext
-                ftp.storlines('STOR %s' % new_filename, _f)
-                self.logger.info('CrashReporter: Submission of %s to %s successful.' % (new_filename, info['host']))
-        return True
-
-    def _sendmail(self, subject, body, attachments=None, html=False):
+    def smtp_submit(self, subject, body, attachments=None, html=False):
         smtp = self._smtp
         msg = MIMEMultipart()
         if isinstance(smtp['recipients'], list) or isinstance(smtp['recipients'], tuple):
@@ -424,7 +369,7 @@ class CrashReporter(object):
         return True
 
     def _smtp_send_offline_reports(self):
-        offline_reports = self._get_offline_reports()
+        offline_reports = self.get_offline_reports()
         if offline_reports:
             spacer = '<br>' if self.html else '-------------------------------------------------\n'
             # Add the body of the message
@@ -435,17 +380,17 @@ class CrashReporter(object):
                     text = _f.readlines()
                     body += ''.join(text)
                     body += spacer
-            great_success = self._sendmail(self.subject(), body, html=self.html)
+            great_success = self.smtp_submit(self.subject(), body, html=self.html)
             if great_success:
                 self.logger.info('CrashReporter: Offline reports sent.')
             return great_success
 
-    def _save_report(self):
+    def store_report(self):
         """
         Save the crash report to a file. Keeping the last `offline_report_limit` files in a cyclical FIFO buffer.
         The newest crash report always named is 01
         """
-        offline_reports = self._get_offline_reports()
+        offline_reports = self.get_offline_reports()
         if offline_reports:
             # Increment the name of all existing reports 1 --> 2, 2 --> 3 etc.
             for ii, report in enumerate(reversed(offline_reports)):
@@ -458,14 +403,14 @@ class CrashReporter(object):
             if len(offline_reports) >= self.offline_report_limit:
                 oldest = glob.glob(os.path.join(self.report_dir, self._report_name % (self.offline_report_limit+1) + '*'))[0]
                 os.remove(oldest)
-        new_report_path = os.path.join(self.report_dir, self._report_name % 1 + ('.html' if self.html else '.txt'))
+        new_report_path = os.path.join(self.report_dir, self._report_name % 1 + '.json')
         # Write a new report
         with open(new_report_path, 'w') as _f:
-            _f.write(self.html_body() if self.html else self.raw_body())
+            json.dump(self.payload, _f)
 
         return new_report_path
 
-    def _get_offline_reports(self):
+    def get_offline_reports(self):
         return sorted(glob.glob(os.path.join(self.report_dir, "crashreport*")))
 
     def _watcher_thread(self):
@@ -478,7 +423,7 @@ class CrashReporter(object):
             if not self._watcher_running:
                 break
             self.logger.info('CrashReporter: Attempting to send offline reports.')
-            great_success |= any(self.submit_offline_reports(smtp=True, ftp=True))
+            great_success |= any(self.submit_offline_reports(smtp=True, hq=True))
         if great_success:
             self.delete_offline_reports()
         self._watcher = None

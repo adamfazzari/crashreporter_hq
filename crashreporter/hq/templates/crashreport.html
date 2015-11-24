@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head lang="en">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='crashreport.css') }}" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='crashreport.css') }}">
     <script src="{{ url_for('static', filename='jquery-2.1.4.min.js') }}"></script>
     <script src="{{ url_for('static', filename='crashreport.js') }}"></script>
     <meta charset="UTF-8">
@@ -33,7 +33,7 @@
 
 <div style="width: 80%;">
     <h4>Traceback (most recent call last):</h4>
-    {% for tb in info['Traceback']%}
+    {% for tb in info['Traceback'] %}
 
         <div class="container">
 
@@ -44,61 +44,62 @@
                 </DD>
             </DL>
 
-            <div class="content">
+            {% if loop.revindex <= inspection_level %}
+                <div class="content">
 
-                <h4>Source Code:</h4>
-                <div class="contentitem">
-                    <div class="codeblock">
-                        <ol start="{{tb['Function Line']}}">
-                            {% for n, line in tb['Source Code'] %}
-                                {% set stripped_line = line.replace('    ', '') %}
-                                {% set indent = 30 * (line.count('    ') - 1) %}
-                                {% if n == tb['Error Line Number'] %}
-                                    <li style="background-color:#BB0000; padding-left:{{indent}}px;">
-                                        {{stripped_line}}
-                                    </li>
-                                {% else %}
-                                    <li style="padding-left: {{indent}}px;">{{stripped_line}}</li>
-
-                                {% endif %}
-                            {% endfor %}
-                        </ol>
-                    </div>
-                </div>
-
-                <h4>Local Variables:</h4>
+                    <h4>Source Code:</h4>
                     <div class="contentitem">
-                        <table border="1" class="variabletable">
-                            <tr class="tableheader">
-                                <td>Variable</td>
-                                <td>Value</td>
-                            </tr>
-                            {% for field, value in tb['Local Variables'] %}
-                                <tr>
-                                    <td class="varcolumn">{{ field|e }}</td>
-                                    <td class="valcolumn">{{ value|e }}</td>
-                                </tr>
-                            {% endfor %}
-                        </table>
+                        <div class="codeblock">
+                            <ol start="{{tb['Function Line']}}">
+                                {% for n, line in tb['Source Code'] %}
+                                    {% set stripped_line = line.replace('    ', '') %}
+                                    {% set indent = 30 * (line.count('    ') - 1) %}
+                                    {% if n == tb['Error Line Number'] %}
+                                        <li style="background-color:#BB0000; padding-left:{{indent}}px;">
+                                            {{stripped_line}}
+                                        </li>
+                                    {% else %}
+                                        <li style="padding-left: {{indent}}px;">{{stripped_line}}</li>
+
+                                    {% endif %}
+                                {% endfor %}
+                            </ol>
+                        </div>
                     </div>
 
-                <h4>Object Inspection:</h4>
-                    <div class="contentitem">
-                        <table border="1" class="variabletable">
-                            <tr class="tableheader">
-                                <td>Variable</td>
-                                <td>Value</td>
-                            </tr>
-                            {% for field, value in tb['Object Variables'] %}
-                                <tr>
-                                    <td class="varcolumn">{{ field|e }}</td>
-                                    <td class="valcolumn">{{ value|e }}</td>
+                    <h4>Local Variables:</h4>
+                        <div class="contentitem">
+                            <table border="1" class="variabletable">
+                                <tr class="tableheader">
+                                    <td>Variable</td>
+                                    <td>Value</td>
                                 </tr>
-                            {% endfor %}
-                        </table>
-                    </div>
-            </div> {# End of content #}
+                                {% for field, value in tb['Local Variables'] %}
+                                    <tr>
+                                        <td class="varcolumn">{{ field|e }}</td>
+                                        <td class="valcolumn">{{ value|e }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </table>
+                        </div>
 
+                    <h4>Object Inspection:</h4>
+                        <div class="contentitem">
+                            <table border="1" class="variabletable">
+                                <tr class="tableheader">
+                                    <td>Variable</td>
+                                    <td>Value</td>
+                                </tr>
+                                {% for field, value in tb['Object Variables'] %}
+                                    <tr>
+                                        <td class="varcolumn">{{ field|e }}</td>
+                                        <td class="valcolumn">{{ value|e }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </table>
+                        </div>
+                </div> {# End of content #}
+            {% endif %}
         </div>
     {% endfor %}
 

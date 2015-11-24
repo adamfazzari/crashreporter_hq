@@ -1,5 +1,5 @@
 __author__ = 'calvin'
 
-from crashreporter.hq import run_hq
+from crashreporter.hq.app import run_hq
 
 run_hq(True)
