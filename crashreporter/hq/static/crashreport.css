@@ -1,5 +1,6 @@
 .container {
-    width:100%;
+    margin: 10px;
+    padding: 0px 10px;
     background-color:#FFF099;
     border:1px solid #000000;
 }
@@ -14,47 +15,43 @@
 }
 .container .content {
     display: none;
+    width: 100%;
     padding : 0px;
 }
 
-/*.container {*/
-    /*!*width:100%;*!*/
-    /*!*border:1px solid #FFF099;*!*/
-/*}*/
-/*.container div {*/
-    /*!*width:100%;*!*/
-/*}*/
-/*.container .header {*/
-    /*!*background-color:#FFF099;*!*/
-    /*!*padding: 10px;*!*/
-    /*cursor: pointer;*/
-    /*background-color:#FFF099;*/
-    /*border-style:solid;*/
-    /*border-width: 1px;*/
-    /*padding: 5px;*/
-    /*!*border-style: solid;*!*/
-    /*!*border-width: 1px;*!*/
-    /*!*font-weight: bold;*!*/
-/*}*/
-/*.container .content {*/
-    /*background-color:#FFF099;*/
-    /*border-style: solid;*/
-    /*border-width: 1px;*/
-    /*!*padding: 10px;*!*/
-    /*display: none;*/
-/*}*/
+.contentitem {
+    max-width: 95%;
+    margin: 20px;
+    padding: 10px;
+    /*border:1px solid #000000;*/
+    display: block;
+}
 
-/*.traceback {*/
-    /*background-color:#FFF099;*/
-    /*border-style:solid;*/
-    /*border-width: 1px;*/
-    /*padding: 5px;"*/
-/*}*/
+.codeblock {
+    background-color:#FFFFFF;
+    border-style:solid;
+    border-width: 1px;
+    font-weight: bold;
+}
+
+.variabletable {
+    background-color:#FFFFFF;
+}
+
+table {
+    background-color:#FFFFFF;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.varcolumn {
+    padding: 5px;
+    width: 30%;
+}
 
 
-/*.codeblock {*/
-    /*background-color:#FFF099;*/
-    /*border-style:solid;*/
-    /*border-width: 0px;*/
-    /*padding: 0px;"*/
-/*}*/
+.valcolumn {
+    padding: 5px;
+    width: 70%;
+}
+
