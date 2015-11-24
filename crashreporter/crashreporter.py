@@ -55,7 +55,7 @@ class CrashReporter(object):
     :param html: Create HTML reports (True) or plain text (False).
 
     """
-    _report_name = "crashreport%02d"
+    _report_name = "crash_report_%02d"
     html_template = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'hq', 'templates', 'email.html')
     active = False
     application_name = None
@@ -310,7 +310,7 @@ class CrashReporter(object):
 
     def hq_submit(self, payload):
         data = json.dumps(payload)
-        r = requests.post(self._hq['server'], data=data)
+        r = requests.post(self._hq['server'] + '/reports/upload', data=data)
         return r
 
     def _hq_send_offline_reports(self):
@@ -322,7 +322,7 @@ class CrashReporter(object):
                     payloads.append(json.load(_f))
 
             data = json.dumps(payloads)
-            r = requests.post(self._hq['server'], data=data)
+            r = requests.post(self._hq['server'] + '/reports/upload_many', data=data)
 
             return True
         else:
@@ -411,7 +411,7 @@ class CrashReporter(object):
         return new_report_path
 
     def get_offline_reports(self):
-        return sorted(glob.glob(os.path.join(self.report_dir, "crashreport*")))
+        return sorted(glob.glob(os.path.join(self.report_dir, self._report_name.replace("%02d", "*"))))
 
     def _watcher_thread(self):
         """
