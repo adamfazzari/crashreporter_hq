@@ -69,6 +69,10 @@
                 <h4>Local Variables:</h4>
                     <div class="contentitem">
                         <table border="1" class="variabletable">
+                            <tr class="tableheader">
+                                <td>Variable</td>
+                                <td>Value</td>
+                            </tr>
                             {% for field, value in tb['Local Variables'] %}
                                 <tr>
                                     <td class="varcolumn">{{ field|e }}</td>
@@ -81,6 +85,10 @@
                 <h4>Object Inspection:</h4>
                     <div class="contentitem">
                         <table border="1" class="variabletable">
+                            <tr class="tableheader">
+                                <td>Variable</td>
+                                <td>Value</td>
+                            </tr>
                             {% for field, value in tb['Object Variables'] %}
                                 <tr>
                                     <td class="varcolumn">{{ field|e }}</td>
