@@ -47,11 +47,17 @@ table {
 .varcolumn {
     padding: 5px;
     width: 30%;
+    font-weight: bold;
 }
 
 
 .valcolumn {
     padding: 5px;
     width: 70%;
+    font-weight: bold;
 }
 
+.tableheader {
+    background-color:#AAAAAA;
+    font-weight: bold;
+}
