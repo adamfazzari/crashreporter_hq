@@ -177,13 +177,13 @@ class CrashReporter(object):
                 self.tb = tb
                 self.payload = self.generate_payload()
                 # Save the offline report. If the upload of the report is successful, then delete the report.
-                report_path = self.store_report()
+                report_path = self.store_report(self.payload)
                 success = False
                 if self._hq is not None:
                     success |= self.hq_submit(self.payload)
                 if self._smtp is not None:
                     # Send the report via email
-                    success |= self.smtp_submit(self.subject(), self.body(), self.attachments(), html=self.html)
+                    success |= self.smtp_submit(self.subject(), self.body(self.payload), self.attachments(), html=self.html)
                 if success:
                     os.remove(report_path)
             else:
@@ -230,47 +230,47 @@ class CrashReporter(object):
         else:
             return 'Crash Report'
 
-    def body(self):
-        return self.html_body() if self.html else self.raw_body()
+    def body(self, payload):
+        return self.html_body(payload) if self.html else self.raw_body(payload)
 
-    def html_body(self):
+    def html_body(self, payload):
         """
         Return a string to be used as the email body. Can be html if html is turned on.
         """
-        html_body = self.render_report(inspection_level=self.inspection_level)
+        html_body = self.render_report(payload, inspection_level=self.inspection_level)
         return html_body
 
-    def raw_body(self):
+    def raw_body(self, payload):
 
-        body = self.payload['Date'] + self.payload['Time'] + '\n'
+        body = payload['Date'] + payload['Time'] + '\n'
         body += '\n'.join(traceback.format_exception(self.etype, self.evalue, self.tb))
         body += '\n'
         # Print the source code in the local scope of the error
         body += 'Source Code:\n\n'
-        scope_lines = self.payload['Traceback'][-1]['Source Code']
+        scope_lines = payload['Traceback'][-1]['Source Code']
         for ln, line in scope_lines:
             body += "{ln}.{line}".format(ln=ln, line=line)
-        body += '\nLocal Variables in the scope of {}\n'.format(self.payload['Traceback'][-1]['Module'])
+        body += '\nLocal Variables in the scope of {}\n'.format(payload['Traceback'][-1]['Module'])
         # Print a table of local variables
         fmt = "{name:<25s}{value:<25s}\n"
         body += '-' * 90 + '\n'
         body += fmt.format(name='Variable', value='Value')
         body += '-' * 90 + '\n'
-        for name, value in self.payload['Traceback'][-1]['Local Variables']:
+        for name, value in payload['Traceback'][-1]['Local Variables']:
             body += fmt.format(name=name, value=value)
-        body += '\nObject Inspection in the scope of {}\n'.format(self.payload['Traceback'][-1]['Module'])
+        body += '\nObject Inspection in the scope of {}\n'.format(payload['Traceback'][-1]['Module'])
         # Print a table of object attribute references
         body += '-' * 90 + '\n'
         body += fmt.format(name='Variable', value='Value')
         body += '-' * 90 + '\n'
-        for name, value in self.payload['Traceback'][-1]['Object Variables']:
+        for name, value in payload['Traceback'][-1]['Object Variables']:
             body += fmt.format(name=name, value=value)
         return body
 
-    def render_report(self, inspection_level=1):
+    def render_report(self, payload, inspection_level=1):
         with open(self.html_template, 'r') as _f:
             template = jinja2.Template(_f.read())
-        return template.render(info=self.payload, inspection_level=inspection_level)
+        return template.render(info=payload, inspection_level=inspection_level)
 
     def attachments(self):
         """
@@ -311,7 +311,7 @@ class CrashReporter(object):
     def hq_submit(self, payload):
         data = json.dumps(payload)
         r = requests.post(self._hq['server'] + '/reports/upload', data=data)
-        return r
+        return r.status_code == 200
 
     def _hq_send_offline_reports(self):
         offline_reports = self.get_offline_reports()
@@ -324,7 +324,7 @@ class CrashReporter(object):
             data = json.dumps(payloads)
             r = requests.post(self._hq['server'] + '/reports/upload_many', data=data)
 
-            return True
+            return r.status_code == 200
         else:
             return False
 
@@ -376,16 +376,14 @@ class CrashReporter(object):
             body = 'Here is a list of crash reports that were stored offline.\n'
             body += spacer
             for report in offline_reports:
-                with open(report, 'r') as _f:
-                    text = _f.readlines()
-                    body += ''.join(text)
-                    body += spacer
-            great_success = self.smtp_submit(self.subject(), body, html=self.html)
-            if great_success:
-                self.logger.info('CrashReporter: Offline reports sent.')
+                with open(report, 'r') as js:
+                    payload = json.load(js)
+                great_success = self.smtp_submit(self.subject(), self.body(payload), html=self.html)
+                if great_success:
+                    self.logger.info('CrashReporter: Offline reports sent.')
             return great_success
 
-    def store_report(self):
+    def store_report(self, payload):
         """
         Save the crash report to a file. Keeping the last `offline_report_limit` files in a cyclical FIFO buffer.
         The newest crash report always named is 01
@@ -406,7 +404,7 @@ class CrashReporter(object):
         new_report_path = os.path.join(self.report_dir, self._report_name % 1 + '.json')
         # Write a new report
         with open(new_report_path, 'w') as _f:
-            json.dump(self.payload, _f)
+            json.dump(payload, _f)
 
         return new_report_path
 
