@@ -33,7 +33,6 @@
 
 <div style="width: 80%;">
     <h4>Traceback (most recent call last):</h4>
-    <b>
     {% for tb in info['Traceback']%}
 
         <div class="container">
@@ -46,52 +45,54 @@
             </DL>
 
             <div class="content">
-                    <h4>Source Code:</h4>
 
-                    <ol start="{{tb['func_line']}}">
-                        {% for n, line in tb['Source Code'] %}
-                            {% set stripped_line = line.replace('    ', '') %}
-                            {% set indent = 30 * (line.count('    ') - 1) %}
-                            {% if n == tb['Error Line Number'] %}
-                                <li style="background-color:#BB0000; padding-left:{{indent}}px;">
-                                    {{stripped_line}}
-                                </li>
-                            {% else %}
-                                <li style="padding-left: {{indent}}px;">{{stripped_line}}</li>
+                <h4>Source Code:</h4>
+                <div class="contentitem">
+                    <div class="codeblock">
+                        <ol start="{{tb['func_line']}}">
+                            {% for n, line in tb['Source Code'] %}
+                                {% set stripped_line = line.replace('    ', '') %}
+                                {% set indent = 30 * (line.count('    ') - 1) %}
+                                {% if n == tb['Error Line Number'] %}
+                                    <li style="background-color:#BB0000; padding-left:{{indent}}px;">
+                                        {{stripped_line}}
+                                    </li>
+                                {% else %}
+                                    <li style="padding-left: {{indent}}px;">{{stripped_line}}</li>
 
-                            {% endif %}
-                        {% endfor %}
-                    </ol>
+                                {% endif %}
+                            {% endfor %}
+                        </ol>
+                    </div>
+                </div>
 
-            </div>
+                <h4>Local Variables:</h4>
+                    <div class="contentitem">
+                        <table border="1" class="variabletable">
+                            {% for field, value in tb['Local Variables'] %}
+                                <tr>
+                                    <td class="varcolumn">{{ field|e }}</td>
+                                    <td class="valcolumn">{{ value|e }}</td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+
+                <h4>Object Inspection:</h4>
+                    <div class="contentitem">
+                        <table border="1" class="variabletable">
+                            {% for field, value in tb['Object Variables'] %}
+                                <tr>
+                                    <td class="varcolumn">{{ field|e }}</td>
+                                    <td class="valcolumn">{{ value|e }}</td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+            </div> {# End of content #}
 
         </div>
     {% endfor %}
-
-    </b>
-
-    <hr>
-
-    <h4>Local Variables in the scope of {{info['Traceback'][-1]['Module']|e}}</h4>
-    <table border="1" style="width:800px">
-        {% for field, value in info['Traceback'][-1]['Local Variables'] %}
-            <tr>
-                <td style="width:30%">{{ field|e }}</td>
-                <td>{{ value|e }}</td>
-            </tr>
-        {% endfor %}
-    </table>
-
-    <h4>Object Inspection in the scope of {{info['Traceback'][-1]['Module']|e}}</h4>
-    <table border="1" style="width:800px">
-        {% for field, value in info['Traceback'][-1]['Object Variables'] %}
-            <tr>
-                <td style="width:30%">{{ field|e }}</td>
-                <td>{{ value|e }}</td>
-            </tr>
-        {% endfor %}
-    </table>
-
 
 </div>
 
