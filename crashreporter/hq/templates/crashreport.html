@@ -49,7 +49,7 @@
                 <h4>Source Code:</h4>
                 <div class="contentitem">
                     <div class="codeblock">
-                        <ol start="{{tb['func_line']}}">
+                        <ol start="{{tb['Function Line']}}">
                             {% for n, line in tb['Source Code'] %}
                                 {% set stripped_line = line.replace('    ', '') %}
                                 {% set indent = 30 * (line.count('    ') - 1) %}
