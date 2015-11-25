@@ -1,7 +1,6 @@
 __author__ = 'calvin'
 
 import sys
-import traceback
 import os
 import re
 import glob
@@ -20,7 +19,6 @@ from email.mime.text import MIMEText
 from email import encoders
 
 import jinja2
-from .hq import STATIC_FOLDER
 
 from tools import analyze_traceback
 
