@@ -117,9 +117,9 @@ class CrashReporter(object):
                 if os.path.exists(self.report_dir):
                     if self.get_offline_reports():
                         # First attempt to send the reports, if that fails then start the watcher
-                        if any(self.submit_offline_reports(smtp=True, hq=True)):
-                            self.delete_offline_reports()
-                        elif self.watcher_enabled:
+                        self.submit_offline_reports()
+                        remaining_reports = self.delete_offline_reports()
+                        if remaining_reports and self.watcher_enabled:
                             self.start_watcher()
                 else:
                     os.makedirs(self.report_dir)
@@ -173,15 +173,21 @@ class CrashReporter(object):
                 self.tb = tb
                 self.payload = self.generate_payload()
                 # Save the offline report. If the upload of the report is successful, then delete the report.
-                report_path = self.store_report(self.payload)
-                success = False
+                hq_success = smtp_success = False
                 if self._hq is not None:
-                    success |= self.hq_submit(self.payload)
+                    hq_success = self.hq_submit(self.payload)
+                    if hq_success:
+                        self.payload['HQ Submission'] = 'Sent'
                 if self._smtp is not None:
                     # Send the report via email
-                    success |= self.smtp_submit(self.subject(), self.body(self.payload), self.attachments())
-                if success:
-                    os.remove(report_path)
+                    smtp_success = self.smtp_submit(self.subject(), self.body(self.payload), self.attachments())
+                    if smtp_success:
+                        self.payload['SMTP Submission'] = 'Sent'
+
+                if (self._smtp and not smtp_success) or (self._hq and not hq_success):
+                    # Only store the offline report if any of the upload methods fail.
+                    report_path = self.store_report(self.payload)
+                    self.logger.info('Offline Report stored %s' % report_path)
             else:
                 self.logger.info('CrashReporter: No crashes detected.')
 
@@ -198,6 +204,8 @@ class CrashReporter(object):
                    'Date': dt.strftime('%d %B %Y'),
                    'Time': dt.strftime('%I:%M %p'),
                    'Traceback': analyze_traceback(self.tb),
+                   'HQ Submission': 'Not sent' if self._hq else 'Disabled',
+                   'SMTP Submission': 'Not sent' if self._smtp else 'Disabled'
                    }
         return payload
 
@@ -244,12 +252,22 @@ class CrashReporter(object):
     def delete_offline_reports(self):
         """
         Delete all stored offline reports
+        :return: List of reports that still require submission
         """
-        for report in self.get_offline_reports():
-            try:
-                os.remove(report)
-            except OSError as e:
-                logging.error(e)
+        reports = self.get_offline_reports()
+        remaining_reports = reports[:]
+        for report in reports:
+            with open(report, 'r') as _f:
+                js = json.load(_f)
+                if js['SMTP Submission'] in ('Sent', 'Disabled') and js['HQ Submission'] in ('Sent', 'Disabled'):
+                    # Only delete the reports which have been sent or who's upload method is disabled.
+                    remaining_reports.remove(report)
+                    try:
+                        os.remove(report)
+                    except OSError as e:
+                        logging.error(e)
+
+        return remaining_reports
 
     def submit_offline_reports(self, smtp=True, hq=True):
         """
@@ -297,7 +315,11 @@ class CrashReporter(object):
 
     def hq_submit(self, payload):
         data = json.dumps(payload)
-        r = requests.post(self._hq['server'] + '/reports/upload', data=data)
+        try:
+            r = requests.post(self._hq['server'] + '/reports/upload', data=data)
+        except Exception as e:
+            logging.error(e)
+            return False
         return r.status_code == 200
 
     def smtp_submit(self, subject, body, attachments=None):
@@ -344,41 +366,56 @@ class CrashReporter(object):
         """
         Periodically attempt to upload the crash reports. If any upload method is successful, delete the saved reports.
         """
-        great_success = False
-        while not great_success:
+        while 1:
             time.sleep(self.check_interval)
             if not self._watcher_running:
                 break
             self.logger.info('CrashReporter: Attempting to send offline reports.')
-            great_success |= any(self.submit_offline_reports(smtp=True, hq=True))
-        if great_success:
-            self.delete_offline_reports()
+            self.submit_offline_reports()
+            remaining_reports = self.delete_offline_reports()
+            if len(remaining_reports) == 0:
+                break
         self._watcher = None
         self.logger.info('CrashReporter: Watcher stopped.')
 
     def _smtp_send_offline_reports(self):
         offline_reports = self.get_offline_reports()
+        success = []
         if offline_reports:
             # Add the body of the message
             for report in offline_reports:
                 with open(report, 'r') as js:
                     payload = json.load(js)
-                great_success = self.smtp_submit(self.subject(), self.body(payload))
-                if great_success:
+                success.append(self.smtp_submit(self.subject(), self.body(payload)))
+                if success[-1]:
+                    # Set the flag in the payload signifying that the SMTP submission was successful
+                    payload['SMTP Submission'] = 'Sent'
+                    with open(report, 'w') as js:
+                        json.dump(payload, js)
                     self.logger.info('CrashReporter: Offline reports sent.')
-            return great_success
+            return success
 
     def _hq_send_offline_reports(self):
         offline_reports = self.get_offline_reports()
-        payloads = []
+        payloads = {}
         if offline_reports:
             for report in offline_reports:
                 with open(report, 'r') as _f:
-                    payloads.append(json.load(_f))
+                    payloads[report] = json.load(_f)
 
-            data = json.dumps(payloads)
-            r = requests.post(self._hq['server'] + '/reports/upload_many', data=data)
+            data = json.dumps(payloads.values())
+            try:
+                r = requests.post(self._hq['server'] + '/reports/upload_many', data=data)
+            except Exception as e:
+                logging.error(e)
+                return [False] * len(payloads)
 
-            return r.status_code == 200
+            # Set the flag in the payload signifying that the HQ submission was successful
+            for report, payload in payloads.iteritems():
+                payload['HQ Submission'] = 'Sent'
+                with open(report, 'w') as js:
+                    json.dump(payload, js)
+
+            return [r.status_code == 200] * len(payloads)
         else:
-            return False
+            return [False] * len(payloads)
