@@ -52,7 +52,6 @@ class CrashReporter(object):
     :param logger: Optional logger to use.
     :param config: Path to configuration file that defines the arguments to setup_smtp and setup_hq. The file has the
                    format of a ConfigParser file with sections [SMTP] and [HQ]
-    :param html: Create HTML reports (True) or plain text (False).
 
     """
     _report_name = "crash_report_%02d"
@@ -65,9 +64,8 @@ class CrashReporter(object):
     max_string_length = 1000
     obj_ref_regex = re.compile("[A-z]+[0-9]*\.(?:[A-z]+[0-9]*\.?)+(?!\')")
 
-    def __init__(self, report_dir=None, html=True, config='', logger=None, activate=True,
+    def __init__(self, report_dir=None, config='', logger=None, activate=True,
                  watcher=True, check_interval=5*60):
-        self.html = True
         self.logger = logger if logger else logging.getLogger(__name__)
         # Setup the directory used to store offline crash reports
         self.report_dir = report_dir
@@ -183,7 +181,7 @@ class CrashReporter(object):
                     success |= self.hq_submit(self.payload)
                 if self._smtp is not None:
                     # Send the report via email
-                    success |= self.smtp_submit(self.subject(), self.body(self.payload), self.attachments(), html=self.html)
+                    success |= self.smtp_submit(self.subject(), self.body(self.payload), self.attachments())
                 if success:
                     os.remove(report_path)
             else:
@@ -231,41 +229,7 @@ class CrashReporter(object):
             return 'Crash Report'
 
     def body(self, payload):
-        return self.html_body(payload) if self.html else self.raw_body(payload)
-
-    def html_body(self, payload):
-        """
-        Return a string to be used as the email body. Can be html if html is turned on.
-        """
-        html_body = self.render_report(payload, inspection_level=self.inspection_level)
-        return html_body
-
-    def raw_body(self, payload):
-
-        body = payload['Date'] + payload['Time'] + '\n'
-        body += '\n'.join(traceback.format_exception(self.etype, self.evalue, self.tb))
-        body += '\n'
-        # Print the source code in the local scope of the error
-        body += 'Source Code:\n\n'
-        scope_lines = payload['Traceback'][-1]['Source Code']
-        for ln, line in scope_lines:
-            body += "{ln}.{line}".format(ln=ln, line=line)
-        body += '\nLocal Variables in the scope of {}\n'.format(payload['Traceback'][-1]['Module'])
-        # Print a table of local variables
-        fmt = "{name:<25s}{value:<25s}\n"
-        body += '-' * 90 + '\n'
-        body += fmt.format(name='Variable', value='Value')
-        body += '-' * 90 + '\n'
-        for name, value in payload['Traceback'][-1]['Local Variables']:
-            body += fmt.format(name=name, value=value)
-        body += '\nObject Inspection in the scope of {}\n'.format(payload['Traceback'][-1]['Module'])
-        # Print a table of object attribute references
-        body += '-' * 90 + '\n'
-        body += fmt.format(name='Variable', value='Value')
-        body += '-' * 90 + '\n'
-        for name, value in payload['Traceback'][-1]['Object Variables']:
-            body += fmt.format(name=name, value=value)
-        return body
+        return self.render_report(payload, inspection_level=self.inspection_level)
 
     def render_report(self, payload, inspection_level=1):
         with open(self.html_template, 'r') as _f:
@@ -308,81 +272,6 @@ class CrashReporter(object):
 
         return smtp_success, hq_success
 
-    def hq_submit(self, payload):
-        data = json.dumps(payload)
-        r = requests.post(self._hq['server'] + '/reports/upload', data=data)
-        return r.status_code == 200
-
-    def _hq_send_offline_reports(self):
-        offline_reports = self.get_offline_reports()
-        payloads = []
-        if offline_reports:
-            for report in offline_reports:
-                with open(report, 'r') as _f:
-                    payloads.append(json.load(_f))
-
-            data = json.dumps(payloads)
-            r = requests.post(self._hq['server'] + '/reports/upload_many', data=data)
-
-            return r.status_code == 200
-        else:
-            return False
-
-    def smtp_submit(self, subject, body, attachments=None, html=False):
-        smtp = self._smtp
-        msg = MIMEMultipart()
-        if isinstance(smtp['recipients'], list) or isinstance(smtp['recipients'], tuple):
-            msg['To'] = ', '.join(smtp['recipients'])
-        else:
-            msg['To'] = smtp['recipients']
-        msg['From'] = smtp['from']
-        msg['Subject'] = subject
-
-        # Add the body of the message
-        if html:
-            msg.attach(MIMEText(body, 'html'))
-        else:
-            msg.attach(MIMEText(body))
-
-        # Add any attachments
-        if attachments:
-            for attachment in attachments:
-                part = MIMEBase('application', 'octet-stream')
-                part.set_payload(open(attachments, 'rb').read())
-                encoders.encode_base64(part)
-                part.add_header('Content-Disposition',
-                                'attachment; filename="%s"' % os.path.basename(attachment))
-                msg.attach(part)
-
-        try:
-            ms = smtplib.SMTP(smtp['host'], smtp['port'])
-            ms.ehlo()
-            ms.starttls()
-            ms.ehlo()
-            ms.login(smtp['user'], smtp['passwd'])
-            ms.sendmail(smtp['from'], smtp['recipients'], msg.as_string())
-            ms.close()
-        except Exception as e:
-            self.logger.error('CrashReporter: %s' % e)
-            return False
-
-        return True
-
-    def _smtp_send_offline_reports(self):
-        offline_reports = self.get_offline_reports()
-        if offline_reports:
-            spacer = '<br>' if self.html else '-------------------------------------------------\n'
-            # Add the body of the message
-            body = 'Here is a list of crash reports that were stored offline.\n'
-            body += spacer
-            for report in offline_reports:
-                with open(report, 'r') as js:
-                    payload = json.load(js)
-                great_success = self.smtp_submit(self.subject(), self.body(payload), html=self.html)
-                if great_success:
-                    self.logger.info('CrashReporter: Offline reports sent.')
-            return great_success
-
     def store_report(self, payload):
         """
         Save the crash report to a file. Keeping the last `offline_report_limit` files in a cyclical FIFO buffer.
@@ -408,6 +297,48 @@ class CrashReporter(object):
 
         return new_report_path
 
+    def hq_submit(self, payload):
+        data = json.dumps(payload)
+        r = requests.post(self._hq['server'] + '/reports/upload', data=data)
+        return r.status_code == 200
+
+    def smtp_submit(self, subject, body, attachments=None):
+        smtp = self._smtp
+        msg = MIMEMultipart()
+        if isinstance(smtp['recipients'], list) or isinstance(smtp['recipients'], tuple):
+            msg['To'] = ', '.join(smtp['recipients'])
+        else:
+            msg['To'] = smtp['recipients']
+        msg['From'] = smtp['from']
+        msg['Subject'] = subject
+
+        # Add the body of the message
+        msg.attach(MIMEText(body, 'html'))
+
+        # Add any attachments
+        if attachments:
+            for attachment in attachments:
+                part = MIMEBase('application', 'octet-stream')
+                part.set_payload(open(attachments, 'rb').read())
+                encoders.encode_base64(part)
+                part.add_header('Content-Disposition',
+                                'attachment; filename="%s"' % os.path.basename(attachment))
+                msg.attach(part)
+
+        try:
+            ms = smtplib.SMTP(smtp['host'], smtp['port'])
+            ms.ehlo()
+            ms.starttls()
+            ms.ehlo()
+            ms.login(smtp['user'], smtp['passwd'])
+            ms.sendmail(smtp['from'], smtp['recipients'], msg.as_string())
+            ms.close()
+        except Exception as e:
+            self.logger.error('CrashReporter: %s' % e)
+            return False
+
+        return True
+
     def get_offline_reports(self):
         return sorted(glob.glob(os.path.join(self.report_dir, self._report_name.replace("%02d", "*"))))
 
@@ -426,3 +357,30 @@ class CrashReporter(object):
             self.delete_offline_reports()
         self._watcher = None
         self.logger.info('CrashReporter: Watcher stopped.')
+
+    def _smtp_send_offline_reports(self):
+        offline_reports = self.get_offline_reports()
+        if offline_reports:
+            # Add the body of the message
+            for report in offline_reports:
+                with open(report, 'r') as js:
+                    payload = json.load(js)
+                great_success = self.smtp_submit(self.subject(), self.body(payload))
+                if great_success:
+                    self.logger.info('CrashReporter: Offline reports sent.')
+            return great_success
+
+    def _hq_send_offline_reports(self):
+        offline_reports = self.get_offline_reports()
+        payloads = []
+        if offline_reports:
+            for report in offline_reports:
+                with open(report, 'r') as _f:
+                    payloads.append(json.load(_f))
+
+            data = json.dumps(payloads)
+            r = requests.post(self._hq['server'] + '/reports/upload_many', data=data)
+
+            return r.status_code == 200
+        else:
+            return False
