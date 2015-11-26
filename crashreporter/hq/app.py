@@ -81,6 +81,7 @@ def home():
                          ('Time', payload['Time'])
                          ))
         reports.append(d)
+        reports.sort(key=lambda x: int(x['Report Number']))
     html = render_template('index.html', reports=reports)
     return html
 
