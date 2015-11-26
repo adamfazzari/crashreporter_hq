@@ -2,6 +2,7 @@
 <html>
 <head lang="en">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='crashreport.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='pythonsyntaxhighlighting.css') }}">
     <script src="{{ url_for('static', filename='jquery-2.1.4.min.js') }}"></script>
     <script src="{{ url_for('static', filename='crashreport.js') }}"></script>
     <meta charset="UTF-8">
@@ -44,26 +45,14 @@
                 </DD>
             </DL>
 
+
             {% if loop.revindex <= inspection_level %}
                 <div class="content">
 
                     <h4>Source Code:</h4>
                     <div class="contentitem">
                         <div class="codeblock">
-                            <ol start="{{tb['Function Line']}}">
-                                {% for n, line in tb['Source Code'] %}
-                                    {% set stripped_line = line.replace('    ', '') %}
-                                    {% set indent = 30 * (line.count('    ') - 1) %}
-                                    {% if n == tb['Error Line Number'] %}
-                                        <li style="background-color:#BB0000; padding-left:{{indent}}px;">
-                                            {{stripped_line}}
-                                        </li>
-                                    {% else %}
-                                        <li style="padding-left: {{indent}}px;">{{stripped_line}}</li>
-
-                                    {% endif %}
-                                {% endfor %}
-                            </ol>
+                            {{ tb['Source Code'] | safe }}
                         </div>
                     </div>
 

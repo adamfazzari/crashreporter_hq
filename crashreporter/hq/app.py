@@ -4,9 +4,13 @@ import os
 import re
 import glob
 import json
-import logging
 from collections import OrderedDict
-from flask import Flask, request, redirect, url_for, render_template
+
+from pygments import highlight
+from pygments.lexers import PythonLexer
+from pygments.formatters import HtmlFormatter
+
+from flask import Flask, request, render_template
 from . import UPLOAD_FOLDER, STATIC_FOLDER, TEMPLATE_FOLDER
 
 cr_number_regex = re.compile('crash_report_(\d+)\.json')
@@ -60,6 +64,11 @@ def get_metadata():
 def view_report(report_number):
     with open(os.path.join(UPLOAD_FOLDER, 'crash_report_%d.json' % report_number)) as r:
         payload = json.load(r)
+        pylexer = PythonLexer(stripall=True)
+        htmlformatter = HtmlFormatter(linenos=True, style='friendly', cssclass='highlight')
+        for tb in payload['Traceback']:
+            src = highlight(''.join(t[1] for t in tb['Source Code']), pylexer, htmlformatter)
+            tb['Source Code'] = src
         html = render_template('crashreport.html', info=payload, inspection_level=10000)
         return html
 
