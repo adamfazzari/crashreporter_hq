@@ -258,7 +258,12 @@ class CrashReporter(object):
         remaining_reports = reports[:]
         for report in reports:
             with open(report, 'r') as _f:
-                js = json.load(_f)
+                try:
+                    js = json.load(_f)
+                except ValueError as e:
+                    logging.error("%s. Deleting crash report.")
+                    os.remove(report)
+                    continue
                 if js['SMTP Submission'] in ('Sent', 'Disabled') and js['HQ Submission'] in ('Sent', 'Disabled'):
                     # Only delete the reports which have been sent or who's upload method is disabled.
                     remaining_reports.remove(report)
