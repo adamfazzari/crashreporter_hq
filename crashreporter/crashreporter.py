@@ -304,7 +304,7 @@ class CrashReporter(object):
             # Increment the name of all existing reports 1 --> 2, 2 --> 3 etc.
             for ii, report in enumerate(reversed(offline_reports)):
                 rpath, ext = os.path.splitext(report)
-                n = int(rpath[-2:])
+                n = int(re.findall('(\d+)', rpath)[0])
                 new_name = os.path.join(self.report_dir, self._report_name % (n + 1)) + ext
                 shutil.copy2(report, new_name)
             os.remove(report)
