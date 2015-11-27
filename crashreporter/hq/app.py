@@ -66,7 +66,11 @@ def view_report(report_number):
         payload = json.load(r)
         pylexer = PythonLexer(stripall=True)
         for tb in payload['Traceback']:
-            htmlformatter = HtmlFormatter(linenos=True, style='friendly', cssclass='highlight', linenostart=tb['Source Code'][0][0])
+            highlighted_line = [tb['Error Line Number'] - tb['Source Code'][0][0] + 1]
+            htmlformatter = HtmlFormatter(linenos=True,
+                                          cssclass='highlight',
+                                          linenostart=tb['Source Code'][0][0],
+                                          hl_lines=highlighted_line)
             src = highlight(''.join(t[1] for t in tb['Source Code']), pylexer, htmlformatter)
             tb['Source Code'] = src
         html = render_template('crashreport.html', info=payload, inspection_level=10000)
