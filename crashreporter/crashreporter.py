@@ -52,7 +52,7 @@ class CrashReporter(object):
                    format of a ConfigParser file with sections [SMTP] and [HQ]
 
     """
-    _report_name = "crash_report_%02d"
+    _report_name = "crash_report_%d"
     html_template = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'hq', 'templates', 'email.html')
     active = False
     application_name = None
