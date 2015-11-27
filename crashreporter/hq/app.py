@@ -116,8 +116,8 @@ def upload_many():
         return 'Upload failed'
 
 
-def run_hq(debug):
-    app.run(debug=debug)
+def run_hq(debug, **kwargs):
+    app.run(debug=debug, **kwargs)
 
 
 if __name__ == '__main__':
