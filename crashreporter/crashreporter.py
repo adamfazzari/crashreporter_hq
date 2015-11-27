@@ -365,7 +365,7 @@ class CrashReporter(object):
         return True
 
     def get_offline_reports(self):
-        return sorted(glob.glob(os.path.join(self.report_dir, self._report_name.replace("%02d", "*"))))
+        return sorted(glob.glob(os.path.join(self.report_dir, self._report_name.replace("%d", "*"))))
 
     def _watcher_thread(self):
         """
