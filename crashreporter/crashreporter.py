@@ -166,13 +166,14 @@ class CrashReporter(object):
         :param tb: Traceback
         :return:
         """
-        if CrashReporter.active:
-            if etype:
-                self.etype = etype
-                self.evalue = evalue
-                self.tb = tb
-                self.payload = self.generate_payload()
-                # Save the offline report. If the upload of the report is successful, then delete the report.
+        if etype:
+            self.etype = etype
+            self.evalue = evalue
+            self.tb = tb
+            self.payload = self.generate_payload()
+
+            if CrashReporter.active:
+                # Attempt to upload the report
                 hq_success = smtp_success = False
                 if self._hq is not None:
                     hq_success = self.hq_submit(self.payload)
@@ -184,12 +185,12 @@ class CrashReporter(object):
                     if smtp_success:
                         self.payload['SMTP Submission'] = 'Sent'
 
-                if (self._smtp and not smtp_success) or (self._hq and not hq_success):
-                    # Only store the offline report if any of the upload methods fail.
-                    report_path = self.store_report(self.payload)
-                    self.logger.info('Offline Report stored %s' % report_path)
-            else:
-                self.logger.info('CrashReporter: No crashes detected.')
+            if not CrashReporter.active or (self._smtp and not smtp_success) or (self._hq and not hq_success):
+                # Only store the offline report if any of the upload methods fail, or if the Crash Reporter was disabled
+                report_path = self.store_report(self.payload)
+                self.logger.info('Offline Report stored %s' % report_path)
+        else:
+            self.logger.info('CrashReporter: No crashes detected.')
 
         # Call the default exception hook
         sys.__excepthook__(etype, evalue, tb)
