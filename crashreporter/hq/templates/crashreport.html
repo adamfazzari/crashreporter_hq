@@ -55,38 +55,40 @@
                             {{ tb['Source Code'] | safe }}
                         </div>
                     </div>
-
-                    <h4>Local Variables:</h4>
-                        <div class="contentitem">
-                            <table border="1" class="variabletable">
-                                <tr class="tableheader">
-                                    <td>Variable</td>
-                                    <td>Value</td>
-                                </tr>
-                                {% for field, value in tb['Local Variables'] %}
-                                    <tr>
-                                        <td class="varcolumn">{{ field|e }}</td>
-                                        <td class="valcolumn">{{ value|e }}</td>
+                    {% if tb['Local Variables'] %}
+                        <h4>Local Variables:</h4>
+                            <div class="contentitem">
+                                <table border="1" class="variabletable">
+                                    <tr class="tableheader">
+                                        <td>Variable</td>
+                                        <td>Value</td>
                                     </tr>
-                                {% endfor %}
-                            </table>
-                        </div>
-
-                    <h4>Object Inspection:</h4>
-                        <div class="contentitem">
-                            <table border="1" class="variabletable">
-                                <tr class="tableheader">
-                                    <td>Variable</td>
-                                    <td>Value</td>
-                                </tr>
-                                {% for field, value in tb['Object Variables'] %}
-                                    <tr>
-                                        <td class="varcolumn">{{ field|e }}</td>
-                                        <td class="valcolumn">{{ value|e }}</td>
+                                    {% for field, value in tb['Local Variables'] %}
+                                        <tr>
+                                            <td class="varcolumn">{{ field|e }}</td>
+                                            <td class="valcolumn">{{ value|e }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </table>
+                            </div>
+                    {% endif %}
+                    {% if tb['Object Variables'] %}
+                        <h4>Object Inspection:</h4>
+                            <div class="contentitem">
+                                <table border="1" class="variabletable">
+                                    <tr class="tableheader">
+                                        <td>Variable</td>
+                                        <td>Value</td>
                                     </tr>
-                                {% endfor %}
-                            </table>
-                        </div>
+                                    {% for field, value in tb['Object Variables'] %}
+                                        <tr>
+                                            <td class="varcolumn">{{ field|e }}</td>
+                                            <td class="valcolumn">{{ value|e }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </table>
+                            </div>
+                    {% endif %}
                 </div> {# End of content #}
             {% endif %}
         </div>
