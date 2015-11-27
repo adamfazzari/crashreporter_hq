@@ -391,13 +391,14 @@ class CrashReporter(object):
             for report in offline_reports:
                 with open(report, 'r') as js:
                     payload = json.load(js)
-                success.append(self.smtp_submit(self.subject(), self.body(payload)))
-                if success[-1]:
-                    # Set the flag in the payload signifying that the SMTP submission was successful
-                    payload['SMTP Submission'] = 'Sent'
-                    with open(report, 'w') as js:
-                        json.dump(payload, js)
-                    self.logger.info('CrashReporter: Offline reports sent.')
+                if payload['SMTP Submission'] == 'Not Sent':
+                    success.append(self.smtp_submit(self.subject(), self.body(payload)))
+                    if success[-1]:
+                        # Set the flag in the payload signifying that the SMTP submission was successful
+                        payload['SMTP Submission'] = 'Sent'
+                        with open(report, 'w') as js:
+                            json.dump(payload, js)
+            self.logger.info('CrashReporter: %d Offline reports sent.' % sum(success))
             return success
 
     def _hq_send_offline_reports(self):
@@ -406,7 +407,9 @@ class CrashReporter(object):
         if offline_reports:
             for report in offline_reports:
                 with open(report, 'r') as _f:
-                    payloads[report] = json.load(_f)
+                    payload = json.load(_f)
+                    if payload['HQ Submission'] == 'Not Sent':
+                        payloads[report] = payload
 
             data = json.dumps(payloads.values())
             try:
