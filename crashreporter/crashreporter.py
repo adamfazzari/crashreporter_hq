@@ -391,7 +391,7 @@ class CrashReporter(object):
             for report in offline_reports:
                 with open(report, 'r') as js:
                     payload = json.load(js)
-                if payload['SMTP Submission'] == 'Not Sent':
+                if payload['SMTP Submission'] == 'Not sent':
                     success.append(self.smtp_submit(self.subject(), self.body(payload)))
                     if success[-1]:
                         # Set the flag in the payload signifying that the SMTP submission was successful
@@ -408,7 +408,7 @@ class CrashReporter(object):
             for report in offline_reports:
                 with open(report, 'r') as _f:
                     payload = json.load(_f)
-                    if payload['HQ Submission'] == 'Not Sent':
+                    if payload['HQ Submission'] == 'Not sent':
                         payloads[report] = payload
 
             data = json.dumps(payloads.values())
