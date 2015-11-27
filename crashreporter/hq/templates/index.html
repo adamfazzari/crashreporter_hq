@@ -2,6 +2,7 @@
 <html>
 <head lang="en">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='crashreport.css') }}">
+    <script src="{{ url_for('static', filename='sorttable.js') }}"></script>
     <meta charset="UTF-8">
     <title>Crash Reporter HQ</title>
 </head>
@@ -12,7 +13,7 @@
 <h1>Crash Reporter HQ</h1>
 
 {% if reports %}
-    <table border="1" style="width:100%">
+    <table border="1" class="sortable", style="width:100%">
         <tr>
             {% for header in reports[0].iterkeys() %}
                 <td class="tableheader">{{ header }}</td>
