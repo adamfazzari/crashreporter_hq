@@ -22,15 +22,15 @@ def delete_report(number):
 
 
 def save_report(payload):
-        metadata = get_metadata()
-        if metadata is not None:
-            metadata['report_count'] += 1
-        else:
-            metadata = {'report_count': 1}
+    metadata = get_metadata()
+    if metadata is not None:
+        metadata['report_count'] += 1
+    else:
+        metadata = {'report_count': 1}
 
-        with open(os.path.join(UPLOAD_FOLDER, '.metadata'), 'w') as metadata_file:
-            json.dump(metadata, metadata_file)
+    with open(os.path.join(UPLOAD_FOLDER, '.metadata'), 'w') as metadata_file:
+        json.dump(metadata, metadata_file)
 
-        with open(os.path.join(UPLOAD_FOLDER, 'crash_report_%d.json' % metadata['report_count']), 'w') as cr:
-            json.dump(payload, cr,  sort_keys=True, indent=4)
+    with open(os.path.join(UPLOAD_FOLDER, 'crash_report_%d.json' % metadata['report_count']), 'w') as cr:
+        json.dump(payload, cr,  sort_keys=True, indent=4)
 
