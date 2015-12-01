@@ -20,6 +20,7 @@ from email import encoders
 
 import jinja2
 
+from api import upload_report, upload_many_reports
 from tools import analyze_traceback
 
 
@@ -320,13 +321,11 @@ class CrashReporter(object):
         return new_report_path
 
     def hq_submit(self, payload):
-        data = json.dumps(payload)
-        try:
-            r = requests.post(self._hq['server'] + '/reports/upload', data=data)
-        except Exception as e:
-            logging.error(e)
+        r = upload_report(self._hq['server'], payload=payload)
+        if r is False:
             return False
-        return r.status_code == 200
+        else:
+            return r.status_code == 200
 
     def smtp_submit(self, subject, body, attachments=None):
         smtp = self._smtp
@@ -412,12 +411,10 @@ class CrashReporter(object):
                     if payload['HQ Submission'] == 'Not sent':
                         payloads[report] = payload
 
-            data = json.dumps(payloads.values())
-            try:
-                r = requests.post(self._hq['server'] + '/reports/upload_many', data=data)
-            except Exception as e:
-                logging.error(e)
-                return [False] * len(payloads)
+            if payloads:
+                r = upload_many_reports(self._hq['server'], payloads.values())
+                if r is False or r.status_code != 200:
+                    return [False] * len(payloads)
 
             # Set the flag in the payload signifying that the HQ submission was successful
             for report, payload in payloads.iteritems():
@@ -425,6 +422,6 @@ class CrashReporter(object):
                 with open(report, 'w') as js:
                     json.dump(payload, js)
 
-            return [r.status_code == 200] * len(payloads)
+            return [True] * len(payloads)
         else:
             return [False] * len(payloads)
