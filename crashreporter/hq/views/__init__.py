@@ -1,6 +1,4 @@
-
 import glob
-import json
 import re
 
 from collections import OrderedDict
@@ -9,26 +7,12 @@ from pygments import highlight
 from pygments.lexers import PythonLexer
 from pygments.formatters import HtmlFormatter
 
-from flask import request, render_template, flash, redirect
+from ..config import *
 
-from tools import delete_report
-
-from . import app
-from .forms import LoginForm
-from config import *
-from tools import save_report
+from api import *
+from login import *
 
 cr_number_regex = re.compile('crash_report_(\d+)\.json')
-
-
-@app.route('/reports/delete/<int:report_number>', methods=['POST'])
-def delete_report(report_number):
-    success = delete_report(report_number)
-    if success:
-        response = 'Success. Crash report #%d deleted' % report_number
-    else:
-        response = 'Failed. Crash report #%d does not exist.' % report_number
-    return response
 
 
 @app.route('/reports/<int:report_number>')
@@ -68,35 +52,3 @@ def home():
         reports.sort(key=lambda x: int(x['Report Number']))
     html = render_template('index.html', reports=reports)
     return html
-
-
-@app.route('/reports/upload', methods=['POST'])
-def upload_file():
-    if request.method == 'POST':
-        payload = json.loads(request.data)
-        save_report(payload)
-        return 'Upload successful'
-    else:
-        return 'Upload failed'
-
-
-@app.route('/reports/upload_many', methods=['POST'])
-def upload_many():
-    if request.method == 'POST':
-        payload = json.loads(request.data)
-        for package in payload:
-            save_report(package)
-        return 'Upload successful'
-    else:
-        return 'Upload failed'
-
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    form = LoginForm()
-    if form.validate_on_submit():
-        flash('Logged in as %s' % form.username.data)
-        return redirect('/')
-    return render_template('login.html',
-                           title='Sign In',
-                           form=form)
