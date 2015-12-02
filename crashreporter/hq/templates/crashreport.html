@@ -11,7 +11,7 @@
 <body>
 
 <div style="width: 80%;">
-    <h2>
+    <h3>
         {% if info['Application Name'] != None %}
             {% if info['Application Version'] != None %}
                 {{info['Application Name']}} (v{{info['Application Version']}})
@@ -22,7 +22,7 @@
         {% else %}
             Crash Report
         {% endif %}
-    </h2>
+    </h3>
 <hr>
     {% if user is none %}
         <p>A crash was detected on {{info['Date']}} at {{info['Time']}}.</p>

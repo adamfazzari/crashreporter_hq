@@ -9,11 +9,12 @@ from pygments import highlight
 from pygments.lexers import PythonLexer
 from pygments.formatters import HtmlFormatter
 
-from flask import request, render_template
+from flask import request, render_template, flash, redirect
 
 from tools import delete_report
 
 from . import app
+from .forms import LoginForm
 from config import *
 from tools import save_report
 
@@ -88,3 +89,14 @@ def upload_many():
         return 'Upload successful'
     else:
         return 'Upload failed'
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    form = LoginForm()
+    if form.validate_on_submit():
+        flash('Logged in as %s' % form.username.data)
+        return redirect('/')
+    return render_template('login.html',
+                           title='Sign In',
+                           form=form)

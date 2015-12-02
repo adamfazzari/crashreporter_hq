@@ -10,30 +10,33 @@
 
 <body>
 
-<h1>Crash Reporter HQ</h1>
+    {% extends "base.html" %}
 
-{% if reports %}
-    <table border="1" class="sortable", style="width:100%">
-        <tr>
-            {% for header in reports[0].iterkeys() %}
-                <td class="tableheader">{{ header }}</td>
-            {% endfor %}
-        </tr>
+    {% block content %}
 
-        {% for r in reports %}
-            <tr>
-                {% for value in r.itervalues() %}
-                    <td>{{ value }}</td>
-                {% endfor %}
-                <td><a href="{{ url_for('view_report', report_number=r['Report Number']) }}">Open</a></td>
-                <td>
-                    <form method='POST' action="{{ url_for('delete_report', report_number=r['Report Number']) }}" class="DeleteForm">
-                        <input type="submit" value="Delete" >
-                    </form>
-                </td>
-            </tr>
-        {% endfor %}
-{% endif %}
-</table>
+            {% if reports %}
+                <table border="1" class="sortable", style="width:100%">
+                    <tr>
+                        {% for header in reports[0].iterkeys() %}
+                            <td class="tableheader">{{ header }}</td>
+                        {% endfor %}
+                    </tr>
+
+                    {% for r in reports %}
+                        <tr>
+                            {% for value in r.itervalues() %}
+                                <td>{{ value }}</td>
+                            {% endfor %}
+                            <td><a href="{{ url_for('view_report', report_number=r['Report Number']) }}">Open</a></td>
+                            <td>
+                                <form method='POST' action="{{ url_for('delete_report', report_number=r['Report Number']) }}" class="DeleteForm">
+                                    <input type="submit" value="Delete" >
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            {% endif %}
+    {% endblock %}
 </body>
 </html>
