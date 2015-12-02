@@ -1,3 +1,4 @@
+from flask import redirect, flash
 import flask.ext.login as flask_login
 from .. import users
 from .. import login_manager
@@ -33,6 +34,6 @@ def request_loader(request):
     return user
 
 
-@login_manager.unauthorized_handler
-def unauthorized_handler():
-    return 'Unauthorized'
+# @login_manager.unauthorized_handler
+# def unauthorized_handler():
+#     return 'Unauthorized'

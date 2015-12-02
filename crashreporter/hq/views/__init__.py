@@ -33,6 +33,7 @@ def view_report(report_number):
 
 
 @app.route('/')
+@flask_login.login_required
 def home():
     reports = []
     for r in glob.glob(os.path.join(UPLOAD_FOLDER, 'crash_report_*.json')):
