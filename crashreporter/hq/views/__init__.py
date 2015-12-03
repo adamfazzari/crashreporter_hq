@@ -29,7 +29,10 @@ def view_report(report_number):
                                           hl_lines=highlighted_line)
             src = highlight(''.join(t[1] for t in tb['Source Code']), pylexer, htmlformatter)
             tb['Source Code'] = src
-        html = render_template('crashreport.html', info=payload, inspection_level=10000)
+        html = render_template('crashreport.html',
+                               info=payload,
+                               inspection_level=10000,
+                               user=flask_login.current_user.get_id())
         return html
 
 
