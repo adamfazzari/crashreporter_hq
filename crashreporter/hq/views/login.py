@@ -39,6 +39,7 @@ def protected():
 @app.route('/logout')
 def logout():
     flask_login.logout_user()
-    return 'Logged out'
+    flash('You have been logged out.')
+    return redirect(url_for('login'))
 
 
