@@ -55,5 +55,5 @@ def home():
                          ))
         reports.append(d)
         reports.sort(key=lambda x: int(x['Report Number']))
-    html = render_template('index.html', reports=reports, user=flask_login.current_user.get_id())
+    html = render_template('index.html', reports=reports, user=flask_login.current_user)
     return html

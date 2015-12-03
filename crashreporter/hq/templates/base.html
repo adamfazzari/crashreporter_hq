@@ -5,8 +5,19 @@
   <body>
     <div>
         {% if user %}
-          <p>Logged in as user: <b>{{ user }}  (<a href=" {{ url_for('logout') }}">logout</a>)</b></p>
-          <hr>
+            <div class="page-header">
+                <div class="right-just">
+                    <span class="nav-item">
+                        Logged in as user: <b>{{ user.email }}  (<a href=" {{ url_for('logout') }}">logout</a>)</b>
+                    </span>
+                    {% if user.admin %}
+                        <span class="nav-item">
+                            <a href=" {{ url_for('users') }}">Users</a>
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+          <br><hr>
         {% endif %}
     </div>
     {% with messages = get_flashed_messages() %}
@@ -18,7 +29,7 @@
     {% endwith %}
     {% block content %}{% endblock %}
 
-    <div id="footer">
+    <div id="page-footer">
       <hr>
       <p>
           © Calvin Lobo 2015. All rights reserved.

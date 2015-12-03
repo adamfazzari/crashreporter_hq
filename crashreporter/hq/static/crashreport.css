@@ -9,7 +9,33 @@ body {
     margin: 1%;
 }
 
-#footer {
+a:link {
+    color: red;
+}
+
+a:visited {
+    color: red;
+}
+
+.nav-item {
+    padding: 5px;
+}
+
+#page-header {
+    width: 100%;
+}
+
+.left-just {
+    display:block;
+    float:left;
+}
+
+.right-just {
+    display:block;
+    float:right;
+}
+
+#page-footer {
 	height:90px;
 	line-height:30px;
 	padding:8px 0px;
