@@ -8,7 +8,6 @@ from ..models import User
 from ..forms import LoginForm
 
 
-
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
@@ -23,6 +22,9 @@ def login():
             if request.form['password'] == user.password:
                 flask_login.login_user(user)
                 return redirect(request.args.get('next') or url_for('home'))
+            else:
+                flash('Incorrect password. Please try again.')
+                return redirect(url_for('login'))
         else:
             return 'No user by the name of %s exists' % email
 
