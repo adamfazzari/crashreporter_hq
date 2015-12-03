@@ -27,9 +27,13 @@
                             {% for value in r.itervalues() %}
                                 <td>{{ value }}</td>
                             {% endfor %}
-                            <td><a href="{{ url_for('view_report', report_number=r['Report Number']) }}">Open</a></td>
                             <td>
-                                <form method='POST' action="{{ url_for('delete_report', report_number=r['Report Number']) }}" class="DeleteForm">
+                                <form method='GET' action="{{ url_for('view_report', report_number=r['Report Number']) }}">
+                                    <input type="submit" value="Open" >
+                                </form>
+                            </td>
+                            <td>
+                                <form method='POST' action="{{ url_for('delete_report', report_number=r['Report Number']) }}">
                                     <input type="submit" value="Delete" >
                                 </form>
                             </td>

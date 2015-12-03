@@ -4,17 +4,18 @@ import json
 from flask import request, render_template, flash, redirect, url_for
 
 from .. import app
-from ..tools import save_report
+from ..tools import save_report, delete_report as _delete_report
 
 
 @app.route('/reports/delete/<int:report_number>', methods=['POST'])
 def delete_report(report_number):
-    success = delete_report(report_number)
+    success = _delete_report(report_number)
     if success:
         response = 'Success. Crash report #%d deleted' % report_number
     else:
         response = 'Failed. Crash report #%d does not exist.' % report_number
-    return response
+    flash(response)
+    return redirect(url_for('home'))
 
 
 @app.route('/reports/upload', methods=['POST'])
