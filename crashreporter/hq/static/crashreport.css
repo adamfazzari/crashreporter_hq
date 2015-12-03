@@ -104,8 +104,17 @@ table {
     font-weight: bold;
 }
 
+.tableheader:hover{
+    background-color:#FFFFC7;
+    font-weight: bold;
+    color: #FFFFFF;
+    cursor: pointer;
+    background-image:url(images/bg_navigation_hover.gif);
+}
+
 .tableheader {
     background-color:#FFFFC7;
     font-weight: bold;
-    color: #000000;
+    color: #FFFFFF;
+    background-image:url(images/bg_navigation.gif);
 }
