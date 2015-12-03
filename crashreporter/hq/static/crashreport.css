@@ -3,18 +3,30 @@ body {
 	background-image:url(images/bg.gif);
 	background-repeat:repeat-x;
 	background-color:#121212;
+	font-family: Arial, Helvetica, sans-serif;
+    font-size:16px;
     color: #FFFFFF;
 }
 
+#footer {
+	height:90px;
+	line-height:30px;
+	padding:8px 0px;
+	background-repeat:no-repeat;
+    font-family: Arial, Helvetica, sans-serif;
+	font-size:12px;
+	color:#BECF96;
+	}
 
 #login-page {
-    background-color:#222222;
+    background-color:#121212;
     margin: 10% 20%;
 }
 
 #login {
     padding: 20px;
-    background-color:#AAAAAA;
+    color: #FFFFFF;
+    background-image:url(images/bg_content.gif);
     border: 2px solid #000000;
 }
 

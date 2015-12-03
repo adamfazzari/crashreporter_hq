@@ -1,21 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    {% if title %}
-    <title>{{ title }} - microblog</title>
-    {% else %}
-    <title>microblog</title>
-    {% endif %}
   </head>
   <body>
     <div>
-        <!--<h2>Crash Reporter HQ</h2>-->
         {% if user %}
-          <p>Logged in as user: {{ user }} (<a href=" {{ url_for('logout') }}">logout</a>)</p>
-
+          <p>Logged in as user: <b>{{ user }}  (<a href=" {{ url_for('logout') }}">logout</a>)</b></p>
+          <hr>
         {% endif %}
     </div>
-    <hr>
     {% with messages = get_flashed_messages() %}
       {% if messages %}
         {% for message in messages %}
@@ -24,5 +17,13 @@
       {% endif %}
     {% endwith %}
     {% block content %}{% endblock %}
+
+    <div id="footer">
+      <hr>
+      <p>
+          © Calvin Lobo 2015. All rights reserved.
+      </p>
+    </div>
+
   </body>
 </html>
