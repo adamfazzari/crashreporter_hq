@@ -26,7 +26,6 @@
                     Crash Report
                 {% endif %}
             </h3>
-        <hr>
             {% if user is none %}
                 <p>A crash was detected on {{info['Date']}} at {{info['Time']}}.</p>
             {% else %}
@@ -97,7 +96,11 @@
                 </div>
             {% endfor %}
 
+            <form method='GET' action="{{ url_for('home') }}">
+                <input type="submit" value="Back" >
+            </form>
         </div>
+
     {% endblock %}
 
 </body>
