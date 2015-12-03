@@ -7,13 +7,23 @@ init_db()
 
 from hq.database import db_session
 from hq.models import User
-u = User('admin', 'secret')
-db_session.add(u)
-db_session.commit()
 
 
-asd = User.query.all()
+def create_user(email, password):
+    u = User(email, password)
 
-qwe = User.query.filter(User.email == 'admin').first()
+    all_users = User.query.all()
+    userquery = User.query.filter(User.email == email).first()
 
-sdg456=7
+    if not userquery:
+        db_session.add(u)
+        db_session.commit()
+
+    print 'Registered users:'
+    print ','.join([u.email for u in User.query.all()])
+
+
+if __name__ == '__main__':
+
+    create_user('calvin', 'sensoft')
+    create_user('adam', 'sensoft2')
