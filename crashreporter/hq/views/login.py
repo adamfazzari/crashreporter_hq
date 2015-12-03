@@ -3,7 +3,8 @@ from flask import request, render_template, flash, redirect, url_for
 from ..models import User
 import flask.ext.login as flask_login
 
-from .. import app, users
+from .. import app
+from ..models import User
 from ..forms import LoginForm
 
 
@@ -16,11 +17,10 @@ def login():
         return render_template('login.html', title='Sign In', form=form)
     elif form.validate_on_submit():
         email = request.form['email']
-        user = users.get(email)
+        # user = users.get(email)
+        user = User.query.filter(User.email == email).first()
         if user:
-            if request.form['password'] == users[email]['password']:
-                user = User()
-                user.id = email
+            if request.form['password'] == user.password:
                 flask_login.login_user(user)
                 return redirect(request.args.get('next') or url_for('home'))
         else:

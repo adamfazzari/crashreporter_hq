@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='crashreport.css') }}">
+    <script src="{{ url_for('static', filename='sorttable.js') }}"></script>
+    <title></title>
+</head>
+<body>
+
+    {% extends "base.html" %}
+
+    {% block content %}
+        {% if user_list %}
+
+            <table border="1" class="sortable", style="width:100%">
+                <tr>
+                    <td class="tableheader">User</td>
+                </tr>
+
+                {% for user in user_list %}
+                    <tr>
+                    <td>{{ user }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% endif %}
+    {% endblock %}
+</body>
+</html>

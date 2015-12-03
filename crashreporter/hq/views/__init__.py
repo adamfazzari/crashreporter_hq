@@ -11,6 +11,7 @@ from ..config import *
 
 from api import *
 from login import *
+from users import *
 
 cr_number_regex = re.compile('crash_report_(\d+)\.json')
 
@@ -51,5 +52,5 @@ def home():
                          ))
         reports.append(d)
         reports.sort(key=lambda x: int(x['Report Number']))
-    html = render_template('index.html', reports=reports)
+    html = render_template('index.html', reports=reports, user=flask_login.current_user.get_id())
     return html
