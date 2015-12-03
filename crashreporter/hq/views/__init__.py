@@ -32,7 +32,7 @@ def view_report(report_number):
         html = render_template('crashreport.html',
                                info=payload,
                                inspection_level=10000,
-                               user=flask_login.current_user.get_id())
+                               user=flask_login.current_user)
         return html
 
 
