@@ -2,25 +2,27 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='crashreport.css') }}">
+    <title>Crash Reporter HQ</title>
 </head>
-<body>
+<body id="login-page">
 
     {% extends "base.html" %}
 
     {% block content %}
-        <h3>Sign In</h3>
+
             <form action="login" method="post" name="login">
                 {{ form.hidden_tag() }}
-                <p>
-                    {{ form.email(size=80) }}
-                    {{ form.password(size=80) }}
-                </p>
+                    <div id="login">
+                        <h3>Sign In</h3>
+                        Username: {{ form.email(size=80) }}    <br>
+                        Password: {{ form.password(size=80) }} <br><br>
+                        <input type='submit' name='submit', value="Sign In"></input>
+                    </div>
                 {% for error in form.email.errors %}
                     <span style="color: red;">[{{ error }}]</span>
                 {% endfor %}<br>
-                <p>{{ form.remember_me }} Remember Me</p>
-                <input type='submit' name='submit', value="Sign In"></input>
+
             </form>
     {% endblock %}
 
