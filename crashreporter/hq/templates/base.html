@@ -10,11 +10,15 @@
                     <span class="nav-item">
                         Logged in as user: <b>{{ user.email }}  (<a href=" {{ url_for('logout') }}">logout</a>)</b>
                     </span>
+                    <span class="nav-item">
+                        <a href="{{ url_for('home') }}">Home</a>
+                    </span>
                     {% if user.admin %}
                         <span class="nav-item">
                             <a href=" {{ url_for('users') }}">Users</a>
                         </span>
                     {% endif %}
+
                 </div>
             </div>
           <br><hr>
