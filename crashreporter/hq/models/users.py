@@ -1,6 +1,5 @@
 from flask import redirect, flash
 import flask.ext.login as flask_login
-from .. import users
 from .. import login_manager
 
 from sqlalchemy import Column, Integer, String

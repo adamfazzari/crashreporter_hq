@@ -7,7 +7,6 @@ import flask.ext.login as flask_login
 from .database import db_session
 
 # Mock database / persistence layer
-users = {'admin': {'password': 'secret'}}
 
 app = Flask(__name__)
 app.config.from_object('hq.config')
