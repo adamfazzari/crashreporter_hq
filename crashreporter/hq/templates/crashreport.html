@@ -29,7 +29,7 @@
             {% if user is none %}
                 <p>A crash was detected on {{info['Date']}} at {{info['Time']}}.</p>
             {% else %}
-                <p>A crash was detected on {{info['Date']}} at {{info['Time']}} from user {{user}}.</p>
+                <p>A crash was detected on {{info['Date']}} at {{info['Time']}} from user {{ info['User'] }}.</p>
             {% endif %}
 
         </div>
