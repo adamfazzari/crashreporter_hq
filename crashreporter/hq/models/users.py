@@ -1,22 +1,21 @@
-from flask import redirect, flash
 import flask.ext.login as flask_login
 from .. import login_manager
 
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, Boolean
 from ..database import Base
 
-# class User(flask_login.UserMixin):
-#     pass
 
 class User(Base, flask_login.UserMixin):
     __tablename__ = 'users'
     id = Column(Integer, primary_key=True)
     email = Column(String(120), unique=True)
     password = Column(String(50), unique=True)
+    admin = Column(Boolean(False))
 
-    def __init__(self, email, password):
+    def __init__(self, email, password, admin=False):
         self.email = email
         self.password = password
+        self.admin = admin
 
     def get_id(self):
         return self.email
@@ -46,8 +45,3 @@ def request_loader(request):
     user.is_authenticated = request.form['pw'] == user.password
 
     return user
-
-
-# @login_manager.unauthorized_handler
-# def unauthorized_handler():
-#     return 'Unauthorized'
