@@ -8,7 +8,7 @@ from sqlalchemy.ext.declarative import declarative_base
 
 import hq.config
 
-engine = create_engine(hq.config.DB_PATH, convert_unicode=True)
+engine = create_engine(hq.config.DB_ABSOLUTE_PATH, convert_unicode=True)
 db_session = scoped_session(sessionmaker(autocommit=False,
                                          autoflush=False,
                                          bind=engine))

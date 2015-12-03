@@ -8,7 +8,8 @@ STATIC_FOLDER = os.path.join(HQ_FOLDER, 'static')
 PYGMENTS_CSS_FILE = os.path.join(TEMPLATE_FOLDER, 'syntax.css')
 UPLOAD_FOLDER = os.path.join(HQ_FOLDER, 'reports')
 TMP_FOLDER = os.path.join(HQ_FOLDER, 'tmp')
-DB_PATH = 'sqlite:///hq/tmp/users.db'
+
+DB_ABSOLUTE_PATH = 'sqlite:///' + os.path.join(HQ_FOLDER, 'tmp/users.db')
 
 if not os.path.isdir(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
