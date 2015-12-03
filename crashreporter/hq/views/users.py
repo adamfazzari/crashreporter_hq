@@ -12,8 +12,7 @@ from .. import app
 def users():
 
     if request.method == 'GET':
-        query = User.query.all()
-        user_list = [u.email for u in query]
+        user_list = User.query.all()
         return render_template('users.html', user_list=user_list, user=flask_login.current_user.get_id())
 
 

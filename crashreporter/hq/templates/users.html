@@ -15,12 +15,14 @@
 
             <table border="1" class="sortable", style="width:100%">
                 <tr>
+                    <td class="tableheader">ID</td>
                     <td class="tableheader">User</td>
                 </tr>
 
                 {% for user in user_list %}
                     <tr>
-                    <td>{{ user }}</td>
+                        <td>{{ user.id }}</td>
+                        <td>{{ user.email }}</td>
                     </tr>
                 {% endfor %}
             </table>
