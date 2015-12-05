@@ -96,6 +96,16 @@
                 </div>
             {% endfor %}
 
+
+            <div class="container">
+                <DL class="header">
+                    Error:
+                    <DD>
+                        {{info['Error Message']|e}}
+                    </DD>
+                </DL>
+            </div>
+
             <form method='GET' action="{{ url_for('home') }}">
                 <input type="submit" value="Back" >
             </form>
