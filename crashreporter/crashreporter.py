@@ -216,6 +216,13 @@ class CrashReporter(object):
 
         with open(config, 'r') as _f:
             cfg.readfp(_f)
+            if cfg.has_section('General'):
+                general = dict(cfg.items('General'))
+                self.application_name = general.get('application_name', CrashReporter.application_name)
+                self.application_version = general.get('application_version', CrashReporter.application_version)
+                self.user_identifier = general.get('user_identifier', CrashReporter.user_identifier)
+                self.offline_report_limit = general.get('offline_report_limit', CrashReporter.offline_report_limit)
+                self.max_string_length = general.get('max_string_length', CrashReporter.max_string_length)
             if cfg.has_section('SMTP'):
                 self.setup_smtp(**dict(cfg.items('SMTP')))
                 if 'port' in self._smtp:
