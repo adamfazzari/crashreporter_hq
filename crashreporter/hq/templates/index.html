@@ -2,6 +2,7 @@
 <html>
 <head lang="en">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='crashreport.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='pagination.css') }}">
     <script src="{{ url_for('static', filename='sorttable.js') }}"></script>
     <meta charset="UTF-8">
     <title>Crash Reporter HQ</title>
@@ -14,6 +15,10 @@
 
     {% block content %}
 
+        <div style="text-align: center;">
+            {{ pagination.info }}
+            {{ pagination.links }}
+        </div>
             {% if reports %}
                 <table border="1" class="sortable", style="width:100%">
                     <tr>
@@ -41,6 +46,11 @@
                     {% endfor %}
                 </table>
             {% endif %}
+
+        <div style="text-align: center;">
+            {{ pagination.links }}
+        </div>
+
     {% endblock %}
 
 

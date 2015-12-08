@@ -1,7 +1,6 @@
-import glob
-import re
 
-from collections import OrderedDict
+from flask.ext.paginate import Pagination
+
 
 from pygments import highlight
 from pygments.lexers import PythonLexer
@@ -9,11 +8,11 @@ from pygments.formatters import HtmlFormatter
 
 from ..config import *
 
+from ..tools import get_reports
+
 from api import *
 from login import *
 from users import *
-
-cr_number_regex = re.compile('crash_report_(\d+)\.json')
 
 
 @app.route('/reports/<int:report_number>')
@@ -39,21 +38,14 @@ def view_report(report_number):
 @app.route('/')
 @flask_login.login_required
 def home():
-    reports = []
-    for r in glob.glob(os.path.join(UPLOAD_FOLDER, 'crash_report_*.json')):
-        fullpath = os.path.join(UPLOAD_FOLDER, r)
-        with open(fullpath) as _f:
-            payload = json.load(_f)
-        d = OrderedDict((('Report Number', cr_number_regex.findall(r)[0]),
-                         ('Application Name', payload['Application Name']),
-                         ('Application Version', payload['Application Version']),
-                         ('User', payload['User']),
-                         ('Error Type', payload['Error Type']),
-                         ('Error Message', payload['Error Message']),
-                         ('Date', payload['Date']),
-                         ('Time', payload['Time'])
-                         ))
-        reports.append(d)
-        reports.sort(key=lambda x: int(x['Report Number']))
-    html = render_template('index.html', reports=reports, user=flask_login.current_user)
+    PER_PAGE = 10
+    reports = get_reports()
+    n_total_reports = len(reports)
+    try:
+        page = int(request.args.get('page', 1))
+    except ValueError:
+        page = 1
+    reports = reports[(page-1) * PER_PAGE: page * PER_PAGE]
+    pagination = Pagination(page=page, total=n_total_reports, search=False, record_name='reports')
+    html = render_template('index.html', reports=reports, user=flask_login.current_user, pagination=pagination)
     return html
