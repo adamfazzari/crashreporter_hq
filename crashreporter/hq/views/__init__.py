@@ -38,7 +38,7 @@ def view_report(report_number):
 @app.route('/')
 @flask_login.login_required
 def home():
-    PER_PAGE = 50
+    PER_PAGE = 25
     reports = get_reports()
     n_total_reports = len(reports)
     try:
