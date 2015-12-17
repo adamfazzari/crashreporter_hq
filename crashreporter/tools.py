@@ -43,7 +43,7 @@ def get_object_references(tb, source, max_string_length=1000):
     """
     global obj_ref_regex
     referenced_attr = set()
-    for lineno, line in source:
+    for line in source:
         referenced_attr.update(set(re.findall(obj_ref_regex, line)))
     referenced_attr = sorted(referenced_attr)
     info = []
@@ -98,11 +98,11 @@ def analyze_traceback(tb, inspection_level=None):
              "Error Line Number": line,
              "Module": module,
              "Error Line": code,
-             "Function Line": func_lineno,
+             "Module Line Number": func_lineno,
              "Source Code": ''}
         if inspection_level is None or len(extracted_tb) - ii <= inspection_level:
             # Perform advanced inspection on the last `inspection_level` tracebacks.
-            d['Source Code'] = zip(xrange(func_lineno, func_lineno+len(func_source)), func_source)
+            d['Source Code'] = ''.join(func_source)
             d['Local Variables'] = get_local_references(tb_level)
             d['Object Variables'] = get_object_references(tb_level, d['Source Code'])
         tb_level = getattr(tb_level, 'tb_next', None)
