@@ -1,21 +1,31 @@
-from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy import Column, Integer, String, DateTime, Table, ForeignKey
 from ..database import Base
 from datetime import datetime
 
 from .traceback import Traceback
 from sqlalchemy.orm import relationship
+from sqlalchemy import and_
+
+SimilarReports = Table("SimilarReports", Base.metadata,
+                       Column("related_to_id", Integer, ForeignKey("crashreport.id")),
+                       Column("related_by_id", Integer, ForeignKey("crashreport.id")))
 
 
 class CrashReport(Base):
+
     __tablename__ = 'crashreport'
 
     id = Column(Integer, primary_key=True)
     date = Column(DateTime())
     application_name = Column(String(50), unique=False)
     application_version = Column(Integer, unique=False)
-    error_message = Column(String(), unique=False)
-    error_type = Column(String(), unique=False)
+    error_message = Column(String(''), unique=False)
+    error_type = Column(String(''), unique=False)
     user_identifier = Column(String(100), unique=False)
+    related_reports = relationship("CrashReport",
+                                   secondary=SimilarReports,
+                                   primaryjoin=id==SimilarReports.c.related_to_id,
+                                   secondaryjoin=id==SimilarReports.c.related_by_id)
 
     __mappings__ = {'Report Number': 'id',
                     'Application Name': 'application_name',
@@ -37,7 +47,20 @@ class CrashReport(Base):
             tb = Traceback(**tb)
             tb.crashreport = self
 
+        similar_reports = self.get_similar_reports()
+        self.related_reports.extend(similar_reports)
+        for r in similar_reports:
+            r.related_to.append(self)
+
     def __getitem__(self, item):
         return getattr(self, CrashReport.__mappings__[item])
 
+    def get_similar_reports(self):
+        _and = and_(*[CrashReport.traceback.any(error_line_number=tb.error_line_number) for tb in self.traceback])
+        return CrashReport.query.filter(_and).all()
+
+    def __repr__(self):
+        return "{s.id} {s.error_type}".format(s=self)
+
 CrashReport.traceback = relationship("Traceback", order_by=Traceback.id, back_populates="crashreport")
+
