@@ -18,7 +18,11 @@
                             <a href=" {{ url_for('users') }}">Users</a>
                         </span>
                     {% endif %}
-
+                    {% if back_link %}
+                        <span class="nav-item">
+                            <a href=" {{ back_link }}">Back</a>
+                        </span>
+                    {% endif%}
                 </div>
             </div>
           <br><hr>

@@ -15,11 +15,11 @@
     {% block content %}
         <div style="width: 80%;">
             <h3>
-                {% if info['Application Name'] != None %}
-                    {% if info['Application Version'] != None %}
-                        {{info['Application Name']}} (v{{info['Application Version']}})
+                {% if report['Application Name'] != None %}
+                    {% if report['Application Version'] != None %}
+                        {{report['Application Name']}} (v{{report['Application Version']}})
                     {% else %}
-                        {{info['Application Name']}}
+                        {{report['Application Name']}}
                     {% endif %}
 
                 {% else %}
@@ -27,16 +27,21 @@
                 {% endif %}
             </h3>
             {% if user is none %}
-                <p>A crash was detected on {{info['Date']}} at {{info['Time']}}.</p>
+                <p>A crash was detected on {{report['Date']}} at {{report['Time']}}.</p>
             {% else %}
-                <p>A crash was detected on {{info['Date']}} at {{info['Time']}} from user {{ info['User'] }}.</p>
+                <p>A crash was detected on {{report['Date']}} at {{report['Time']}} from user {{ report['User'] }}.</p>
+            {% endif %}
+            {% if report.related_reports|length == 1 %}
+                <p>There is <a href="{{ url_for('view_related_reports', related_group_id=report.related_group_id) }}">{{ report.related_reports|length }}</a> other related report found.</p>
+            {% elif report.related_reports|length > 1 %}
+                <p>There are <a href="{{ url_for('view_related_reports', related_group_id=report.related_group_id) }}">{{ report.related_reports|length }}</a> other related reports found.</p>
             {% endif %}
 
         </div>
 
         <div style="width: 80%;">
             <h4>Traceback (most recent call last):</h4>
-            {% for tb in info['Traceback'] %}
+            {% for tb in report['Traceback'] %}
 
                 <div class="container">
 
@@ -101,7 +106,7 @@
                 <DL class="header">
                     Error:
                     <DD>
-                        {{info['Error Message']|e}}
+                        {{report['Error Message']|e}}
                     </DD>
                 </DL>
             </div>

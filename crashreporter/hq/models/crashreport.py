@@ -1,5 +1,5 @@
-from sqlalchemy import Column, Integer, String, DateTime, Table, ForeignKey
-from ..database import Base
+from sqlalchemy import Column, Integer, String, DateTime, Table, ForeignKey, func
+from ..database import Base, db_session
 from datetime import datetime
 
 from .traceback import Traceback
@@ -22,6 +22,7 @@ class CrashReport(Base):
     error_message = Column(String(''), unique=False)
     error_type = Column(String(''), unique=False)
     user_identifier = Column(String(100), unique=False)
+    related_group_id = Column(Integer, unique=False)
     related_reports = relationship("CrashReport",
                                    secondary=SimilarReports,
                                    primaryjoin=id==SimilarReports.c.related_to_id,
@@ -48,9 +49,14 @@ class CrashReport(Base):
             tb.crashreport = self
 
         similar_reports = self.get_similar_reports()
-        self.related_reports.extend(similar_reports)
-        for r in similar_reports:
-            r.related_to.append(self)
+        if similar_reports:
+            self.related_reports.extend(similar_reports)
+            self.related_group_id = similar_reports[0].related_group_id
+            for r in similar_reports:
+                r.related_reports.append(self)
+        else:
+            max_related_id = db_session.query(func.max(CrashReport.related_group_id)).first()[0] or 0
+            self.related_group_id = max_related_id + 1
 
     def __getitem__(self, item):
         return getattr(self, CrashReport.__mappings__[item])

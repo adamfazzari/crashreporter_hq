@@ -25,5 +25,8 @@ def save_report(payload):
     return cr
 
 
-def get_reports():
+def get_similar_reports():
+    return CrashReport.query.group_by('related_group_id').all()
+
+def get_all_reports():
     return CrashReport.query.all()
