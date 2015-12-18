@@ -9,6 +9,7 @@ class LoginForm(Form):
 
 
 class YoutrackSubmitForm(Form):
+    server = StringField('YouTrack Server', validators=[DataRequired()])
     project = StringField('Project', validators=[DataRequired()])
     assignee = StringField('Assignee', validators=[DataRequired()])
     summary = StringField('Summary', validators=[DataRequired()])

@@ -117,6 +117,7 @@
             {{ form.hidden_tag() }}
             <fieldset>
                 <legend>YouTrack</legend>
+                <p>{{ form.server.label }} {{ form.server}}</p>
                 <p>{{ form.assignee.label }} {{ form.assignee }}</p>
                 <p>{{ form.password.label }}{{ form.password }}</p>
                 <p>{{ form.project.label }}{{ form.project}}</p>

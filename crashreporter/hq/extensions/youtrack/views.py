@@ -11,7 +11,7 @@ def youtrack_submit(report_number):
     form = YoutrackSubmitForm()
 
     if form.validate_on_submit():
-        c = Connection('http://192.168.1.66', 'calvin', 'sensoft123')
+        c = Connection(form.data['server'], form.data['assignee'], form.data['password'])
         report_link = url_for('view_report', report_number=report_number)
         desc = form.data['description'] +  "\n{html}" + \
                '''
