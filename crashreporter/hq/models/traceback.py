@@ -35,6 +35,5 @@ class Traceback(Base):
             if column:
                 setattr(self, column, v)
 
-
     def __getitem__(self, item):
         return getattr(self, Traceback.__mappings__[item])
