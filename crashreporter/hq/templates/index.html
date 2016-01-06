@@ -23,19 +23,21 @@
                 <table border="1" class="sortable", style="width:100%">
                     <tr>
 
-                        {% for header in ('Report Number', 'Application Name', 'User', 'Error Type', 'Error Message', 'Date/Time') %}
+                        {% for header in ('Report #', 'Count', 'Application Name', 'Version', 'User', 'Error Type', 'Error Message', 'Date/Time') %}
                             <td class="tableheader">{{ header }}</td>
                         {% endfor %}
                     </tr>
 
                     {% for r in reports %}
                         <tr>
-                                <td> {{ r['Application Name'] }} </td>
-                                <td> {{ r['Application Version'] }} </td>
-                                <td> {{ r['User'] }} </td>
-                                <td> {{ r['Error Type'] }} </td>
-                                <td> {{ r['Error Message'] }} </td>
-                                <td> {{ r['Date'] }} </td>
+                                <td style="text-align: center"> {{ r['Report Number'] }} </td>
+                                <td style="text-align: center"> <a href="{{ url_for('view_related_reports', related_group_id=r.related_group_id) }}">{{ r.related_reports|length }}</a></td>
+                                <td style="text-align: center"> {{ r['Application Name'] }} </td>
+                                <td style="text-align: center"> {{ r['Application Version'] }} </td>
+                                <td style="text-align: center"> {{ r['User'] }} </td>
+                                <td style="text-align: center"> {{ r['Error Type'] }} </td>
+                                <td style="padding-left: 10px"> {{ r['Error Message'] }} </td>
+                                <td style="text-align: center"> {{ r['Date'] }} </td>
                             <td>
                                 <form method='GET' action="{{ url_for('view_report', report_number=r['Report Number']) }}">
                                     <input type="submit" value="Open" >
