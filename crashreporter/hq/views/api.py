@@ -22,8 +22,8 @@ def delete_report(report_number):
 def upload_file():
     if request.method == 'POST':
         payload = json.loads(request.data)
-        save_report(payload)
-        return 'Upload successful'
+        cr, response = save_report(payload)
+        return response
     else:
         return 'Upload failed'
 
@@ -33,7 +33,7 @@ def upload_many():
     if request.method == 'POST':
         payload = json.loads(request.data)
         for package in payload:
-            save_report(package)
-        return 'Upload successful'
+            cr, response = save_report(package)
+        return response
     else:
         return 'Upload failed'

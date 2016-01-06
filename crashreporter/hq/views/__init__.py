@@ -63,7 +63,11 @@ def view_related_reports(related_group_id):
 @flask_login.login_required
 def home():
     PER_PAGE = 25
-    reports = get_similar_reports()
+    q = get_similar_reports(return_query=True)
+    if flask_login.current_user.group:
+        reports = q.filter(CrashReport.group == flask_login.current_user.group).all()
+    else:
+        reports = []
     n_total_reports = len(reports)
     try:
         page = max(1, int(request.args.get('page', n_total_reports / PER_PAGE)))

@@ -28,6 +28,9 @@ class CrashReport(Base):
                                    primaryjoin=id==SimilarReports.c.related_to_id,
                                    secondaryjoin=id==SimilarReports.c.related_by_id)
 
+    group_id = Column(Integer, ForeignKey('group.id'))
+    group = relationship('Group', backref='reports', foreign_keys=[group_id])
+
     __mappings__ = {'Report Number': 'id',
                     'Application Name': 'application_name',
                     'Application Version': 'application_version',

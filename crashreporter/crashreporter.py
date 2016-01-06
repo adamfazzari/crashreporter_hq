@@ -328,6 +328,7 @@ class CrashReporter(object):
         return new_report_path
 
     def hq_submit(self, payload):
+        payload['HQ Parameters'] = self._hq if self._hq is not None else {}
         r = upload_report(self._hq['server'], payload=payload)
         if r is False:
             return False
