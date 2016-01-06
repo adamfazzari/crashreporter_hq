@@ -24,6 +24,8 @@ class Group(Base):
 class User(Base, flask_login.UserMixin):
     __tablename__ = 'users'
     id = Column(Integer, primary_key=True)
+    name = Column(String(30), unique=False, default='')
+    company = Column(String(50), unique=False, default='')
     email = Column(String(120), unique=True)
     password = Column(String(50), unique=True)
     admin = Column(Boolean(False))
@@ -31,10 +33,12 @@ class User(Base, flask_login.UserMixin):
     group_id = Column(Integer, ForeignKey('group.id'))
     group = relationship('Group', backref='users', foreign_keys=[group_id])
 
-    def __init__(self, email, password, admin=False, groups=None):
+    def __init__(self, email, password, name='', company='', admin=False, group=None):
         self.email = email
         self.password = password
         self.admin = admin
+        self.name = name
+        self.company = company
         # Generate a new unique API key for the user.
         while 1:
             api_key = str(uuid.uuid4()).replace('-', '')
@@ -42,12 +46,9 @@ class User(Base, flask_login.UserMixin):
                 self.api_key = api_key
                 break
         # Add the groups this user belongs to
-        if groups:
-            if isinstance(groups, basestring):
-                groups = [groups]
-            for g in groups:
-                group = Group.query.filter(Group.name == g).first()
-                group.users.append(self)
+        if group and isinstance(group, basestring):
+            group = Group.query.filter(Group.name == g).first()
+            group.users.append(self)
 
     def get_id(self):
         return self.email

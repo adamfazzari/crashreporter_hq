@@ -49,3 +49,32 @@ def get_similar_reports(return_query=False):
 
 def get_all_reports():
     return CrashReport.query.all()
+
+
+
+def create_user(email, password, **kwargs):
+    """
+    Create a new user, or return the existing user if email is not unique
+    :param password:
+    :param group:
+    :param admin:
+    :return:
+    """
+    u = User.query.filter(User.email == email).first()
+    if not u:
+        u = User(email, password, **kwargs)
+        db_session.add(u)
+        db_session.commit()
+
+    return u
+
+
+def create_group(name, users=None):
+
+    g = Group.query.filter(Group.name == name).first()
+    if not g:
+        g = Group(name, users)
+        db_session.add(g)
+        db_session.commit()
+
+    return g
