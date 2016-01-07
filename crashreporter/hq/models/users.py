@@ -44,6 +44,8 @@ class User(Base, flask_login.UserMixin):
         self.admin = admin
         self.name = name
         self.company = company
+        if admin:
+            self.group_admin = True
         # Generate a new unique API key for the user.
         while 1:
             api_key = str(uuid.uuid4()).replace('-', '')
