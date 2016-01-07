@@ -61,14 +61,23 @@ def view_related_reports(related_group_id):
     return html
 
 
-@app.route('/groups', methods=['GET', 'POST'])
+@app.route('/groups', methods=['GET', 'POST'], defaults={'group': None})
+@app.route('/groups/<string:group>', methods=['GET', 'POST'])
 @flask_login.login_required
-def groups():
+def groups(group):
     sform = SearchForm(prefix='search')
     cform = CreateGroupForm(prefix='create')
     if request.method == 'GET':
-        return render_template('groups.html', sform=sform, cform=cform, user=flask_login.current_user)
+        if group is None:
+            g = flask_login.current_user.group
+        else:
+            g = Group.query.filter(Group.name == group).first()
+            if g is None:
+                flash('Group "{name}" does not exist.'.format(name=group))
+                g = flask_login.current_user.group
+        return render_template('groups.html', sform=sform, cform=cform, group=g, user=flask_login.current_user)
     elif cform.validate_on_submit() and cform.data['submit']:
+        # Creating a group
         group = Group.query.filter(Group.name == cform.data['name']).first()
         if group is None:
             g = Group(cform.data['name'], description=cform.data['description'])
@@ -78,29 +87,14 @@ def groups():
             db_session.add(g)
             db_session.commit()
             flash('Group "{name}" has been created.'.format(**cform.data))
-            return redirect(url_for('group_page', name=g.name))
+            return redirect(url_for('groups'))
         else:
             flash('Group "{name}" already exists.'.format(**cform.data))
             return redirect(url_for('groups'))
 
     elif sform.validate_on_submit() and sform.data['submit']:
-        g = Group.query.filter(Group.name == sform.data['name']).first()
-        if g:
-            return redirect(url_for('group_page', name=g.name))
-        else:
-            flash('Group "{name}" does not exist.'.format(**sform.data))
-            return redirect(url_for('groups'))
-
-
-@app.route('/groups/<string:name>')
-@flask_login.login_required
-def group_page(name):
-    if request.method == 'GET':
-        group = Group.query.filter(Group.name == name).first()
-        if group is None:
-            return 'Invalid group name.'
-        else:
-            return render_template('group_page.html', group=group, user=flask_login.current_user)
+        # Searching for a group
+        return redirect(url_for('groups', group=sform.data['name']))
 
 
 @app.route('/')

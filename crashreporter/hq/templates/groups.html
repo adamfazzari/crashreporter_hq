@@ -17,7 +17,10 @@
                 {{ sform.hidden_tag() }}
                 <ul>
                     <li>
-                        <span>Group Name</span> {{ sform.name(size=80) }}
+                        <span>Group Name</span>
+                    </li>
+                    <li>
+                        {{ sform.name(size=80) }}
                     </li>
                     <li>
                         {{ sform.submit }}
@@ -29,34 +32,56 @@
                 {% endfor %}<br>
             </form>
         </div>
-        <br>
-        <div class="form" >
-            <h3>Create a group</h3>
-            <form action="groups" method="post" name="groups">
-                {{ cform.hidden_tag() }}
-                <ul>
-                    <li>
-                        <span>Group Name</span>
-                    </li>
-                    <li>
-                        {{ cform.name(size=80) }}
-                    </li>
-                    <li>
-                        <span>Group Description</span>
-                    </li>
-                    <li>
-                        {{ cform.description }}
-                    </li>
-                    <li>
-                        {{ cform.submit }}
-                    </li>
-                </ul>
 
-                {% for error in cform.name.errors %}
-                    <span style="color: red;">[{{ error }}]</span>
+        {%  if group is none %}
+            <br>
+            <div class="form" >
+                <h3>Create a group</h3>
+                <form action="groups" method="post" name="groups">
+                    {{ cform.hidden_tag() }}
+                    <ul>
+                        <li>
+                            <span>Group Name</span>
+                        </li>
+                        <li>
+                            {{ cform.name(size=80) }}
+                        </li>
+                        <li>
+                            <span>Group Description</span>
+                        </li>
+                        <li>
+                            {{ cform.description }}
+                        </li>
+                        <li>
+                            {{ cform.submit }}
+                        </li>
+                    </ul>
+
+                    {% for error in cform.name.errors %}
+                        <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </form>
+            </div>
+        {% else %}
+            <h3> {{ group.name }} </h3>
+            <p> {{ group.description }} </p>
+            <table border="1" class="sortable", style="width:100%">
+                <tr>
+
+                    {% for header in ('Users', 'Group Admin') %}
+                        <td class="tableheader">{{ header }}</td>
+                    {% endfor %}
+                </tr>
+
+                {% for u in group.users%}
+                    <tr>
+                            <td style="text-align: center"> {{ u.name}} </td>
+                            <td style="text-align: center"> {{ u.group_admin }} </td>
+
+                    </tr>
                 {% endfor %}
-            </form>
-        </div>
+            </table>
+        {%  endif %}
 
     {% endblock %}
 

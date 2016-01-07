@@ -17,7 +17,7 @@ class SignUpForm(Form):
 
 class SearchForm(Form):
     name = StringField('name')
-    submit = SubmitField('Create')
+    submit = SubmitField('Search')
 
 
 class CreateGroupForm(Form):
