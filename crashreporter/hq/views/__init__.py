@@ -94,16 +94,38 @@ def groups(group):
     elif sform.validate_on_submit() and sform.data['submit']:
         # Searching for a group
         return redirect(url_for('groups', group=sform.data['name']))
-    elif request.method == 'POST' and 'request_join' in request.args and group is not None:
-        if flask_login.current_user.group is None or (group != flask_login.current_user.group.name):
-            g = Group.query.filter(Group.name == group).first()
-            if flask_login.current_user not in g.join_requests:
-                g.join_requests.append(flask_login.current_user)
-                db_session.commit()
-                flash('Request to join group "{name}" has been submitted.'.format(name=group))
-            else:
-                flash('Request to join group "{name}" has already been submitted.'.format(name=group))
+
+
+@app.route('/groups/request/accept_invite', methods=['POST'])
+def accept_group_invite():
+    group = request.args['group']
+    loggedin_user = flask_login.current_user
+    if loggedin_user.group.name == group and loggedin_user.group_admin:
+        g = Group.query.filter(Group.name == group).first()
+        q = User.query.filter(User.email == request.args['user_email'])
+        u = q.first()
+        if u in g.join_requests:
+            g.join_requests.remove(u)
+            g.users.append(u)
+            db_session.commit()
             return redirect(url_for('groups', group=group))
+
+
+@app.route('/groups/request/request_invite', methods=['POST'])
+def request_group_invite():
+    # Current user has requested to join the group
+    group = request.args['group']
+    loggedin_user = flask_login.current_user
+    if loggedin_user.group is None or (group != loggedin_user.group.name):
+        g = Group.query.filter(Group.name == group).first()
+        # Only request to join the group is the user isn't already in a group
+        if flask_login.current_user not in g.join_requests:
+            g.join_requests.append(flask_login.current_user)
+            db_session.commit()
+            flash('Request to join group "{name}" has been submitted.'.format(name=group))
+        else:
+            flash('Request to join group "{name}" has already been submitted.'.format(name=group))
+        return redirect(url_for('groups', group=group))
 
 
 @app.route('/')
