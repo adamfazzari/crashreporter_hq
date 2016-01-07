@@ -46,8 +46,9 @@ class User(Base, flask_login.UserMixin):
                 self.api_key = api_key
                 break
         # Add the groups this user belongs to
-        if group and isinstance(group, basestring):
-            group = Group.query.filter(Group.name == g).first()
+        if group:
+            if isinstance(group, basestring):
+                group = Group.query.filter(Group.name == group).first()
             group.users.append(self)
 
     def get_id(self):
