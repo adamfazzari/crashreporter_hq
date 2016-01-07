@@ -15,6 +15,10 @@ class SignUpForm(Form):
     company = StringField('name')
 
 
+class CreateGroupForm(Form):
+    name = StringField('name')
+
+
 class YoutrackSubmitForm(Form):
     server = StringField('YouTrack Server', validators=[DataRequired()])
     project = StringField('Project', validators=[DataRequired()])

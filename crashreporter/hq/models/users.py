@@ -32,6 +32,7 @@ class User(Base, flask_login.UserMixin):
     api_key = Column(String(50), unique=True)
     group_id = Column(Integer, ForeignKey('group.id'))
     group = relationship('Group', backref='users', foreign_keys=[group_id])
+    group_admin = Column(Boolean, default=False)
 
     def __init__(self, email, password, name='', company='', admin=False, group=None):
         self.email = email

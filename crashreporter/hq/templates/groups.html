@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='crashreport.css') }}">
+    <title>Crash Reporter HQ</title>
+</head>
+<body id="login-page">
+
+    {% extends "base.html" %}
+
+    {% block content %}
+
+        <div class="login">
+            <h3>Create a group</h3>
+            <form action="groups" method="post" name="groups">
+                {{ form.hidden_tag() }}
+                <ul>
+                    <li>
+                        <span>Group Name</span> {{ form.name(size=80) }}
+                    </li>
+                </ul>
+                <input type='submit' name='submit', value="Create Group"></input>
+                {% for error in form.name.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}<br>
+            </form>
+        </div>
+
+    {% endblock %}
+
+
+</body>
+</html>
