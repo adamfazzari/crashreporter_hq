@@ -15,7 +15,8 @@ class SignUpForm(Form):
     company = StringField('name')
 
 
-class CreateGroupForm(Form):
+class GroupForm(Form):
+    submit_type = 'Search'
     name = StringField('name')
 
 

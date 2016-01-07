@@ -12,16 +12,32 @@
     {% block content %}
 
         <div class="login">
-            <h3>Create a group</h3>
+            <h3>Search for a group</h3>
             <form action="groups" method="post" name="groups">
-                {{ form.hidden_tag() }}
+                {{ sform.hidden_tag() }}
                 <ul>
                     <li>
-                        <span>Group Name</span> {{ form.name(size=80) }}
+                        <span>Group Name</span> {{ sform.name(size=80) }}
                     </li>
                 </ul>
-                <input type='submit' name='submit', value="Create Group"></input>
-                {% for error in form.name.errors %}
+                <input type='submit' name='submit', value="Search"></input>
+                {% for error in sform.name.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}<br>
+            </form>
+        </div>
+
+        <div class="login">
+            <h3>Create a group</h3>
+            <form action="groups" method="post" name="groups">
+                {{ cform.hidden_tag() }}
+                <ul>
+                    <li>
+                        <span>Group Name</span> {{ cform.name(size=80) }}
+                    </li>
+                </ul>
+                <input type='submit' name='submit', value="Create"></input>
+                {% for error in cform.name.errors %}
                     <span style="color: red;">[{{ error }}]</span>
                 {% endfor %}<br>
             </form>
