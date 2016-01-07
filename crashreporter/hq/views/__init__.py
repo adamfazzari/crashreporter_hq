@@ -91,10 +91,19 @@ def groups(group):
         else:
             flash('Group "{name}" already exists.'.format(**cform.data))
             return redirect(url_for('groups'))
-
     elif sform.validate_on_submit() and sform.data['submit']:
         # Searching for a group
         return redirect(url_for('groups', group=sform.data['name']))
+    elif request.method == 'POST' and 'request_join' in request.args and group is not None:
+        if flask_login.current_user.group is None or (group != flask_login.current_user.group.name):
+            g = Group.query.filter(Group.name == group).first()
+            if flask_login.current_user not in g.join_requests:
+                g.join_requests.append(flask_login.current_user)
+                db_session.commit()
+                flash('Request to join group "{name}" has been submitted.'.format(name=group))
+            else:
+                flash('Request to join group "{name}" has already been submitted.'.format(name=group))
+            return redirect(url_for('groups', group=group))
 
 
 @app.route('/')

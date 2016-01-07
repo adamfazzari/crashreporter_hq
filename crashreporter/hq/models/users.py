@@ -13,6 +13,8 @@ class Group(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(120), unique=True)
     description = Column(String, unique=False)
+    join_requests_id = Column(Integer,  ForeignKey('users.id'))
+    join_requests = relationship('User', uselist=True, foreign_keys=[join_requests_id])
 
     def __init__(self, name, description='', users=None):
         self.name = name
