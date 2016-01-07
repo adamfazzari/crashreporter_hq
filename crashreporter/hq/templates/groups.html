@@ -5,13 +5,13 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='crashreport.css') }}">
     <title>Crash Reporter HQ</title>
 </head>
-<body id="login-page">
+<body id="form-page">
 
     {% extends "base.html" %}
 
     {% block content %}
 
-        <div class="login">
+        <div class="form">
             <h3>Search for a group</h3>
             <form action="groups" method="post" name="groups">
                 {{ sform.hidden_tag() }}
@@ -30,7 +30,7 @@
             </form>
         </div>
         <br>
-        <div class="login" style="height: 400px">
+        <div class="form" >
             <h3>Create a group</h3>
             <form action="groups" method="post" name="groups">
                 {{ cform.hidden_tag() }}
@@ -48,13 +48,13 @@
                         {{ cform.description }}
                     </li>
                     <li>
-                        <span>{{ cform.submit }}</span>
+                        {{ cform.submit }}
                     </li>
                 </ul>
 
                 {% for error in cform.name.errors %}
                     <span style="color: red;">[{{ error }}]</span>
-                {% endfor %}<br>
+                {% endfor %}
             </form>
         </div>
 
