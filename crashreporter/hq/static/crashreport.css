@@ -149,7 +149,8 @@ table {
 }
 
 .login li {
-    display: block;
+    display: inline-block;
+    width: 100%;
 }
 
 .login span {

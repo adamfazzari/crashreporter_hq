@@ -15,9 +15,15 @@ class SignUpForm(Form):
     company = StringField('name')
 
 
-class GroupForm(Form):
-    submit_type = 'Search'
+class SearchForm(Form):
     name = StringField('name')
+    submit = SubmitField('Create')
+
+
+class CreateGroupForm(Form):
+    name = StringField('name')
+    description = TextAreaField('desc')
+    submit = SubmitField('Create')
 
 
 class YoutrackSubmitForm(Form):

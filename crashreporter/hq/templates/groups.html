@@ -19,24 +19,39 @@
                     <li>
                         <span>Group Name</span> {{ sform.name(size=80) }}
                     </li>
+                    <li>
+                        {{ sform.submit }}
+                    </li>
                 </ul>
-                <input type='submit' name='submit', value="Search"></input>
+
                 {% for error in sform.name.errors %}
                     <span style="color: red;">[{{ error }}]</span>
                 {% endfor %}<br>
             </form>
         </div>
-
-        <div class="login">
+        <br>
+        <div class="login" style="height: 400px">
             <h3>Create a group</h3>
             <form action="groups" method="post" name="groups">
                 {{ cform.hidden_tag() }}
                 <ul>
                     <li>
-                        <span>Group Name</span> {{ cform.name(size=80) }}
+                        <span>Group Name</span>
+                    </li>
+                    <li>
+                        {{ cform.name(size=80) }}
+                    </li>
+                    <li>
+                        <span>Group Description</span>
+                    </li>
+                    <li>
+                        {{ cform.description }}
+                    </li>
+                    <li>
+                        <span>{{ cform.submit }}</span>
                     </li>
                 </ul>
-                <input type='submit' name='submit', value="Create"></input>
+
                 {% for error in cform.name.errors %}
                     <span style="color: red;">[{{ error }}]</span>
                 {% endfor %}<br>

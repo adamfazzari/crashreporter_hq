@@ -12,9 +12,11 @@ class Group(Base):
     __tablename__ = 'group'
     id = Column(Integer, primary_key=True)
     name = Column(String(120), unique=True)
+    description = Column(String, unique=False)
 
-    def __init__(self, name, users=None):
+    def __init__(self, name, description='', users=None):
         self.name = name
+        self.description = description
         if users is not None:
             for user in users:
                 if isinstance(user, User):

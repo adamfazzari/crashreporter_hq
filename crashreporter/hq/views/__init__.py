@@ -15,7 +15,7 @@ from login import *
 from users import *
 from ..extensions import views
 from ..database import db_session
-from ..forms import GroupForm
+from ..forms import CreateGroupForm, SearchForm
 from ..models import CrashReport, Traceback, Group
 
 
@@ -60,17 +60,18 @@ def view_related_reports(related_group_id):
                            back_link=request.referrer)
     return html
 
+
 @app.route('/groups', methods=['GET', 'POST'])
 @flask_login.login_required
 def groups():
-    sform = GroupForm(prefix='search')
-    cform = GroupForm(prefix='create')
+    sform = SearchForm(prefix='search')
+    cform = CreateGroupForm(prefix='create')
     if request.method == 'GET':
         return render_template('groups.html', sform=sform, cform=cform)
-    elif cform.validate_on_submit() and request.form['submit'] == 'Create':
+    elif cform.validate_on_submit() and cform.data['submit']:
         group = Group.query.filter(Group.name == cform.data['name']).first()
         if group is None:
-            g = Group(cform.data['name'])
+            g = Group(cform.data['name'], description=cform.data['description'])
             user = flask_login.current_user
             user.group = g
             user.group_admin = True
@@ -82,12 +83,12 @@ def groups():
             flash('Group "{name}" already exists.'.format(**cform.data))
             return redirect(url_for('groups'))
 
-    elif sform.validate_on_submit() and request.form['submit'] == 'Search':
+    elif sform.validate_on_submit() and sform.data['submit']:
         g = Group.query.filter(Group.name == sform.data['name']).first()
         if g:
             return redirect(url_for('group_page', name=g.name))
         else:
-            flash('Group "{name}" does not exist.'.format(**cform.data))
+            flash('Group "{name}" does not exist.'.format(**sform.data))
             return redirect(url_for('groups'))
 
 
