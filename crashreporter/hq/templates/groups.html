@@ -64,11 +64,13 @@
             </div>
         {% else %}
             <h3> {{ group.name }} </h3>
-            <p> {{ group.description }} </p>
+            {% if group.description %}
+                <p> {{ group.description }} </p>
+            {% endif %}
             <table border="1" class="sortable", style="width:100%">
                 <tr>
 
-                    {% for header in ('Users', 'Group Admin') %}
+                    {% for header in ('User', 'Group Admin') %}
                         <td class="tableheader">{{ header }}</td>
                     {% endfor %}
                 </tr>
