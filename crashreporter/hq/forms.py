@@ -8,6 +8,13 @@ class LoginForm(Form):
     password = PasswordField('password', validators=[DataRequired()])
 
 
+class SignUpForm(Form):
+    email = StringField('email', validators=[DataRequired()])
+    password = PasswordField('password', validators=[DataRequired()])
+    name = StringField('name')
+    company = StringField('name')
+
+
 class YoutrackSubmitForm(Form):
     server = StringField('YouTrack Server', validators=[DataRequired()])
     project = StringField('Project', validators=[DataRequired()])

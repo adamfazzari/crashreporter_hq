@@ -12,21 +12,25 @@
     {% block content %}
 
         <div class="login">
-            <h3>Sign In</h3>
-            <form action="login" method="post" name="login">
+            <h3>Sign Up</h3>
+            <form action="signup" method="post" name="signup">
                 {{ form.hidden_tag() }}
                 <ul>
                     <li>
-                        <span>Email</span> {{ form.email(size=80) }}
+                        <span>* Email</span> {{ form.email(size=80) }}
                     </li>
                     <li>
-                        <span>Password</span> {{ form.password(size=80) }}
+                        <span>* Password</span> {{ form.password(size=80) }}
                     </li>
+                    <li>
+                        <span>Name</span> {{ form.name(size=80) }}
+                    </li>
+                    <li>
+                        <span>Company</span> {{ form.company(size=80) }}
+                    </li>
+
                 </ul>
-                <input type='submit' name='submit', value="Sign In"></input>
-                <p>
-                    <a href="{{ url_for('signup') }}">Sign Up</a>
-                </p>
+                <input type='submit' name='submit', value="Sign Up"></input>
                 {% for error in form.email.errors %}
                     <span style="color: red;">[{{ error }}]</span>
                 {% endfor %}<br>
