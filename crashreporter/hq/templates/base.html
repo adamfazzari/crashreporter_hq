@@ -13,6 +13,9 @@
                     <span class="nav-item">
                         <a href="{{ url_for('home') }}">Home</a>
                     </span>
+                    <span class="nav-item">
+                        <a href="{{ url_for('group_page', name=user.group.name) }}">Group ({{ user.group.name }})</a>
+                    </span>
                     {% if user.admin %}
                         <span class="nav-item">
                             <a href=" {{ url_for('users') }}">Users</a>

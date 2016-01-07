@@ -67,7 +67,7 @@ def groups():
     sform = SearchForm(prefix='search')
     cform = CreateGroupForm(prefix='create')
     if request.method == 'GET':
-        return render_template('groups.html', sform=sform, cform=cform)
+        return render_template('groups.html', sform=sform, cform=cform, user=flask_login.current_user)
     elif cform.validate_on_submit() and cform.data['submit']:
         group = Group.query.filter(Group.name == cform.data['name']).first()
         if group is None:
@@ -100,7 +100,7 @@ def group_page(name):
         if group is None:
             return 'Invalid group name.'
         else:
-            return render_template('group_page.html', group=group)
+            return render_template('group_page.html', group=group, user=flask_login.current_user)
 
 
 @app.route('/')
