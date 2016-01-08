@@ -7,11 +7,11 @@ import glob
 import datetime
 import shutil
 import smtplib
-import requests
 import json
 import time
 import logging
 import ConfigParser
+
 from threading import Thread
 from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
@@ -55,6 +55,7 @@ class CrashReporter(object):
     """
     _report_name = "crash_report_%d"
     html_template = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'hq', 'templates', 'email.html')
+    python_syntax_css = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'hq', 'static', 'syntax.css')
     active = False
     application_name = None
     application_version = None
@@ -247,9 +248,15 @@ class CrashReporter(object):
         return self.render_report(payload, inspection_level=self.inspection_level)
 
     def render_report(self, payload, inspection_level=1):
+        payload = payload.copy()
+        for tb in payload['Traceback']:
+            tb['Source Code'] = tb['Source Code'].split('\n')
         with open(self.html_template, 'r') as _f:
             template = jinja2.Template(_f.read())
-        return template.render(info=payload, inspection_level=inspection_level)
+
+        return template.render(info=payload,
+                               inspection_level=inspection_level,
+                               python_syntax_css=self.python_syntax_css)
 
     def attachments(self):
         """
