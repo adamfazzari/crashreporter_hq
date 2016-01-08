@@ -37,8 +37,6 @@ def save_report(payload):
         return None, 'Invalid or missing API Key.'
 
 
-
-
 def get_similar_reports(return_query=False):
     q = CrashReport.query.group_by('related_group_id')
     if return_query:
@@ -49,7 +47,6 @@ def get_similar_reports(return_query=False):
 
 def get_all_reports():
     return CrashReport.query.all()
-
 
 
 def create_user(email, password, **kwargs):

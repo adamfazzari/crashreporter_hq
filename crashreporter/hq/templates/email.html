@@ -50,7 +50,7 @@
 
     <div style="width: 800px; background-color:#FFF099; border-style:solid; border-width: 1px; padding: 10px;">
         <ol start="{{info['Traceback'][-1]['Module Line Number']}}">
-            {% for line in info['Traceback'][-1]['Source Code'] %}
+            {% for line in info['Traceback'][-1]['Source Code'].split('\n') %}
                 {% set stripped_line = line.replace('    ', '') %}
                 {% set indent = 30 * (line.count('    ') - 1) %}
                 {% if info['Traceback'][-1]['Module Line Number'] + loop.index0 == info['Traceback'][-1]['Error Line Number'] %}

@@ -248,9 +248,6 @@ class CrashReporter(object):
         return self.render_report(payload, inspection_level=self.inspection_level)
 
     def render_report(self, payload, inspection_level=1):
-        payload = payload.copy()
-        for tb in payload['Traceback']:
-            tb['Source Code'] = tb['Source Code'].split('\n')
         with open(self.html_template, 'r') as _f:
             template = jinja2.Template(_f.read())
 
@@ -290,24 +287,24 @@ class CrashReporter(object):
 
         return remaining_reports
 
-    def submit_offline_reports(self, smtp=True, hq=True):
+    def submit_offline_reports(self, **kwargs):
         """
         Submit offline reports using the enabled methods (SMTP and/or HQ)
         Returns a list of booleans signifying upload method success (smtp_success, hq_success)
         """
         hq_success = smtp_success = False
-        if smtp and self._smtp is not None:
+        if kwargs.get('smtp', True) and self._smtp is not None:
             try:
                 smtp_success = self._smtp_send_offline_reports()
             except Exception as e:
                 logging.error(e)
-        if hq and self._hq is not None:
+        if kwargs.get('hq', True) and self._hq is not None:
             try:
                 hq_success = self._hq_send_offline_reports()
             except Exception as e:
                 logging.error(e)
 
-        return smtp_success, hq_success
+        return smtp_success and hq_success
 
     def store_report(self, payload):
         """
@@ -424,6 +421,7 @@ class CrashReporter(object):
                 with open(report, 'r') as _f:
                     payload = json.load(_f)
                     if payload['HQ Submission'] == 'Not sent':
+                        payload['HQ Parameters'] = self._hq if self._hq is not None else {}
                         payloads[report] = payload
 
             if payloads:
