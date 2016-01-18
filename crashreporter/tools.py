@@ -43,7 +43,7 @@ def get_object_references(tb, source, max_string_length=1000):
     """
     global obj_ref_regex
     referenced_attr = set()
-    for line in source:
+    for line in source.split('\n'):
         referenced_attr.update(set(re.findall(obj_ref_regex, line)))
     referenced_attr = sorted(referenced_attr)
     info = []
