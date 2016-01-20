@@ -6,6 +6,7 @@ from pygments import highlight
 from pygments.lexers import PythonLexer
 from pygments.formatters import HtmlFormatter
 
+from math import ceil
 from ..config import *
 
 from ..tools import get_similar_reports
@@ -136,11 +137,13 @@ def home():
     if flask_login.current_user.group:
         reports = q.filter(CrashReport.group == flask_login.current_user.group).all()
         n_total_reports = len(reports)
+        max_page = int(ceil(n_total_reports / float(PER_PAGE)))
         try:
-            page = max(1, int(request.args.get('page', n_total_reports / PER_PAGE)))
+            page = max(1, int(request.args.get('page', 1)))
         except ValueError:
             page = 1
-        reports = reports[(page-1) * PER_PAGE: page * PER_PAGE]
+        page_rev = max_page - page + 1
+        reports = reports[(page_rev-1) * PER_PAGE: page_rev * PER_PAGE]
         pagination = Pagination(page=page, per_page=PER_PAGE, total=n_total_reports, search=False, record_name='reports')
         html = render_template('index.html', reports=reports, user=flask_login.current_user, pagination=pagination)
         return html
