@@ -10,7 +10,7 @@ setup(
     package_dir={'crashreporter': 'crashreporter'},
     package_data={'crashreporter': [join('hq', 'templates', '*.html')]},
     version=__version__,
-    description='Track and send crash reports by email or FTP',
+    description='Track and send crash reports by email or upload them to a webserver.',
     author='Calvin Lobo',
     author_email='calvinvlobo@gmail.com',
     license='MIT',
