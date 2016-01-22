@@ -7,7 +7,7 @@ from os.path import join
 setup(
     name='crashreporter',
     packages=['crashreporter'],  # this must be the same as the name above
-    package_dir={'crashreporter': '.'},
+    package_dir={'crashreporter': 'crashreporter'},
     package_data={'crashreporter': [join('hq', 'templates', '*.html')]},
     version=__version__,
     description='Track and send crash reports by email or FTP',
