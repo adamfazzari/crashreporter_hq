@@ -5,10 +5,10 @@ from crashreporter import __version__
 from os.path import join
 
 setup(
-    name='crashreporter',
+    name='crashreporter-hq',
     packages=['crashreporter'],  # this must be the same as the name above
     package_dir={'crashreporter': 'crashreporter'},
-    package_data={'crashreporter': [join('hq', 'templates', '*.html')]},
+    package_data={'crashreporter': [join('crashreporter_hq', 'templates', '*.html')]},
     version=__version__,
     description='Track and send crash reports by email or upload them to a webserver.',
     author='Calvin Lobo',

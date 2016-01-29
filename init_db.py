@@ -1,12 +1,11 @@
 __author__ = 'calvin'
 
-from hq.database import init_db
+from crashreporter_hq.database import init_db
 
 init_db()
 
 
-from hq.tools import create_group, create_user
-
+from crashreporter_hq.tools import create_group, create_user
 
 
 if __name__ == '__main__':

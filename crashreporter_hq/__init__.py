@@ -9,7 +9,7 @@ from .database import db_session
 # Mock database / persistence layer
 
 app = Flask(__name__)
-app.config.from_object('hq.config')
+app.config.from_object('crashreporter_hq.config')
 
 login_manager = flask_login.LoginManager()
 login_manager.init_app(app)

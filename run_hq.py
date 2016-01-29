@@ -1,6 +1,6 @@
 __author__ = 'calvin'
 
-from hq import app
+from crashreporter_hq import app
 
 import argparse
 

@@ -6,9 +6,9 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
-import hq.config
+import crashreporter_hq.config
 
-engine = create_engine(hq.config.DB_ABSOLUTE_PATH, convert_unicode=True)
+engine = create_engine(crashreporter_hq.config.DB_ABSOLUTE_PATH, convert_unicode=True)
 db_session = scoped_session(sessionmaker(autocommit=False,
                                          autoflush=False,
                                          bind=engine))
