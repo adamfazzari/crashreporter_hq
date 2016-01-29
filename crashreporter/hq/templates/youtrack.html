@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='crashreport.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='syntax.css') }}">
+    <script src="{{ url_for('static', filename='jquery-2.1.4.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='crashreport.js') }}"></script>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+
+    {% extends "base.html" %}
+
+    {% block content %}
+        <div style="width: 80%;">
+            <h3>
+                {% if report['Application Name'] != None %}
+                    {% if report['Application Version'] != None %}
+                        {{report['Application Name']}} (v{{report['Application Version']}})
+                    {% else %}
+                        {{report['Application Name']}}
+                    {% endif %}
+
+                {% else %}
+                    Crash Report
+                {% endif %}
+            </h3>
+            {% if user is none %}
+                <p>A crash was detected on {{report['Date']}} at {{report['Time']}}.</p>
+            {% else %}
+                <p>A crash was detected on {{report['Date']}} at {{report['Time']}} from user {{ report['User'] }}.</p>
+            {% endif %}
+            {% if report.related_reports|length == 1 %}
+                <p>There is <a href="{{ url_for('view_related_reports', related_group_id=report.related_group_id) }}">{{ report.related_reports|length }}</a> other related report found.</p>
+            {% elif report.related_reports|length > 1 %}
+                <p>There are <a href="{{ url_for('view_related_reports', related_group_id=report.related_group_id) }}">{{ report.related_reports|length }}</a> other related reports found.</p>
+            {% endif %}
+
+        </div>
+
+        <div style="width: 80%;">
+            <h4>Traceback (most recent call last):</h4>
+            {% for tb in report['Traceback'] %}
+
+                <div class="container">
+
+                    <DL class="header">
+                        File: {{tb['File']|e}} , line {{tb['Error Line Number']|e}}, in module {{tb['Module']|e}}
+                        <DD>
+                            {{tb['Error Line']|e}}
+                        </DD>
+                    </DL>
+
+
+                    {% if loop.revindex <= inspection_level %}
+                        <div class="content">
+
+                            <h4>Source Code:</h4>
+                            <div class="contentitem">
+                                <div class="codeblock">
+                                    {{ source_code[loop.index0] | safe }}
+                                </div>
+                            </div>
+                            {% if tb['Local Variables'] %}
+                                <h4>Local Variables:</h4>
+                                    <div class="contentitem">
+                                        <table border="1" class="variabletable">
+                                            <tr class="tableheader">
+                                                <td>Variable</td>
+                                                <td>Value</td>
+                                            </tr>
+                                            {% for field, value in tb['Local Variables'] %}
+                                                <tr>
+                                                    <td class="varcolumn">{{ field|e }}</td>
+                                                    <td class="valcolumn">{{ value|e }}</td>
+                                                </tr>
+                                            {% endfor %}
+                                        </table>
+                                    </div>
+                            {% endif %}
+                            {% if tb['Object Variables'] %}
+                                <h4>Object Inspection:</h4>
+                                    <div class="contentitem">
+                                        <table border="1" class="variabletable">
+                                            <tr class="tableheader">
+                                                <td>Variable</td>
+                                                <td>Value</td>
+                                            </tr>
+                                            {% for field, value in tb['Object Variables'] %}
+                                                <tr>
+                                                    <td class="varcolumn">{{ field|e }}</td>
+                                                    <td class="valcolumn">{{ value|e }}</td>
+                                                </tr>
+                                            {% endfor %}
+                                        </table>
+                                    </div>
+                            {% endif %}
+                        </div> {# End of content #}
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+
+            <div class="container">
+                <DL class="header">
+                    Error:
+                    <DD>
+                        {{report['Error Message']|e}}
+                    </DD>
+                </DL>
+            </div>
+
+            <form method='GET' action="{{ url_for('home') }}">
+                <input type="submit" value="Back" >
+            </form>
+        </div>
+
+    {% endblock %}
+
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+  </head>
+  <body>
+    <div>
+        {% if user %}
+            <div class="page-header">
+                <div class="right-just">
+                    <span class="nav-item">
+                        Logged in as user: <b>{{ user.email }}  (<a href=" {{ url_for('logout') }}">logout</a>)</b>
+                    </span>
+                    <span class="nav-item">
+                        <a href="{{ url_for('home') }}">Home</a>
+                    </span>
+                    <span class="nav-item">
+                        <a href="{{ url_for('groups') }}">Group {% if user.group %} ({{ user.group.name }}) {% endif %}</a>
+                    </span>
+                    {% if user.admin %}
+                        <span class="nav-item">
+                            <a href=" {{ url_for('users') }}">Users</a>
+                        </span>
+                    {% endif %}
+                    {% if back_link %}
+                        <span class="nav-item">
+                            <a href=" {{ back_link }}">Back</a>
+                        </span>
+                    {% endif%}
+                </div>
+            </div>
+          <br><hr>
+        {% endif %}
+    </div>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        {% for message in messages %}
+            <p> {{ message }} </p><br>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+
+    <div id="page-footer">
+      <hr>
+        <div style="text-align: center;">
+          <p>© Calvin Lobo 2015. All rights reserved.</p>
+        </div>
+    </div>
+
+  </body>
+</html>

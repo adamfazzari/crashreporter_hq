@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='crashreport.css') }}">
+    <script src="{{ url_for('static', filename='sorttable.js') }}"></script>
+    <title></title>
+</head>
+<body>
+
+    {% extends "base.html" %}
+
+    {% block content %}
+        {% if user_list %}
+
+            <table border="1" class="sortable", style="width:100%">
+                <tr>
+                    <td class="tableheader">ID</td>
+                    <td class="tableheader">Email</td>
+                    <td class="tableheader">Name</td>
+                    <td class="tableheader">Company</td>
+                    <td class="tableheader">Group</td>
+                    <td class="tableheader">API Key</td>
+                    <td class="tableheader">Admin</td>
+                </tr>
+
+                {% for user in user_list %}
+                    <tr>
+                        <td>{{ user.id }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>{{ user.name }}</td>
+                        <td>{{ user.company }}</td>
+                        <td>{{ user.group.name }}</td>
+                        <td>{{ user.api_key }}</td>
+                        <td>{% if user.admin %}  Yes {% else %} No {% endif %}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% endif %}
+    {% endblock %}
+</body>
+</html>

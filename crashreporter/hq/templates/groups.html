@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='crashreport.css') }}">
+    <title>Crash Reporter HQ</title>
+</head>
+<body id="form-page">
+
+    {% extends "base.html" %}
+
+    {% block content %}
+
+        <div class="form">
+            <h3>Search for a group</h3>
+            <form action="groups" method="post" name="groups">
+                {{ sform.hidden_tag() }}
+                <ul>
+                    <li>
+                        <span>Group Name</span>
+                    </li>
+                    <li>
+                        {{ sform.name(size=80) }}
+                    </li>
+                    <li>
+                        {{ sform.submit }}
+                    </li>
+                </ul>
+
+                {% for error in sform.name.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}<br>
+            </form>
+        </div>
+
+        {%  if group is none %}
+            <br>
+            <div class="form" >
+                <h3>Create a group</h3>
+                <form action="groups" method="post" name="groups">
+                    {{ cform.hidden_tag() }}
+                    <ul>
+                        <li>
+                            <span>Group Name</span>
+                        </li>
+                        <li>
+                            {{ cform.name(size=80) }}
+                        </li>
+                        <li>
+                            <span>Group Description</span>
+                        </li>
+                        <li>
+                            {{ cform.description }}
+                        </li>
+                        <li>
+                            {{ cform.submit }}
+                        </li>
+                    </ul>
+
+                    {% for error in cform.name.errors %}
+                        <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                </form>
+            </div>
+        {% else %}
+            <h3> {{ group.name }} </h3>
+            {% if group.description %}
+                <p> {{ group.description }} </p>
+            {% endif %}
+            {%  if not user.group %}
+                <form method='POST' action="{{ url_for('request_group_invite', group=group.name) }}">
+                    <input type="submit" value="Request Invite" >
+                </form>
+            {% endif %}
+            <table border="1" class="sortable", style="width:100%">
+                <tr>
+
+                    {% for header in ('User', 'Group Admin') %}
+                        <td class="tableheader">{{ header }}</td>
+                    {% endfor %}
+                </tr>
+
+                {% for u in group.users%}
+                    <tr>
+                        <td style="text-align: center"> {{ u.name}}</td>
+                        <td style="text-align: center"> {{ u.group_admin }} </td>
+                    </tr>
+                {% endfor %}
+            </table>
+
+
+            {% if user.group_admin and group.name == user.group.name %}
+                <h3> Invitations </h3>
+                <table border="1" class="sortable", style="width:100%">
+                    <tr>
+
+                        {% for header in ('User', 'Accept') %}
+                            <td class="tableheader">{{ header }}</td>
+                        {% endfor %}
+                    </tr>
+
+                    {% for u in group.join_requests %}
+                        <tr>
+                            <td style="text-align: center"> {{ u.name}}</td>
+                            <td>
+                                <form method='POST' action="{{ url_for('accept_group_invite', group=group.name, user_email=u.email) }}">
+                                    <input type="submit" value="Accept Invite" >
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            {% endif %}
+
+        {% endif %}
+    {% endblock %}
+
+
+</body>
+</html>

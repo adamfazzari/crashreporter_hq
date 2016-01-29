@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='crashreport.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='pagination.css') }}">
+    <script src="{{ url_for('static', filename='sorttable.js') }}"></script>
+    <meta charset="UTF-8">
+    <title>Crash Reporter HQ</title>
+</head>
+
+
+<body>
+
+    {% extends "base.html" %}
+
+    {% block content %}
+
+        <div style="text-align: center;">
+            {{ pagination.info }}
+            {{ pagination.links }}
+        </div>
+            {% if reports %}
+                <table border="1" class="sortable", style="width:100%">
+                    <tr>
+
+                        {% for header in ('Report #', 'Count', 'Application Name', 'Version', 'User', 'Error Type', 'Error Message', 'Date/Time') %}
+                            <td class="tableheader">{{ header }}</td>
+                        {% endfor %}
+                    </tr>
+
+                    {% for r in reports %}
+                        <tr>
+                                <td style="text-align: center"> {{ r['Report Number'] }} </td>
+                                <td style="text-align: center"> <a href="{{ url_for('view_related_reports', related_group_id=r.related_group_id) }}">{{ r.related_reports|length + 1}}</a></td>
+                                <td style="text-align: center"> {{ r['Application Name'] }} </td>
+                                <td style="text-align: center"> {{ r['Application Version'] }} </td>
+                                <td style="text-align: center"> {{ r['User'] }} </td>
+                                <td style="text-align: center"> {{ r['Error Type'] }} </td>
+                                <td style="padding-left: 10px"> {{ r['Error Message'] }} </td>
+                                <td style="text-align: center"> {{ r['Date'] }} </td>
+                            <td>
+                                <form method='GET' action="{{ url_for('view_report', report_number=r['Report Number']) }}">
+                                    <input type="submit" value="Open" >
+                                </form>
+                            </td>
+                            <td>
+                                <form method='POST' action="{{ url_for('delete_report', report_number=r['Report Number']) }}">
+                                    <input type="submit" value="Delete" >
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            {% endif %}
+
+        <div style="text-align: center;">
+            {{ pagination.links }}
+        </div>
+
+    {% endblock %}
+
+
+</body>
+</html>

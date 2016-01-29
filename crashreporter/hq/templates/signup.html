@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='crashreport.css') }}">
+    <title>Crash Reporter HQ</title>
+</head>
+<body id="form-page">
+
+    {% extends "base.html" %}
+
+    {% block content %}
+
+        <div class="form">
+            <h3>Sign Up</h3>
+            <form action="signup" method="post" name="signup">
+                {{ form.hidden_tag() }}
+                <ul>
+                    <li>
+                        <span>* Email</span> {{ form.email(size=80) }}
+                    </li>
+                    <li>
+                        <span>* Password</span> {{ form.password(size=80) }}
+                    </li>
+                    <li>
+                        <span>Name</span> {{ form.name(size=80) }}
+                    </li>
+                    <li>
+                        <span>Company</span> {{ form.company(size=80) }}
+                    </li>
+
+                </ul>
+                <input type='submit' name='submit', value="Sign Up"></input>
+                {% for error in form.email.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}<br>
+            </form>
+        </div>
+
+    {% endblock %}
+
+
+</body>
+</html>
