@@ -1,5 +1,5 @@
 from flask.ext.wtf import Form
-from wtforms import StringField, PasswordField, TextAreaField, SubmitField
+from wtforms import StringField, PasswordField, TextAreaField, SubmitField, SelectField
 from wtforms.validators import DataRequired
 
 
@@ -26,6 +26,13 @@ class CreateGroupForm(Form):
     submit = SubmitField('Create')
 
 
+class SearchReportsForm(Form):
+    field = SelectField('Field', choices=[('user_identifier', 'User'), ('application_name', 'Application Name'),
+                                          ('application_version', 'Application Version'), ('id', 'Report Number'),
+                                         ('error_message', 'Error Message'), ('error_type', 'Error Type')])
+    value = StringField('Value')
+
+
 class YoutrackSubmitForm(Form):
     server = StringField('YouTrack Server', validators=[DataRequired()])
     project = StringField('Project', validators=[DataRequired()])
@@ -33,7 +40,7 @@ class YoutrackSubmitForm(Form):
     summary = StringField('Summary', validators=[DataRequired()])
     description = TextAreaField('Description', validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()])
-    priority = StringField('Ppriority')
+    priority = StringField('Priority')
     type = StringField('Type')
     subsystem = StringField('Subsystem')
     state = StringField('State')
