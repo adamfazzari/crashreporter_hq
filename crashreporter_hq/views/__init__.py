@@ -136,9 +136,11 @@ def home():
     q = get_similar_reports(return_query=True)
     if flask_login.current_user.group:
         form = SearchReportsForm()
-        reports = q.filter(CrashReport.group == flask_login.current_user.group)
         if request.args:
-            reports = reports.filter(getattr(CrashReport, request.args['field']) == request.args['value'])
+            reports = q.filter(CrashReport.group == flask_login.current_user.group,
+                               getattr(CrashReport, request.args['field']).contains(str(request.args['value'])))
+        else:
+            reports = q.filter(CrashReport.group == flask_login.current_user.group)
         reports = reports.all()
 
         n_total_reports = len(reports)
