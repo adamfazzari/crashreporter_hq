@@ -136,7 +136,7 @@ def home():
     q = get_similar_reports(return_query=True)
     if flask_login.current_user.group:
         form = SearchReportsForm()
-        if request.args:
+        if request.args.get('field'):
             reports = q.filter(CrashReport.group == flask_login.current_user.group,
                                getattr(CrashReport, request.args['field']).contains(str(request.args['value'])))
         else:
