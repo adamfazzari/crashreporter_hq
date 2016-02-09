@@ -57,8 +57,9 @@ def view_related_reports(related_group_id):
         page = 1
     reports = reports[(page-1) * PER_PAGE: page * PER_PAGE]
     pagination = Pagination(page=page, per_page=PER_PAGE, total=n_total_reports, search=False, record_name='reports')
+    form = SearchReportsForm()
     html = render_template('index.html', reports=reports, user=flask_login.current_user, pagination=pagination,
-                           back_link=request.referrer)
+                           back_link=request.referrer, form=form)
     return html
 
 
