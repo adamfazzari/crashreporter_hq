@@ -14,18 +14,19 @@
     {% extends "base.html" %}
 
     {% block content %}
-
-        <form action="search" method="post" name="login" >
-            {{ form.hidden_tag() }}
-            <div style="display:inline ">
-                <span>{{ form.field() }}</span>
-                <span>{{ form.value(size=80) }}</span>
-            </div>
-            <input type='submit' name='search', value="Search"></input>
-            {% for error in form.value.errors %}
-                <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}<br>
-        </form>
+        {% if form %}
+            <form action="search" method="post" name="login" >
+                {{ form.hidden_tag() }}
+                <div style="display:inline ">
+                    <span>{{ form.field() }}</span>
+                    <span>{{ form.value(size=80) }}</span>
+                </div>
+                <input type='submit' name='search', value="Search"></input>
+                {% for error in form.value.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}<br>
+            </form>
+        {% endif %}
 
         <div style="text-align: center;">
             {{ pagination.info }}
