@@ -21,6 +21,9 @@
                             <a href=" {{ url_for('users') }}">Users</a>
                         </span>
                     {% endif %}
+                    <span class="nav-item">
+                        <a href=" {{ url_for('users', id=user.id) }}">Profile</a>
+                    </span>
                     {% if back_link %}
                         <span class="nav-item">
                             <a href=" {{ back_link }}">Back</a>
