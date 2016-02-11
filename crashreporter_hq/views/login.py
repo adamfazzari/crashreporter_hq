@@ -38,12 +38,18 @@ def signup():
         return render_template('signup.html', title='Sign Up', form=form)
     elif form.validate_on_submit():
         user = User.query.filter(User.email == form.data['email']).first()
-        if user is None:
+        if user:
+            flash('User with email {email} already exists.'.format(**form.data))
+            return redirect(url_for('signup'))
+        else:
             u = User(admin=False, **form.data)
             db_session.add(u)
             db_session.commit()
             flash('Account under {email} has been created.'.format(**form.data))
             return redirect(url_for('login'))
+    else:
+        return render_template('signup.html', title='Sign Up', form=form)
+
 
 
 @app.route('/protected')

@@ -9,6 +9,19 @@
 
     {% extends "base.html" %}
 
+    {% macro render_field(field, required=False) %}
+        <li>
+            <span>{{ '* ' if required else '' }}{{ field.name.capitalize() }}</span> {{ field(**kwargs)|safe }}
+        </li>
+        {% if field.errors %}
+            <ul>
+            {% for error in field.errors %}
+                <li style="color: red;">{{ error }}</li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+    {% endmacro %}
+
     {% block content %}
 
         <div class="form">
@@ -16,24 +29,13 @@
             <form action="signup" method="post" name="signup">
                 {{ form.hidden_tag() }}
                 <ul>
-                    <li>
-                        <span>* Email</span> {{ form.email(size=80) }}
-                    </li>
-                    <li>
-                        <span>* Password</span> {{ form.password(size=80) }}
-                    </li>
-                    <li>
-                        <span>Name</span> {{ form.name(size=80) }}
-                    </li>
-                    <li>
-                        <span>Company</span> {{ form.company(size=80) }}
-                    </li>
-
+                    {{ render_field(form.email, required=True) }}
+                    {{ render_field(form.password, required=True) }}
+                    {{ render_field(form.confirm, required=True) }}
+                    {{ render_field(form.name, required=False) }}
+                    {{ render_field(form.company, required=False) }}
                 </ul>
                 <input type='submit' name='submit', value="Sign Up"></input>
-                {% for error in form.email.errors %}
-                    <span style="color: red;">[{{ error }}]</span>
-                {% endfor %}<br>
             </form>
         </div>
 

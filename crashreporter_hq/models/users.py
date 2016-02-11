@@ -38,7 +38,7 @@ class User(Base, flask_login.UserMixin):
     group = relationship('Group', backref='users', foreign_keys=[group_id])
     group_admin = Column(Boolean, default=False)
 
-    def __init__(self, email, password, name='', company='', admin=False, group=None, api_key=None):
+    def __init__(self, email, password, name='', company='', admin=False, group=None, api_key=None, **kwargs):
         self.email = email
         self.password = password
         self.admin = admin
