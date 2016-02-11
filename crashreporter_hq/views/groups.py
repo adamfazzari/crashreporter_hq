@@ -45,9 +45,9 @@ def groups(group):
         return redirect(url_for('groups', group=sform.data['name']))
 
 
-@app.route('/groups/request/accept_invite', methods=['POST'])
+@app.route('/groups/request/join', methods=['POST'])
 @flask_login.login_required
-def accept_group_invite():
+def group_join_request():
     group = request.args['group']
     loggedin_user = flask_login.current_user
     if loggedin_user.group.name == group and loggedin_user.group_admin:
@@ -58,7 +58,29 @@ def accept_group_invite():
             g.join_requests.remove(u)
             g.join_requests_id = None
             db_session.commit()
-            u.group = g
+            if request.args['action'] == 'accept':
+                u.group = g
+                db_session.commit()
+            return redirect(url_for('groups', group=group))
+
+
+@app.route('/groups/members', methods=['POST'])
+@flask_login.login_required
+def manage_member():
+    group = request.args['group']
+    loggedin_user = flask_login.current_user
+    if loggedin_user.group.name == group and loggedin_user.group_admin:
+        g = Group.query.filter(Group.name == group).first()
+        u = User.query.filter(User.email == request.args['user_email'], User.group_id == g.id).first()
+        if u:
+            if request.args['action'] == 'remove':
+                g.users.remove(u)
+                u.group = None
+                u.group_admin = False
+            elif request.args['action'] == 'promote':
+                u.group_admin = True
+            elif request.args['action'] == 'demote':
+                u.group_admin = False
             db_session.commit()
             return redirect(url_for('groups', group=group))
 
