@@ -108,7 +108,9 @@ def accept_group_invite():
         u = q.first()
         if u in g.join_requests:
             g.join_requests.remove(u)
-            g.users.append(u)
+            g.join_requests_id = None
+            db_session.commit()
+            u.group = g
             db_session.commit()
             return redirect(url_for('groups', group=group))
 
