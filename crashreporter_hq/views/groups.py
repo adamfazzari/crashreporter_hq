@@ -46,6 +46,7 @@ def groups(group):
 
 
 @app.route('/groups/request/accept_invite', methods=['POST'])
+@flask_login.login_required
 def accept_group_invite():
     group = request.args['group']
     loggedin_user = flask_login.current_user
@@ -63,6 +64,7 @@ def accept_group_invite():
 
 
 @app.route('/groups/request/request_invite', methods=['POST'])
+@flask_login.login_required
 def request_group_invite():
     # Current user has requested to join the group
     group = request.args['group']
