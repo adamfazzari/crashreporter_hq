@@ -56,11 +56,13 @@
                                     <input type="submit" value="Open" >
                                 </form>
                             </td>
-                            <td>
-                                <form method='POST' action="{{ url_for('delete_report', report_number=r['Report Number']) }}">
-                                    <input type="submit" value="Delete" >
-                                </form>
-                            </td>
+                            {% if user.group_admin %}
+                                <td>
+                                    <form method='POST' action="{{ url_for('delete_report', report_number=r['Report Number']) }}">
+                                        <input type="submit" value="Delete" >
+                                    </form>
+                                </td>
+                            {% endif %}
                         </tr>
                     {% endfor %}
                 </table>
