@@ -34,6 +34,12 @@ class SearchReportsForm(Form):
     value = StringField('Value')
 
 
+class CreateAliasForm(Form):
+    alias = StringField('alias')
+    uuid = StringField('uuid')
+    submit = SubmitField('Create')
+
+
 class YoutrackSubmitForm(Form):
     server = StringField('YouTrack Server', validators=[DataRequired()])
     project = StringField('Project', validators=[DataRequired()])

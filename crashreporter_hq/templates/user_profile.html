@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='crashreport.css') }}">
+    <title>Crash Reporter HQ</title>
+</head>
+<body id="form-page">
+
+    {% extends "base.html" %}
+
+    {% macro render_field(field, required=False) %}
+        <!--<li>-->
+            <span>{{ '* ' if required else '' }}{{ field.name.capitalize() }}</span> {{ field(**kwargs)|safe }}
+        <!--</li>-->
+        {% if field.errors %}
+            <ul>
+            {% for error in field.errors %}
+                <li style="color: red;">{{ error }}</li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+    {% endmacro %}
+
+    {% block content %}
+
+        <div class="form">
+            <h3>Aliases</h3>
+        <table border="1" class="sortable", style="width:100%">
+            <tr class="tableheader">
+
+                {% for header in ('Alias', 'UUID') %}
+                    <td class="tableheader">{{ header }}</td>
+                {% endfor %}
+            </tr>
+        </table>
+        <br>
+            <form action="create_alias" method="post" name="aliases">
+                {{ form.hidden_tag() }}
+                <!--<ul>-->
+                <div style="display:flex">
+                    {{ render_field(form.alias) }}
+                    {{ render_field(form.uuid) }}
+                    {{ form.submit }}
+                </div>
+                <!--</ul>-->
+                <!--<input type='submit' name='submit', value="Sign Up"></input>-->
+            </form>
+
+        </div>
+
+    {% endblock %}
+
+
+</body>
+</html>

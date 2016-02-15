@@ -1,7 +1,7 @@
 
 from flask import request, render_template, flash, redirect, url_for
 import flask.ext.login as flask_login
-
+from ..forms import CreateAliasForm
 from ..models import User
 
 from .. import app
@@ -15,7 +15,7 @@ def users():
         uid = int(request.args.get('id', -1))
         if uid and flask_login.current_user.id == uid:
             # Show profile for the logged in user
-            return render_template('users.html', user_list=[flask_login.current_user], user=flask_login.current_user)
+            return redirect(url_for('user_profile'))
         elif uid < 0:
             if flask_login.current_user.admin:
                 user_list = User.query.all()
@@ -30,3 +30,19 @@ def users():
 
 
 
+@app.route('/users/profile', methods=['GET'])
+@flask_login.login_required
+def user_profile():
+
+    if request.method == 'GET':
+        form = CreateAliasForm()
+        return render_template('user_profile.html', user=flask_login.current_user, form=form)
+
+
+
+@app.route('/users/profile', methods=['POST'])
+@flask_login.login_required
+def create_alias():
+    form = CreateAliasForm()
+    if form.validate_on_submit():
+        pass
