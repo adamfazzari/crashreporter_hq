@@ -27,11 +27,12 @@ def home():
     if flask_login.current_user.group:
         form = SearchReportsForm()
         if request.args.get('field'):
-            reports = q.filter(CrashReport.group == flask_login.current_user.group,
+            q = q.filter(CrashReport.group == flask_login.current_user.group,
                                getattr(CrashReport, request.args['field']).contains(str(request.args['value'])))
         else:
-            reports = q.filter(CrashReport.group == flask_login.current_user.group)
-        reports = reports.all()
+            q = q.filter(CrashReport.group == flask_login.current_user.group)
+
+        reports = q.order_by(CrashReport.id.asc()).all()
 
         n_total_reports = len(reports)
         max_page = int(ceil(n_total_reports / float(PER_PAGE)))
