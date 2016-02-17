@@ -58,15 +58,17 @@ class CrashReport(Base):
             for r in similar_reports:
                 r.related_reports.append(self)
         else:
-            max_related_id = db_session.query(func.max(CrashReport.related_group_id)).first()[0] or 0
-            self.related_group_id = max_related_id + 1
+            signature = tuple([(tb.module, tb.error_line_number) for tb in self.traceback])
+            related_id = hash(signature)
+            self.related_group_id = related_id
 
     def __getitem__(self, item):
         return getattr(self, CrashReport.__mappings__[item])
 
     def get_similar_reports(self):
-        _and = and_(*[CrashReport.traceback.any(error_line_number=tb.error_line_number) for tb in self.traceback])
-        return CrashReport.query.filter(_and).all()
+        signature = tuple([(tb.module, tb.error_line_number) for tb in self.traceback])
+        related_id = hash(signature)
+        return CrashReport.query.filter(CrashReport.related_group_id == related_id).all()
 
     def __repr__(self):
         return "{s.id} {s.error_type}".format(s=self)
