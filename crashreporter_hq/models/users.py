@@ -5,10 +5,10 @@ from .. import login_manager
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
 
-from ..database import Base
+from .. import db
 
 
-class Group(Base):
+class Group(db.Model):
     __tablename__ = 'group'
     id = Column(Integer, primary_key=True)
     name = Column(String(120), unique=True)
@@ -25,7 +25,16 @@ class Group(Base):
                     self.users.append(user)
 
 
-class User(Base, flask_login.UserMixin):
+class Alias(db.Model):
+    __tablename__ = 'alias'
+    id = Column(Integer, primary_key=True)
+    alias = Column(String(50), unique=False, default='')
+    user_identifier = Column(String(100), unique=False)
+    user_id = Column(Integer,  ForeignKey('users.id'))
+    user = relationship('User', foreign_keys=[user_id])
+
+
+class User(db.Model, flask_login.UserMixin):
     __tablename__ = 'users'
     id = Column(Integer, primary_key=True)
     name = Column(String(30), unique=False, default='')

@@ -1,17 +1,17 @@
 from sqlalchemy import Column, Integer, String, DateTime, Table, ForeignKey, func
-from ..database import Base, db_session
 from datetime import datetime
+from .. import db
 
 from .traceback import Traceback
 from sqlalchemy.orm import relationship
-from sqlalchemy import and_
 
-SimilarReports = Table("SimilarReports", Base.metadata,
+
+SimilarReports = Table("SimilarReports", db.metadata,
                        Column("related_to_id", Integer, ForeignKey("crashreport.id")),
                        Column("related_by_id", Integer, ForeignKey("crashreport.id")))
 
 
-class CrashReport(Base):
+class CrashReport(db.Model):
 
     __tablename__ = 'crashreport'
 

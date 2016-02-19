@@ -16,7 +16,7 @@ from login import *
 from users import *
 from groups import *
 from ..forms import SearchReportsForm
-from ..models import CrashReport, Traceback
+from ..models import CrashReport, Traceback, Alias
 
 
 @app.route('/', methods=['GET'])

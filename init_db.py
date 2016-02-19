@@ -1,8 +1,18 @@
 __author__ = 'calvin'
 
-from crashreporter_hq.database import init_db
 
-init_db()
+from migrate.versioning import api
+from crashreporter_hq.config import SQLALCHEMY_DATABASE_URI, SQLALCHEMY_MIGRATE_REPO
+from crashreporter_hq import db
+
+import os.path
+
+db.create_all()
+if not os.path.exists(SQLALCHEMY_MIGRATE_REPO):
+    api.create(SQLALCHEMY_MIGRATE_REPO, 'database repository')
+    api.version_control(SQLALCHEMY_DATABASE_URI, SQLALCHEMY_MIGRATE_REPO)
+else:
+    api.version_control(SQLALCHEMY_DATABASE_URI, SQLALCHEMY_MIGRATE_REPO, api.version(SQLALCHEMY_MIGRATE_REPO))
 
 
 from crashreporter_hq.tools import create_group, create_user

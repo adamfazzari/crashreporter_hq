@@ -1,9 +1,10 @@
 from sqlalchemy import Column, Integer, String, PickleType, ForeignKey
 from sqlalchemy.orm import relationship
-from ..database import Base
+
+from .. import db
 
 
-class Traceback(Base):
+class Traceback(db.Model):
 
     __tablename__ = 'traceback'
 

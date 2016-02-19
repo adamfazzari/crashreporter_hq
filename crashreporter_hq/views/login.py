@@ -3,7 +3,7 @@ from flask import request, render_template, flash, redirect, url_for
 
 import flask.ext.login as flask_login
 
-from .. import app, db_session
+from .. import app, db
 from ..models import User
 from ..forms import LoginForm, SignUpForm
 
@@ -43,8 +43,8 @@ def signup():
             return redirect(url_for('signup'))
         else:
             u = User(admin=False, **form.data)
-            db_session.add(u)
-            db_session.commit()
+            db.session.add(u)
+            db.session.commit()
             flash('Account under {email} has been created.'.format(**form.data))
             return redirect(url_for('login'))
     else:

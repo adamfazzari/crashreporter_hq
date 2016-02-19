@@ -3,9 +3,8 @@
 from flask import request, render_template, flash, redirect, url_for
 import flask.ext.login as flask_login
 
-from .. import app
+from .. import app, db
 from ..extensions.views import *
-from ..database import db_session
 from ..forms import CreateGroupForm, SearchForm
 from ..models import Group, User
 
@@ -33,8 +32,8 @@ def groups(group):
             user = flask_login.current_user
             user.group = g
             user.group_admin = True
-            db_session.add(g)
-            db_session.commit()
+            db.session.add(g)
+            db.session.commit()
             flash('Group "{name}" has been created.'.format(**cform.data))
             return redirect(url_for('groups'))
         else:
@@ -57,10 +56,10 @@ def group_join_request():
         if u in g.join_requests:
             g.join_requests.remove(u)
             g.join_requests_id = None
-            db_session.commit()
+            db.session.commit()
             if request.args['action'] == 'accept':
                 u.group = g
-                db_session.commit()
+                db.session.commit()
             return redirect(url_for('groups', group=group))
 
 
@@ -81,7 +80,7 @@ def manage_member():
                 u.group_admin = True
             elif request.args['action'] == 'demote':
                 u.group_admin = False
-            db_session.commit()
+            db.session.commit()
             return redirect(url_for('groups', group=group))
 
 
@@ -96,7 +95,7 @@ def request_group_invite():
         # Only request to join the group is the user isn't already in a group
         if flask_login.current_user not in g.join_requests:
             g.join_requests.append(flask_login.current_user)
-            db_session.commit()
+            db.session.commit()
             flash('Request to join group "{name}" has been submitted.'.format(name=group))
         else:
             flash('Request to join group "{name}" has already been submitted.'.format(name=group))

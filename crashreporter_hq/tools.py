@@ -1,7 +1,7 @@
 import re
 
 from models import CrashReport, Group, User
-from database import db_session
+from . import db
 
 _report_cache = []
 cr_number_regex = re.compile('crash_report_(\d+)\.json')
@@ -12,7 +12,7 @@ def delete_report(number):
     cr = query.first()
     if cr:
         query.delete()
-        db_session.commit()
+        db.session.commit()
     return len(CrashReport.query.filter(CrashReport.id == number).all()) == 0
 
 
@@ -27,10 +27,10 @@ def save_report(payload):
         if user.group:
             user.group.reports.append(cr)
 
-        db_session.add(cr)
+        db.session.add(cr)
         for tb in cr['Traceback']:
-            db_session.add(tb)
-        db_session.commit()
+            db.session.add(tb)
+        db.session.commit()
 
         return cr, 'Success'
     else:
@@ -60,8 +60,8 @@ def create_user(email, password, **kwargs):
     u = User.query.filter(User.email == email).first()
     if not u:
         u = User(email, password, **kwargs)
-        db_session.add(u)
-        db_session.commit()
+        db.session.add(u)
+        db.session.commit()
 
     return u
 
@@ -71,7 +71,7 @@ def create_group(name, users=None):
     g = Group.query.filter(Group.name == name).first()
     if not g:
         g = Group(name, users)
-        db_session.add(g)
-        db_session.commit()
+        db.session.add(g)
+        db.session.commit()
 
     return g
