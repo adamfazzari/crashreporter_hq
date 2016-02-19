@@ -9,15 +9,16 @@
 
     {% extends "base.html" %}
 
-    {% macro render_field(field, required=False) %}
+    {% macro render_field(field, required=False, field_name=None) %}
         <!--<li>-->
-            <span>{{ '* ' if required else '' }}{{ field.name.capitalize() }}</span> {{ field(**kwargs)|safe }}
+            <span>{{ '* ' if required else '' }}{{ field_name if field_name is not none else field.name.capitalize() }}</span> {{ field(**kwargs)|safe }}
         <!--</li>-->
         {% if field.errors %}
             <ul>
             {% for error in field.errors %}
                 <li style="color: red;">{{ error }}</li>
             {% endfor %}
+
             </ul>
         {% endif %}
     {% endmacro %}
@@ -32,15 +33,22 @@
                 {% for header in ('Alias', 'UUID') %}
                     <td class="tableheader">{{ header }}</td>
                 {% endfor %}
+
             </tr>
+            {% for alias in aliases %}
+                <tr>
+                    <td>{{ alias.alias }}</td>
+                    <td>{{ alias.user_identifier}}</td>
+                </tr>
+            {% endfor %}
         </table>
         <br>
-            <form action="create_alias" method="post" name="aliases">
+            <form action="{{ url_for('create_alias') }}" method="post" name="aliases">
                 {{ form.hidden_tag() }}
                 <!--<ul>-->
                 <div style="display:flex">
                     {{ render_field(form.alias) }}
-                    {{ render_field(form.uuid) }}
+                    {{ render_field(form.uuid, field_name='UUID') }}
                     {{ form.submit }}
                 </div>
                 <!--</ul>-->

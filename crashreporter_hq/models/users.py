@@ -33,6 +33,11 @@ class Alias(db.Model):
     user_id = Column(Integer,  ForeignKey('users.id'))
     user = relationship('User', foreign_keys=[user_id])
 
+    def __init__(self, user, name, user_identifier):
+        self.user = user
+        self.alias = name
+        self.user_identifier = user_identifier
+
 
 class User(db.Model, flask_login.UserMixin):
     __tablename__ = 'users'

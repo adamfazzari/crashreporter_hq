@@ -2,9 +2,9 @@
 from flask import request, render_template, flash, redirect, url_for
 import flask.ext.login as flask_login
 from ..forms import CreateAliasForm
-from ..models import User
+from ..models import User, Alias
 
-from .. import app
+from .. import app, db
 
 
 
@@ -28,21 +28,23 @@ def users():
 
 
 
-
-
 @app.route('/users/profile', methods=['GET'])
 @flask_login.login_required
 def user_profile():
 
     if request.method == 'GET':
         form = CreateAliasForm()
-        return render_template('user_profile.html', user=flask_login.current_user, form=form)
+        aliases = Alias.query.filter(Alias.user_id==flask_login.current_user.id).all()
+        return render_template('user_profile.html', user=flask_login.current_user, form=form, aliases=aliases)
 
 
 
-@app.route('/users/profile', methods=['POST'])
+@app.route('/users/profile/create_alias', methods=['POST'])
 @flask_login.login_required
 def create_alias():
     form = CreateAliasForm()
     if form.validate_on_submit():
-        pass
+        alias = Alias(flask_login.current_user, form.data['alias'], form.data['uuid'])
+        db.session.add(alias)
+        db.session.commit()
+        return redirect(request.referrer)
