@@ -34,7 +34,7 @@ def user_profile():
 
     if request.method == 'GET':
         form = CreateAliasForm()
-        aliases = Alias.query.filter(Alias.user_id==flask_login.current_user.id).all()
+        aliases = Alias.query.filter(Alias.user==flask_login.current_user).all()
         return render_template('user_profile.html', user=flask_login.current_user, form=form, aliases=aliases)
 
 
