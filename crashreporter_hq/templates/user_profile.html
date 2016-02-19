@@ -39,11 +39,16 @@
                 <tr>
                     <td>{{ alias.alias }}</td>
                     <td>{{ alias.user_identifier}}</td>
+                    <td>
+                        <form method='POST' action="{{ url_for('alias', action='delete', uuid=alias.user_identifier) }}">
+                            <input type="submit" value="Delete" >
+                        </form>
+                    </td>
                 </tr>
             {% endfor %}
         </table>
         <br>
-            <form action="{{ url_for('create_alias') }}" method="post" name="aliases">
+            <form action="{{ url_for('alias', action='create') }}" method="post" name="aliases">
                 {{ form.hidden_tag() }}
                 <!--<ul>-->
                 <div style="display:flex">

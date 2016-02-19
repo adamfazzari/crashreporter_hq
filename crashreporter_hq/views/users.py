@@ -34,17 +34,23 @@ def user_profile():
 
     if request.method == 'GET':
         form = CreateAliasForm()
-        aliases = Alias.query.filter(Alias.user==flask_login.current_user).all()
+        aliases = Alias.query.filter(Alias.user_id==flask_login.current_user.id).all()
         return render_template('user_profile.html', user=flask_login.current_user, form=form, aliases=aliases)
 
 
 
-@app.route('/users/profile/create_alias', methods=['POST'])
+@app.route('/users/profile/alias', methods=['POST'])
 @flask_login.login_required
-def create_alias():
-    form = CreateAliasForm()
-    if form.validate_on_submit():
-        alias = Alias(flask_login.current_user, form.data['alias'], form.data['uuid'])
-        db.session.add(alias)
+def alias():
+    if request.args.get('action') == 'create':
+        form = CreateAliasForm()
+        if form.validate_on_submit():
+            alias = Alias(flask_login.current_user, form.data['alias'], form.data['uuid'])
+            db.session.add(alias)
+            db.session.commit()
+            return redirect(request.referrer)
+    elif request.args.get('action') == 'delete':
+        alias = Alias.query.filter(Alias.user_id==flask_login.current_user.id, Alias.user_identifier==request.args.get('uuid')).first()
+        db.session.delete(alias)
         db.session.commit()
         return redirect(request.referrer)
