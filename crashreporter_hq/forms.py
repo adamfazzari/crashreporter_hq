@@ -35,8 +35,8 @@ class SearchReportsForm(Form):
 
 
 class CreateAliasForm(Form):
-    alias = StringField('alias')
-    uuid = StringField('uuid')
+    alias = StringField('alias', validators=[DataRequired()])
+    uuid = StringField('uuid', validators=[DataRequired()])
     submit = SubmitField('Create')
 
 
