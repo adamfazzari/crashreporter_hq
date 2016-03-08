@@ -51,6 +51,13 @@ def home():
         return redirect(url_for('groups'))
 
 
+@app.route('/usage_stats', methods=['GET', 'POST'])
+@flask_login.login_required
+def usage_stats():
+    html = render_template('usage_stats.html', user=flask_login.current_user)
+    return html
+
+
 @app.route('/reports/<int:report_number>')
 def view_report(report_number):
     cr = CrashReport.query.filter(CrashReport.id == report_number).first()

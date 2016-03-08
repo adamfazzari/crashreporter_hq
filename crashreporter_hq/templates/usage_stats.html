@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html ng-app="HQApp" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='crashreport.css') }}">
+
+    <title>Usage Statistics</title>
+
+    <script src="{{ url_for('static', filename='angular.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='main.js') }}"></script>
+
+</head>
+<body ng-controller="UsageStats">
+
+    <table border="1">
+        {% raw %}
+        <tr ng-repeat="phone in phones">
+          <td>
+              {{phone.name}}
+          </td>
+          <td>
+              {{phone.snippet}}
+          </td>
+        </tr>
+        {% endraw %}
+    </table>
+
+</body>
+</html>
