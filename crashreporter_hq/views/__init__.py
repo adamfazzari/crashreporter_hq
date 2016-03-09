@@ -1,7 +1,8 @@
 
 from flask.ext.paginate import Pagination
+from flask import Response
 
-
+from sqlalchemy import func
 from pygments import highlight
 from pygments.lexers import PythonLexer
 from pygments.formatters import HtmlFormatter
@@ -11,6 +12,7 @@ from ..config import *
 
 from ..tools import get_similar_reports
 from ..forms import YoutrackSubmitForm
+from .. import db
 from api import *
 from login import *
 from users import *
@@ -18,6 +20,7 @@ from groups import *
 from ..forms import SearchReportsForm
 from ..models import CrashReport, Traceback, Alias
 
+import json
 
 @app.route('/', methods=['GET'])
 @flask_login.login_required
@@ -51,11 +54,22 @@ def home():
         return redirect(url_for('groups'))
 
 
-@app.route('/usage_stats', methods=['GET', 'POST'])
+@app.route('/view_stats', methods=['GET', 'POST'])
 @flask_login.login_required
-def usage_stats():
+def view_stats():
     html = render_template('usage_stats.html', user=flask_login.current_user)
     return html
+
+@app.route('/get_stats', methods=['GET'])
+def get_stats():
+    asd = db.session.query(CrashReport.user_identifier, func.count(CrashReport.user_identifier).label('# crashes')).\
+        group_by(CrashReport.user_identifier).all()
+    asd.insert(0, ('User', '# Reports'))
+    json_response = json.dumps(asd)
+    response = Response(json_response, content_type='application/json; charset=utf-8')
+    response.headers.add('content-length', len(json_response))
+    response.status_code = 200
+    return response
 
 
 @app.route('/reports/<int:report_number>')

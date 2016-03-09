@@ -8,35 +8,15 @@
 
     <script src="{{ url_for('static', filename='angular.js') }}"></script>
     <script src="{{ url_for('static', filename='ng-google-chart.js') }}"></script>
-    <script src="{{ url_for('static', filename='main.js') }}"></script>
+    <script src="{{ url_for('static', filename='usagestats.js') }}"></script>
 
 </head>
 <body ng-controller="UsageStats">
 
-    <table border="1">
-        {% raw %}
-        <tr ng-repeat="phone in phones">
-          <td>
-              {{phone.name}}
-          </td>
-          <td>
-              {{phone.snippet}}
-          </td>
-        </tr>
-    </table>
-
+    {% raw %}
     <div google-chart chart="chart" style="border:1px inset black;padding:0;width:400px;">
     </div>
 
-    <p>
-        Software: <input type=range min=10000 max=100000 value={{aa}} ng-model="aa" ng-change="chart.data[1][1]=1*aa"> {{aa}}
-    </p>
-    <p>
-        Hardware: <input type=range min=10000 max=100000 value={{bb}} ng-model="bb" ng-change="chart.data[2][1]=1*bb">{{bb}}
-    </p>
-    <p>
-        Services: <input type=range min=10000 max=100000 value={{cc}} ng-model="cc" ng-change="chart.data[3][1]=1*cc">{{cc}}
-    </p>
     {% endraw %}
 </body>
 </html>
