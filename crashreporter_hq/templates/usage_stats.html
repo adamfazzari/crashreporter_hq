@@ -7,6 +7,7 @@
     <title>Usage Statistics</title>
 
     <script src="{{ url_for('static', filename='bower_components/angular/angular.js') }}"></script>
+    <script src="https://www.google.com/jsapi" type="text/javascript"></script>
     <script src="{{ url_for('static', filename='bower_components/angular-google-chart/ng-google-chart.js') }}"></script>
     <script src="{{ url_for('static', filename='usagestats.js') }}"></script>
 
@@ -14,8 +15,8 @@
 <body ng-controller="UsageStats">
 
     {% raw %}
-    <div google-chart chart="chart" style="border:1px inset black;padding:0;width:400px;">
-    </div>
+
+    <div chart></div>
 
     {% endraw %}
 </body>

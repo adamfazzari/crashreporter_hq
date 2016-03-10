@@ -1,34 +1,39 @@
 'use strict';
 
-angular.module('HQApp', ['googlechart'])
 
+var app = angular.module('HQApp', []);
 
-.controller('UsageStats', function($scope, $http) {
-    var done=function(resp){
-    var chart1 = {};
-    chart1.type = "PieChart";
-    chart1.data = resp.data;
-    chart1.options = {
-        displayExactValues: true,
-        width: 600,
-        height: 400,
-        is3D: false,
-        chartArea: {left:10,top:10,bottom:10,height:"100%"}
-    };
+app.controller('UsageStats', function($scope, $http) {
 
-    chart1.formatters = {
-      number : [{
-        columnNum: 1,
-        pattern: "#,##0"
-      }]
-    };
-
-    $scope.chart = chart1;
-      };
-    var fail=function(err){
-
-      };
-
-     $http.get('/get_stats')
-     .then(done,fail);
 });
+
+app.directive('chart', function($http) {
+        return {
+          restrict: 'A',
+          link: function($scope, $elm, $attr) {
+                // Create the data table.
+                var data = new google.visualization.DataTable();
+                var fail=function(err){ };
+                var done = function(resp) {
+                    data.addColumn('string', 'User ID');
+                    data.addColumn('number', 'Number of Reports');
+                    data.addRows(resp.data);
+                    // Set chart options
+                    var options = {'title':'Breakdown of Crash Reports from Users',
+                                   'width':800,
+                                   'height':600};
+                    // Instantiate and draw our chart, passing in some options.
+                    var chart = new google.visualization.PieChart($elm[0]);
+                    chart.draw(data, options);
+                };
+
+                // Make a request to get the chart data
+                $http.get('/get_stats').then(done, fail);
+
+          }
+    }
+
+});
+
+
+google.load('visualization', '1', {packages: ['corechart']});

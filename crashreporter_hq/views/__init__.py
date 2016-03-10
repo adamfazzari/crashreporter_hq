@@ -64,7 +64,7 @@ def view_stats():
 def get_stats():
     asd = db.session.query(CrashReport.user_identifier, func.count(CrashReport.user_identifier).label('# crashes')).\
         group_by(CrashReport.user_identifier).all()
-    asd.insert(0, ('User', '# Reports'))
+    # asd.insert(0, ('User', '# Reports'))
     json_response = json.dumps(asd)
     response = Response(json_response, content_type='application/json; charset=utf-8')
     response.headers.add('content-length', len(json_response))
