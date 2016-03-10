@@ -2,7 +2,7 @@
 from flask.ext.paginate import Pagination
 from flask import Response
 
-from sqlalchemy import func
+from sqlalchemy import func, asc
 from pygments import highlight
 from pygments.lexers import PythonLexer
 from pygments.formatters import HtmlFormatter
@@ -62,10 +62,14 @@ def view_stats():
 
 @app.route('/get_stats', methods=['GET'])
 def get_stats():
-    asd = db.session.query(CrashReport.user_identifier, func.count(CrashReport.user_identifier).label('# crashes')).\
-        group_by(CrashReport.user_identifier).all()
-    # asd.insert(0, ('User', '# Reports'))
-    json_response = json.dumps(asd)
+    q = db.session.query(CrashReport.date, func.count(CrashReport.date)).group_by(CrashReport.user_identifier).\
+                           order_by(asc(CrashReport.date))
+    q2 = db.session.query(CrashReport.user_identifier, func.count(CrashReport.user_identifier).label('# crashes')).\
+        group_by(CrashReport.user_identifier)
+    data = {'date_data': [(d.year, d.month, d.day, d.hour, n) for d, n in q.all() if d.year == 2016],
+            'user_data': q2.all()}
+
+    json_response = json.dumps(data)
     response = Response(json_response, content_type='application/json; charset=utf-8')
     response.headers.add('content-length', len(json_response))
     response.status_code = 200

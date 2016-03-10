@@ -7,7 +7,7 @@ app.controller('UsageStats', function($scope, $http) {
 
 });
 
-app.directive('chart', function($http) {
+app.directive('datechart', function($http) {
         return {
           restrict: 'A',
           link: function($scope, $elm, $attr) {
@@ -15,15 +15,19 @@ app.directive('chart', function($http) {
                 var data = new google.visualization.DataTable();
                 var fail=function(err){ };
                 var done = function(resp) {
-                    data.addColumn('string', 'User ID');
+                    var dates = [];
+                    for (var ii=0; ii < resp.data.date_data.length; ii++){
+                        dates.push([new Date(resp.data.date_data[ii][0], resp.data.date_data[ii][1], resp.data.date_data[ii][2], resp.data.date_data[ii][3]), resp.data.date_data[ii][4]])
+                    }
+                    data.addColumn('date', 'Date of Report');
                     data.addColumn('number', 'Number of Reports');
-                    data.addRows(resp.data);
+                    data.addRows(dates);
                     // Set chart options
-                    var options = {'title':'Breakdown of Crash Reports from Users',
+                    var options = {'title':'Crash Reports',
                                    'width':800,
                                    'height':600};
                     // Instantiate and draw our chart, passing in some options.
-                    var chart = new google.visualization.PieChart($elm[0]);
+                    var chart = new google.visualization.LineChart($elm[0]);
                     chart.draw(data, options);
                 };
 
@@ -33,6 +37,35 @@ app.directive('chart', function($http) {
           }
     }
 
+});
+
+
+app.directive('userchart', function($http) {
+        return {
+          restrict: 'A',
+          link: function($scope, $elm, $attr) {
+                // Create the data table.
+                var data = new google.visualization.DataTable();
+                var fail=function(err){ };
+                var done = function(resp) {
+
+                    data.addColumn('string', 'User');
+                    data.addColumn('number', 'Number of Reports');
+                    data.addRows(resp.data.user_data);
+                    // Set chart options
+                    var options = {'title':'Crash Reports',
+                                   'width':800,
+                                   'height':600};
+                    // Instantiate and draw our chart, passing in some options.
+                    var chart = new google.visualization.PieChart($elm[0]);
+                    chart.draw(data, options);
+                    };
+
+                // Make a request to get the chart data
+                $http.get('/get_stats').then(done, fail);
+
+                    }
+            }
 });
 
 
