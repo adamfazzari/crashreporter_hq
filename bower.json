@@ -1,0 +1,23 @@
+{
+  "name": "crashreporter_hq",
+  "homepage": "https://github.com/lobocv/crashreporter-hq",
+  "authors": [
+    "clobo <clobo@sensoft.ca>"
+  ],
+  "description": "",
+  "main": "",
+  "moduleType": [],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "AngularJS": "angular-latest#^1.5.0",
+    "angular-google-chart": "^0.1.0"
+  }
+}
