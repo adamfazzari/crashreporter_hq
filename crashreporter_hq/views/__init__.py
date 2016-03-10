@@ -66,7 +66,7 @@ def get_stats():
                            order_by(asc(CrashReport.date))
     q2 = db.session.query(CrashReport.user_identifier, func.count(CrashReport.user_identifier).label('# crashes')).\
         group_by(CrashReport.user_identifier)
-    data = {'date_data': [(d.year, d.month, d.day, d.hour, n) for d, n in q.all() if d.year == 2016],
+    data = {'date_data': [(d.year, d.month-1, d.day, d.hour, n) for d, n in q.all() if d.year == 2016],
             'user_data': q2.all()}
 
     json_response = json.dumps(data)
