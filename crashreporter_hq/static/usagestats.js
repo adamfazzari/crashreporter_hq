@@ -24,7 +24,7 @@ app.directive('datechart', function($http) {
                     data.addRows(dates);
                     // Set chart options
                     var options = {'title':'Crash Reports',
-                                   'width':800,
+                                   'width':'100%',
                                    'height':600};
                     // Instantiate and draw our chart, passing in some options.
                     var chart = new google.visualization.LineChart($elm[0]);
@@ -54,7 +54,7 @@ app.directive('userchart', function($http) {
                     data.addRows(resp.data.user_data);
                     // Set chart options
                     var options = {'title':'Crash Reports',
-                                   'width':800,
+                                   'width':'100%',
                                    'height':600};
                     // Instantiate and draw our chart, passing in some options.
                     var chart = new google.visualization.PieChart($elm[0]);
