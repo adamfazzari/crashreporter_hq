@@ -2,9 +2,11 @@ from flask import Response
 from sqlalchemy import func, asc
 
 from groups import *
-from ..models import CrashReport
+from ..models import CrashReport, Statistic, State, Timer, Sequence
 
 import json
+
+TRACKABLES = {'Statistic': Statistic, 'State': State, 'Timer': Timer, 'Sequence': Sequence}
 
 
 @app.route('/view_stats', methods=['GET', 'POST'])
@@ -28,3 +30,28 @@ def get_stats():
     response.headers.add('content-length', len(json_response))
     response.status_code = 200
     return response
+
+@app.route('/usagestats/upload', methods=['POST'])
+def upload_stats():
+    payload = json.loads(request.data)
+    api_key = payload.get('API Key')
+
+    if api_key is None:
+        return 'Missing API Key.'
+    user = User.query.filter(User.api_key == api_key).first()
+    if user is None:
+        return 'Upload failed'
+    else:
+        for trackable_name, data in payload.get('Data', {}).iteritems():
+            cls = TRACKABLES.get(data['type'])
+            trackable = cls.query.filter(cls.name==trackable_name, cls.group_id==user.group_id).first()
+            if trackable is None:
+                row = cls(trackable_name, payload['User Identifier'], payload['Application Name'], payload['Application Version'], user.group)
+                db.session.add(row)
+            else:
+                if data['type'] == 'State':
+                    trackable.state = data['data']
+                else:
+                    trackable.count = data['data']
+        db.session.commit()
+
