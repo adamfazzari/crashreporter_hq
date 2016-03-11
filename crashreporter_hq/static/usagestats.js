@@ -62,7 +62,7 @@ app.directive('userchart', function($http) {
                     };
 
                 // Make a request to get the chart data
-                $http.get('/get_stats').then(done, fail);
+                $http.get('/reports/get_stats').then(done, fail);
 
                     }
             }
@@ -92,7 +92,7 @@ app.directive('columnchart', function($http) {
                     };
 
                 // Make a request to get the chart data
-                $http.get('/get_stats2').then(done, fail);
+                $http.get('/usage/get_stats').then(done, fail);
 
                     }
             }

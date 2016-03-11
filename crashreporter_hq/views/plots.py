@@ -9,15 +9,15 @@ import json
 TRACKABLES = {'Statistic': Statistic, 'State': State, 'Timer': Timer, 'Sequence': Sequence}
 
 
-@app.route('/view_stats2', methods=['GET', 'POST'])
+@app.route('/usage/view_stats', methods=['GET', 'POST'])
 @flask_login.login_required
-def view_stats2():
+def view_usage_stats():
     html = render_template('usage_stats2.html', user=flask_login.current_user)
     return html
 
 
-@app.route('/get_stats2', methods=['GET'])
-def get_stats2():
+@app.route('/usage/get_stats', methods=['GET'])
+def get_usage_stats():
 
     q = Statistic.query.filter(Statistic.count is not None)
     q2 = db.session.query(State.state, func.count(State.id)).group_by(State.state)
@@ -31,15 +31,15 @@ def get_stats2():
     return response
 
 
-@app.route('/view_stats', methods=['GET', 'POST'])
+@app.route('/reports/view_stats', methods=['GET', 'POST'])
 @flask_login.login_required
-def view_stats():
+def view_report_stats():
     html = render_template('usage_stats.html', user=flask_login.current_user)
     return html
 
 
-@app.route('/get_stats', methods=['GET'])
-def get_stats():
+@app.route('/reports/get_stats', methods=['GET'])
+def get_report_stats():
     q = db.session.query(CrashReport.date, func.count(CrashReport.date)).group_by(CrashReport.user_identifier).\
                            order_by(asc(CrashReport.date))
     q2 = db.session.query(CrashReport.user_identifier, func.count(CrashReport.user_identifier).label('# crashes')).\
