@@ -9,6 +9,28 @@ import json
 TRACKABLES = {'Statistic': Statistic, 'State': State, 'Timer': Timer, 'Sequence': Sequence}
 
 
+@app.route('/view_stats2', methods=['GET', 'POST'])
+@flask_login.login_required
+def view_stats2():
+    html = render_template('usage_stats2.html', user=flask_login.current_user)
+    return html
+
+
+@app.route('/get_stats2', methods=['GET'])
+def get_stats2():
+
+    q = Statistic.query.filter(Statistic.count is not None)
+    q2 = db.session.query(State.state, func.count(State.id)).group_by(State.state)
+    data = {'statistic': [(s.name, s.count) for s in q.all() if s.count],
+            'state': [s for s in q2.all() if s is not s[0] is not None]}
+
+    json_response = json.dumps(data)
+    response = Response(json_response, content_type='application/json; charset=utf-8')
+    response.headers.add('content-length', len(json_response))
+    response.status_code = 200
+    return response
+
+
 @app.route('/view_stats', methods=['GET', 'POST'])
 @flask_login.login_required
 def view_stats():
