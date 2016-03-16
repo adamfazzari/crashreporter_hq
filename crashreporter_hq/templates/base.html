@@ -14,6 +14,12 @@
                         <a href="{{ url_for('home') }}">Home</a>
                     </span>
                     <span class="nav-item">
+                        <a href="{{ url_for('view_report_stats') }}">Crash Statistics</a>
+                    </span>
+                    <span class="nav-item">
+                        <a href="{{ url_for('view_usage_stats') }}">Usage Statistics</a>
+                    </span>
+                    <span class="nav-item">
                         <a href="{{ url_for('groups') }}">Group {% if user.group %} ({{ user.group.name }}) {% endif %}</a>
                     </span>
                     {% if user.admin %}
