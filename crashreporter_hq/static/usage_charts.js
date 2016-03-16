@@ -18,8 +18,7 @@ app.directive('statisticchart', function($http) {
 
                     data.addColumn('string', 'Statistic');
                     data.addColumn('number', 'Count');
-                    data.addRows(resp.data.statistic);
-                    data.addRows(resp.data.state);
+                    data.addRows(resp.data);
                     // Set chart options
                     var options = {'title':'Anonymous Statistics',
                                    'width':'100%',
@@ -30,7 +29,7 @@ app.directive('statisticchart', function($http) {
                     };
 
                 // Make a request to get the chart data
-                $http.get('/usage/get_stats').then(done, fail);
+                $http.get('/usage/get_stats?type=statistics').then(done, fail);
 
                     }
             }

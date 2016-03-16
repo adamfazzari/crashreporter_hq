@@ -18,12 +18,10 @@ def view_usage_stats():
 
 @app.route('/usage/get_stats', methods=['GET'])
 def get_usage_stats():
-
-    q = db.session.query(Statistic.name, func.sum(Statistic.count)).group_by(Statistic.name).all()
-    # q2 = db.session.query(State.state, func.count(State.id)).group_by(State.state).all()
-    data = {'statistic': q,
-            'state': []}
-
+    if request.args.get('type') == 'statistics':
+        data = db.session.query(Statistic.name, func.sum(Statistic.count)).group_by(Statistic.name).all()
+    elif request.args.get('type') == 'states':
+        data = db.session.query(State.state, func.count(State.id)).group_by(State.state).all()
     json_response = json.dumps(data)
     response = Response(json_response, content_type='application/json; charset=utf-8')
     response.headers.add('content-length', len(json_response))

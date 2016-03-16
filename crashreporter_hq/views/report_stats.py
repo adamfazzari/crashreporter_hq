@@ -20,16 +20,13 @@ def get_report_stats():
         q = db.session.query(CrashReport.date, func.count(CrashReport.date)).group_by(CrashReport.user_identifier).\
                                order_by(asc(CrashReport.date))
         data = [(d.year, d.month-1, d.day, d.hour, n) for d, n in q.all() if d.year == 2016]
-        json_response = json.dumps(data)
     elif request.args.get('type') == 'user':
         q = db.session.query(CrashReport.user_identifier, func.count(CrashReport.user_identifier).label('# crashes')).\
             group_by(CrashReport.user_identifier)
         data = q.all()
-        json_response = json.dumps(data)
-
     else:
         return 'Invalid request'
-
+    json_response = json.dumps(data)
     response = Response(json_response, content_type='application/json; charset=utf-8')
     response.headers.add('content-length', len(json_response))
     response.status_code = 200
