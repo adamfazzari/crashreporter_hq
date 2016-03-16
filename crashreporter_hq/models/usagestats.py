@@ -28,7 +28,7 @@ class Statistic(TrackableBase, db.Model):
     __tablename__ = 'statistic'
     __mapper_args__ = {'polymorphic_identity':'statistic','concrete': True}
     id = Column(Integer, primary_key=True)
-    count = Column(Integer, unique=False)
+    count = Column(Integer, default=0, unique=False)
     name = Column(String(20), unique=False)
     description = Column(String(150), unique=False)
     user_identifier = Column(String(100), unique=False)
@@ -40,6 +40,7 @@ class Statistic(TrackableBase, db.Model):
 
     def __repr__(self):
         return '%s = %s' % (self.name, self.count)
+
 
 class State(TrackableBase, db.Model):
     __tablename__ = 'state'
@@ -63,7 +64,7 @@ class Timer(TrackableBase, db.Model):
     __tablename__ = 'timer'
     __mapper_args__ = {'polymorphic_identity':'timer', 'concrete': True}
     id = Column(Integer, primary_key=True)
-    count = Column(Integer, unique=False)
+    count = Column(Integer, default=0, unique=False)
     time = Column(Integer, unique=False)
     name = Column(String(20), unique=False)
     description = Column(String(150), unique=False)
@@ -82,7 +83,7 @@ class Sequence(TrackableBase, db.Model):
     __tablename__ = 'sequence'
     __mapper_args__ = {'polymorphic_identity':'sequence', 'concrete': True}
     id = Column(Integer, primary_key=True)
-    count = Column(Integer, unique=False)
+    count = Column(Integer, default=0, unique=False)
     name = Column(String(20), unique=False)
     description = Column(String(150), unique=False)
     user_identifier = Column(String(100), unique=False)
