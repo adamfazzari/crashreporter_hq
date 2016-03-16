@@ -16,8 +16,8 @@ app.directive('datechart', function($http) {
                 var fail=function(err){ };
                 var done = function(resp) {
                     var dates = [];
-                    for (var ii=0; ii < resp.data.date_data.length; ii++){
-                        dates.push([new Date(resp.data.date_data[ii][0], resp.data.date_data[ii][1], resp.data.date_data[ii][2], resp.data.date_data[ii][3]), resp.data.date_data[ii][4]])
+                    for (var ii=0; ii < resp.data.length; ii++){
+                        dates.push([new Date(resp.data[ii][0], resp.data[ii][1], resp.data[ii][2], resp.data[ii][3]), resp.data[ii][4]])
                     }
                     data.addColumn('date', 'Date of Report');
                     data.addColumn('number', 'Number of Reports');
@@ -32,7 +32,7 @@ app.directive('datechart', function($http) {
                 };
 
                 // Make a request to get the chart data
-                $http.get('/get_stats').then(done, fail);
+                $http.get('/reports/get_stats?type=date').then(done, fail);
 
           }
     }
@@ -51,7 +51,7 @@ app.directive('userchart', function($http) {
 
                     data.addColumn('string', 'User');
                     data.addColumn('number', 'Number of Reports');
-                    data.addRows(resp.data.user_data);
+                    data.addRows(resp.data);
                     // Set chart options
                     var options = {'title':'Crash Reports',
                                    'width':'100%',
@@ -62,7 +62,7 @@ app.directive('userchart', function($http) {
                     };
 
                 // Make a request to get the chart data
-                $http.get('/reports/get_stats').then(done, fail);
+                $http.get('/reports/get_stats?type=user').then(done, fail);
 
                     }
             }
