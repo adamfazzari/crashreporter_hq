@@ -57,7 +57,7 @@ app.directive('statechart', function($http) {
                     };
 
                 // Make a request to get the chart data
-                $http.get('/usage/get_stats?type=states&name=units').then(done, fail);
+                $http.get('/usage/get_stats?type=states&name=' + $attr.state).then(done, fail);
 
                     }
             }
