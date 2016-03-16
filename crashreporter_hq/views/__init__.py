@@ -13,7 +13,8 @@ from api import *
 from login import *
 from users import *
 from groups import *
-from plots import *
+from anonymousage_usage import *
+from report_stats import *
 from ..config import *
 from ..forms import SearchReportsForm
 from ..models import CrashReport, Traceback
