@@ -14,12 +14,18 @@
 </head>
 <body ng-controller="UsageStats">
 
-    {% raw %}
+    {% extends "base.html" %}
 
-    <div statisticchart></div>
+    {% block content %}
+        {% raw %}
 
-    <div statechart state="units"></div>
+        <div statisticchart></div>
 
-    {% endraw %}
+        <div statechart state="units"></div>
+
+        {% endraw %}
+
+    {% endblock %}
+
 </body>
 </html>

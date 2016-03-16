@@ -14,11 +14,19 @@
 </head>
 <body ng-controller="ReportStats">
 
-    {% raw %}
 
-    <div datechart></div>
-    <div userchart></div>
+    {% extends "base.html" %}
 
-    {% endraw %}
+    {% block content %}
+
+        {% raw %}
+
+        <div datechart></div>
+        <div userchart></div>
+
+        {% endraw %}
+
+    {% endblock %}
+
 </body>
 </html>
