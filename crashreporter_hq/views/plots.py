@@ -19,10 +19,10 @@ def view_usage_stats():
 @app.route('/usage/get_stats', methods=['GET'])
 def get_usage_stats():
 
-    q = Statistic.query.filter(Statistic.count is not None)
-    q2 = db.session.query(State.state, func.count(State.id)).group_by(State.state)
-    data = {'statistic': [(s.name, s.count) for s in q.all() if s.count],
-            'state': [s for s in q2.all() if s is not s[0] is not None]}
+    q = db.session.query(Statistic.name, func.sum(Statistic.count)).group_by(Statistic.name).all()
+    # q2 = db.session.query(State.state, func.count(State.id)).group_by(State.state).all()
+    data = {'statistic': q,
+            'state': []}
 
     json_response = json.dumps(data)
     response = Response(json_response, content_type='application/json; charset=utf-8')
@@ -63,17 +63,19 @@ def upload_stats():
     user = User.query.filter(User.api_key == api_key).first()
     if user is None:
         return 'Upload failed'
+    elif user.group is None:
+        return 'User does not belong to a group.'
     else:
         for trackable_name, data in payload.get('Data', {}).iteritems():
             cls = TRACKABLES.get(data['type'])
-            trackable = cls.query.filter(cls.name==trackable_name, cls.group_id==user.group_id).first()
+            trackable = cls.query.filter(cls.name==trackable_name, cls.user_identifier==payload['User Identifier'], cls.group_id==user.group_id).first()
             if trackable is None:
-                row = cls(trackable_name, payload['User Identifier'], payload['Application Name'], payload['Application Version'], user.group)
-                db.session.add(row)
+                trackable = cls(trackable_name, payload['User Identifier'], payload['Application Name'], payload['Application Version'], user.group)
+                db.session.add(trackable)
+            # Apply the value of the data to the row
+            if data['type'] == 'State':
+                trackable.state = data['data']
             else:
-                if data['type'] == 'State':
-                    trackable.state = data['data']
-                else:
-                    trackable.count = data['data']
+                trackable.count = data['data']
         db.session.commit()
 
