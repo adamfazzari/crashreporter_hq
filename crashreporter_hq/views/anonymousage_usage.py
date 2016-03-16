@@ -20,8 +20,14 @@ def view_usage_stats():
 def get_usage_stats():
     if request.args.get('type') == 'statistics':
         data = db.session.query(Statistic.name, func.sum(Statistic.count)).group_by(Statistic.name).all()
-    elif request.args.get('type') == 'states':
-        data = db.session.query(State.state, func.count(State.id)).group_by(State.state).all()
+    elif request.args.get('type') == 'states' and request.args.get('name'):
+        data = {'name': request.args.get('name'),
+                'counts': db.session.query(State.state, func.count(State.id)).
+                                   filter(State.name==request.args.get('name')).
+                                   group_by(State.state).all()
+                }
+    else:
+        return 'Invalid query.'
     json_response = json.dumps(data)
     response = Response(json_response, content_type='application/json; charset=utf-8')
     response.headers.add('content-length', len(json_response))
