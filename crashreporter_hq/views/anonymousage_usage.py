@@ -12,7 +12,8 @@ TRACKABLES = {'Statistic': Statistic, 'State': State, 'Timer': Timer, 'Sequence'
 @app.route('/usage/view_stats', methods=['GET', 'POST'])
 @flask_login.login_required
 def view_usage_stats():
-    html = render_template('anonymous_usage.html', user=flask_login.current_user)
+    state_trackables = [q.name for q in db.session.query(State.name.distinct().label('name'))]
+    html = render_template('anonymous_usage.html', user=flask_login.current_user, states=state_trackables)
     return html
 
 
@@ -20,12 +21,16 @@ def view_usage_stats():
 def get_usage_stats():
     if request.args.get('type') == 'statistics':
         data = db.session.query(Statistic.name, func.sum(Statistic.count)).group_by(Statistic.name).all()
-    elif request.args.get('type') == 'states' and request.args.get('name'):
-        data = {'name': request.args.get('name'),
-                'counts': db.session.query(State.state, func.count(State.id)).
-                                   filter(State.name==request.args.get('name')).
-                                   group_by(State.state).all()
-                }
+    elif request.args.get('type') == 'states':
+        if request.args.get('name'):
+            data = {'name': request.args.get('name'),
+                    'counts': db.session.query(State.state, func.count(State.id)).
+                                       filter(State.name==request.args.get('name')).
+                                       group_by(State.state).all()
+                    }
+        else:
+            data = [q.name for q in db.session.query(State.name.distinct().label('name'))]
+
     else:
         return 'Invalid query.'
     json_response = json.dumps(data)

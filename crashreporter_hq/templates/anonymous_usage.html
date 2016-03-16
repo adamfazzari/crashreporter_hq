@@ -21,7 +21,12 @@
 
         <div statisticchart></div>
 
-        <div statechart state="units"></div>
+        <select id="stateSelection" ng-model="stateSelection" ng-options="s for s in states">
+            <option value="" selected>Select a Trackable State</option>
+        </select>
+        <div statechart state="{{stateSelection}}">
+        </div>
+
 
         {% endraw %}
 
