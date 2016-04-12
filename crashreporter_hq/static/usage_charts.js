@@ -28,9 +28,9 @@ app.directive('statisticchart', function($http) {
 
                     data.addColumn('string', 'Statistic');
                     data.addColumn('number', 'Count');
-                    data.addRows(resp.data);
+                    data.addRows(resp.data['stats']);
                     // Set chart options
-                    var options = {'title':'Anonymous Statistics',
+                    var options = {'title':'Anonymous Statistics (Submissions from ' + resp.data['n_users'] + ' Users)',
                                    'width':'100%',
                                    'height':600};
                     // Instantiate and draw our chart, passing in some options.
