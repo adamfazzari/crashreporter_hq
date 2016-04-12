@@ -65,4 +65,5 @@ def upload_stats():
             else:
                 trackable.count = data['data']
         db.session.commit()
+        return 'Success'
 
