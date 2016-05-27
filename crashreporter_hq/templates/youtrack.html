@@ -32,9 +32,9 @@
                 <p>A crash was detected on {{report['Date']}} at {{report['Time']}} from user {{ report['User'] }}.</p>
             {% endif %}
             {% if report.related_reports|length == 1 %}
-                <p>There is <a href="{{ url_for('view_related_reports', related_group_id=report.related_group_id) }}">{{ report.related_reports|length }}</a> other related report found.</p>
+                <p>There is <a href="{{ url_for('view_related_reports', report_id=report.id) }}">{{ report.related_reports|length }}</a> other related report found.</p>
             {% elif report.related_reports|length > 1 %}
-                <p>There are <a href="{{ url_for('view_related_reports', related_group_id=report.related_group_id) }}">{{ report.related_reports|length }}</a> other related reports found.</p>
+                <p>There are <a href="{{ url_for('view_related_reports', report_id=report.id) }}">{{ report.related_reports|length }}</a> other related reports found.</p>
             {% endif %}
 
         </div>

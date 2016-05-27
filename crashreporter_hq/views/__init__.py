@@ -78,10 +78,11 @@ def view_report(report_number):
     return html
 
 
-@app.route('/reports/related/<int:related_group_id>')
-def view_related_reports(related_group_id):
+@app.route('/reports/related/<int:report_id>')
+def view_related_reports(report_id):
     PER_PAGE = 25
-    reports = CrashReport.query.filter(CrashReport.related_group_id == related_group_id).order_by('date').all()
+    report = CrashReport.query.filter(CrashReport.id == report_id).first()
+    reports = CrashReport.query.filter(CrashReport.related_group_id == report.related_group_id).order_by('date').all()
     n_total_reports = len(reports)
     try:
         page = max(1, int(request.args.get('page', n_total_reports / PER_PAGE)))
