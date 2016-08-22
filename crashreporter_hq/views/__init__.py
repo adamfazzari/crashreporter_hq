@@ -28,25 +28,30 @@ def home():
     q = get_similar_reports(return_query=True)
     if flask_login.current_user.group:
         form = SearchReportsForm()
-        if request.args.get('field'):
-            value = request.args['value']
-            if request.args['field'] == 'user_identifier':
-                # Search the user identifiers associated with any aliases that may be part of the search
-                attr = getattr(CrashReport, request.args['field'])
-                logic_or = or_(attr.contains(a.user_identifier) for a in flask_login.current_user.group.aliases if value in a.alias)
-                q = q.filter(CrashReport.group == flask_login.current_user.group, logic_or)
-            elif request.args['field'] == 'before_date':
-                date = datetime.strptime(value, '%d %B %Y')
-                q = q.filter(CrashReport.group == flask_login.current_user.group,
-                        CrashReport.date <= date)
-            elif request.args['field'] == 'after_date':
-                date = datetime.strptime(value, '%d %B %Y')
-                q = q.filter(CrashReport.group == flask_login.current_user.group,
-                             CrashReport.date >= date)
+        search_fields = [request.args.get('field%d' % (i+1)) for i in xrange(3)]
+        search_values = [request.args.get('value%d' % (i+1)) for i in xrange(3)]
+        if any(search_values):
+            for field, value in zip(search_fields, search_values):
+                if not value:
+                    continue
 
-            else:
-                attr = getattr(CrashReport, request.args['field'])
-                q = q.filter(CrashReport.group == flask_login.current_user.group, attr.contains(str(value)))
+                if field == 'user_identifier':
+                    # Search the user identifiers associated with any aliases that may be part of the search
+                    attr = getattr(CrashReport, field)
+                    logic_or = or_(attr.contains(a.user_identifier) for a in flask_login.current_user.group.aliases if value in a.alias)
+                    q = q.filter(CrashReport.group == flask_login.current_user.group, logic_or)
+                elif field == 'before_date':
+                    date = datetime.strptime(value, '%d %B %Y')
+                    q = q.filter(CrashReport.group == flask_login.current_user.group,
+                            CrashReport.date <= date)
+                elif field == 'after_date':
+                    date = datetime.strptime(value, '%d %B %Y')
+                    q = q.filter(CrashReport.group == flask_login.current_user.group,
+                                 CrashReport.date >= date)
+
+                else:
+                    attr = getattr(CrashReport, field)
+                    q = q.filter(CrashReport.group == flask_login.current_user.group, attr.contains(str(value)))
         else:
             q = q.filter(CrashReport.group == flask_login.current_user.group)
 

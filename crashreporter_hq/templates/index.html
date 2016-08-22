@@ -17,12 +17,34 @@
         {% if form %}
             <form action="search" method="post" name="login" >
                 {{ form.hidden_tag() }}
-                <div style="display:inline ">
-                    <span>{{ form.field() }}</span>
-                    <span>{{ form.value(size=80) }}</span>
-                </div>
-                <input type='submit' name='search', value="Search"></input>
-                {% for error in form.value.errors %}
+            <ul>
+                <li style="list-style-type: none">
+                    <div style="display:inline ">
+                        <span>{{ form.field1() }}</span>
+                        <span>{{ form.value1(size=80) }}</span>
+                    </div>
+                </li>
+
+                <li style="list-style-type: none">
+                    <div style="display:inline ">
+                        <span>{{ form.field2() }}</span>
+                        <span>{{ form.value2(size=80) }}</span>
+                    </div>
+                </li>
+
+                <li style="list-style-type: none">
+                    <div style="display:inline ">
+                        <span>{{ form.field3() }}</span>
+                        <span>{{ form.value3(size=80) }}</span>
+                    </div>
+                </li>
+
+                <li style="list-style-type: none">
+                    <input type='submit' name='search', value="Search"></input>
+                </li>
+            </ul>
+
+                {% for error in form.errors %}
                     <span style="color: red;">[{{ error }}]</span>
                 {% endfor %}<br>
             </form>

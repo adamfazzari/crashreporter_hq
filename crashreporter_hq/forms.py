@@ -34,11 +34,21 @@ class CreateGroupForm(Form):
 
 
 class SearchReportsForm(Form):
-    field = SelectField('Field', choices=[('user_identifier', 'User'), ('application_name', 'Application Name'),
-                                          ('application_version', 'Application Version'), ('id', 'Report Number'),
-                                          ('error_message', 'Error Message'), ('error_type', 'Error Type'),
-                                          ('date', 'Date'), ('before_date', 'Before Date'), ('after_date', 'After Date')])
-    value = StringField('Value')
+    choices = [('user_identifier', 'User'), ('application_name', 'Application Name'),
+               ('application_version', 'Application Version'), ('id', 'Report Number'),
+               ('error_message', 'Error Message'), ('error_type', 'Error Type'),
+               ('date', 'Date'), ('before_date', 'Before Date'), ('after_date', 'After Date')]
+    field1 = SelectField('Date', choices=choices)
+    value1 = StringField('Value')
+
+    field2 = SelectField('Field', choices=choices)
+    value2 = StringField('Value')
+
+    field3 = SelectField('Field', choices=choices)
+    value3 = StringField('Value')
+
+    fields = field1, field2, field3
+    values = value1, value2, value3
 
 
 class CreateAliasForm(Form):
