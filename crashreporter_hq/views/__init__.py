@@ -6,6 +6,7 @@ from pygments.lexers import PythonLexer
 from pygments.formatters import HtmlFormatter
 
 from math import ceil
+from sqlalchemy import or_
 
 from ..tools import get_similar_reports
 from ..forms import YoutrackSubmitForm
@@ -28,8 +29,15 @@ def home():
     if flask_login.current_user.group:
         form = SearchReportsForm()
         if request.args.get('field'):
-            q = q.filter(CrashReport.group == flask_login.current_user.group,
-                               getattr(CrashReport, request.args['field']).contains(str(request.args['value'])))
+            value = request.args['value']
+            attr = getattr(CrashReport, request.args['field'])
+
+            if request.args['field'] == 'user_identifier':
+                # Search the user identifiers associated with any aliases that may be part of the search
+                logic_or = or_(attr.contains(a.user_identifier) for a in flask_login.current_user.group.aliases if value in a.alias)
+                q = q.filter(CrashReport.group == flask_login.current_user.group, logic_or)
+            else:
+                q = q.filter(CrashReport.group == flask_login.current_user.group, attr.contains(str(value)))
         else:
             q = q.filter(CrashReport.group == flask_login.current_user.group)
 
