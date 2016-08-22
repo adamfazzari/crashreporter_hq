@@ -51,7 +51,7 @@
                                 <td style="text-align: center"> {{ aliases.get(r['User'], r['User']) }} </td>
                                 <td style="text-align: center"> {{ r['Error Type'] }} </td>
                                 <td style="padding-left: 10px"> {{ r['Error Message'] }} </td>
-                                <td style="text-align: center"> {{ r['Date'] }} </td>
+                                <td style="text-align: center"> {{ r['Date'].strftime('%d %B %Y') }} </td>
                             <td>
                                 <form method='GET' action="{{ url_for('view_report', report_number=r['Report Number']) }}">
                                     <input type="submit" value="Open" >

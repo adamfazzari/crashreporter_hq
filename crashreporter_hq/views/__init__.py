@@ -1,12 +1,12 @@
 
 from flask.ext.paginate import Pagination
-
 from pygments import highlight
 from pygments.lexers import PythonLexer
 from pygments.formatters import HtmlFormatter
 
 from math import ceil
 from sqlalchemy import or_
+from datetime import datetime
 
 from ..tools import get_similar_reports
 from ..forms import YoutrackSubmitForm
@@ -30,13 +30,22 @@ def home():
         form = SearchReportsForm()
         if request.args.get('field'):
             value = request.args['value']
-            attr = getattr(CrashReport, request.args['field'])
-
             if request.args['field'] == 'user_identifier':
                 # Search the user identifiers associated with any aliases that may be part of the search
+                attr = getattr(CrashReport, request.args['field'])
                 logic_or = or_(attr.contains(a.user_identifier) for a in flask_login.current_user.group.aliases if value in a.alias)
                 q = q.filter(CrashReport.group == flask_login.current_user.group, logic_or)
+            elif request.args['field'] == 'before_date':
+                date = datetime.strptime(value, '%d %B %Y')
+                q = q.filter(CrashReport.group == flask_login.current_user.group,
+                        CrashReport.date <= date)
+            elif request.args['field'] == 'after_date':
+                date = datetime.strptime(value, '%d %B %Y')
+                q = q.filter(CrashReport.group == flask_login.current_user.group,
+                             CrashReport.date >= date)
+
             else:
+                attr = getattr(CrashReport, request.args['field'])
                 q = q.filter(CrashReport.group == flask_login.current_user.group, attr.contains(str(value)))
         else:
             q = q.filter(CrashReport.group == flask_login.current_user.group)
