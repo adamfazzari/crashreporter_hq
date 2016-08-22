@@ -11,7 +11,7 @@ class LoginForm(Form):
 class PasswordChangeform(Form):
     old_password = PasswordField('old_password', validators=[DataRequired()])
     new_password = PasswordField('new_password', validators=[DataRequired()])
-    confirm = PasswordField('confirm', validators=[DataRequired(), EqualTo('new_password', message='New Passwords must match')])
+    confirm = PasswordField('confirm', validators=[DataRequired(), EqualTo('new_password', message='Passwords must match')])
 
 
 class SignUpForm(Form):
