@@ -58,14 +58,14 @@ def alias():
     if request.args.get('action') == 'create':
         form = CreateAliasForm()
         if form.validate_on_submit():
-            alias = Alias(flask_login.current_user, form.data['alias'], form.data['uuid'])
+            alias = Alias(flask_login.current_user.group, form.data['alias'], form.data['uuid'])
             db.session.add(alias)
             db.session.commit()
             return redirect(request.referrer)
         else:
             return render_template('user_profile.html', user=flask_login.current_user, form=form)
     elif request.args.get('action') == 'delete':
-        alias = Alias.query.filter(Alias.user_id==flask_login.current_user.id,
+        alias = Alias.query.filter(Alias.group_id==flask_login.current_user.group_id,
                                    Alias.user_identifier==request.args.get('uuid')).first()
         db.session.delete(alias)
         db.session.commit()

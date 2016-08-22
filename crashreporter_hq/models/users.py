@@ -30,11 +30,11 @@ class Alias(db.Model):
     id = Column(Integer, primary_key=True)
     alias = Column(String(50), unique=False, default='')
     user_identifier = Column(String(100), unique=False)
-    user_id = Column(Integer, ForeignKey('users.id'))
-    user = relationship('User', backref='aliases', foreign_keys=[user_id])
+    group_id = Column(Integer, ForeignKey('group.id'))
+    group = relationship('Group', backref='aliases', foreign_keys=[group_id])
 
-    def __init__(self, user, name, user_identifier):
-        self.user = user
+    def __init__(self, group, name, user_identifier):
+        self.group = group
         self.alias = name
         self.user_identifier = user_identifier
 
@@ -76,7 +76,6 @@ class User(db.Model, flask_login.UserMixin):
             if isinstance(group, basestring):
                 group = Group.query.filter(Group.name == group).first()
             group.users.append(self)
-
 
     def get_id(self):
         return self.email

@@ -33,7 +33,7 @@
                 {% endfor %}
 
             </tr>
-            {% for alias in user.aliases %}
+            {% for alias in user.group.aliases %}
                 <tr>
                     <td>{{ alias.alias }}</td>
                     <td>{{ alias.user_identifier}}</td>
