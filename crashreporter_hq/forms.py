@@ -8,6 +8,12 @@ class LoginForm(Form):
     password = PasswordField('password', validators=[DataRequired()])
 
 
+class PasswordChangeform(Form):
+    old_password = PasswordField('old_password', validators=[DataRequired()])
+    new_password = PasswordField('new_password', validators=[DataRequired()])
+    confirm = PasswordField('confirm', validators=[DataRequired(), EqualTo('new_password', message='New Passwords must match')])
+
+
 class SignUpForm(Form):
     email = StringField('email', validators=[DataRequired(), Email()])
     password = PasswordField('password', validators=[DataRequired()])
@@ -30,7 +36,8 @@ class CreateGroupForm(Form):
 class SearchReportsForm(Form):
     field = SelectField('Field', choices=[('user_identifier', 'User'), ('application_name', 'Application Name'),
                                           ('application_version', 'Application Version'), ('id', 'Report Number'),
-                                         ('error_message', 'Error Message'), ('error_type', 'Error Type')])
+                                         ('error_message', 'Error Message'), ('error_type', 'Error Type'),
+                                          ('date', 'Date')])
     value = StringField('Value')
 
 

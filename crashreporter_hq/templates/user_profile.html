@@ -47,16 +47,43 @@
         </table>
         <br>
             <form action="{{ url_for('alias', action='create') }}" method="post" name="aliases">
-                {{ form.hidden_tag() }}
+                {{ alias_form.hidden_tag() }}
                 <div style="display:flex">
-                    {{ render_field(form.alias) }}
-                    {{ render_field(form.uuid, field_name='UUID') }}
-                    {{ form.submit }}
+                    {{ render_field(alias_form.alias) }}
+                    {{ render_field(alias_form.uuid, field_name='UUID') }}
+                    {{ alias_form.submit }}
                 </div>
             </form>
 
         </div>
+        <br>
+        <div class="form">
+            <h3>Change Password</h3>
 
+            {% for error in pw_form.confirm.errors %}
+                <span style="color: red;">{{ error }}</span>
+            {% endfor %}
+
+            <form action="{{ url_for('update_password') }}" method="post" name="update_password">
+                {{ pw_form.hidden_tag() }}
+                <ul>
+                    <li>
+                        <span>Current Password{{ pw_form.old_password(size=80) }}</span>
+                    </li>
+                    <li>
+                        <span>New Password {{ pw_form.new_password(size=80) }}</span>
+                    </li>
+                    <li>
+                        <span>Confirm New Password {{ pw_form.confirm(size=80) }}</span>
+                    </li>
+                    <li>
+                        <span><input type='submit' name='submit', style="margin-top: 10px;" value="Change Password"></input></span>
+                    </li>
+                </ul>
+
+            </form>
+
+        </div>
     {% endblock %}
 
 
