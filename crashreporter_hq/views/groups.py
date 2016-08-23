@@ -6,7 +6,7 @@ import flask.ext.login as flask_login
 from .. import app, db
 from ..extensions.views import *
 from ..forms import CreateGroupForm, SearchForm
-from ..models import Group, User
+from ..models import Group, User, CrashReport
 
 
 @app.route('/groups', methods=['GET', 'POST'], defaults={'group': None})
@@ -23,7 +23,14 @@ def groups(group):
             if g is None:
                 flash('Group "{name}" does not exist.'.format(name=group))
                 g = flask_login.current_user.group
-        return render_template('groups.html', sform=sform, cform=cform, group=g, user=flask_login.current_user)
+
+        if flask_login.current_user.group_admin:
+            uuids = g.uuids
+        else:
+            uuids = []
+
+        return render_template('groups.html', sform=sform, cform=cform, group=g, user=flask_login.current_user,
+                               uuids=uuids)
     elif cform.validate_on_submit() and cform.data['submit']:
         # Creating a group
         group = Group.query.filter(Group.name == cform.data['name']).first()

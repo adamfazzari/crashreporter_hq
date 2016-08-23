@@ -17,12 +17,12 @@ def view_report_stats():
 @app.route('/reports/get_stats', methods=['GET'])
 def get_report_stats():
     if request.args.get('type') == 'date':
-        q = db.session.query(CrashReport.date, func.count(CrashReport.date)).group_by(CrashReport.user_identifier).\
+        q = db.session.query(CrashReport.date, func.count(CrashReport.date)).group_by(CrashReport.uuid_id).\
                                order_by(asc(CrashReport.date))
         data = [(d.year, d.month-1, d.day, d.hour, n) for d, n in q.all() if d.year == 2016]
     elif request.args.get('type') == 'user':
-        q = db.session.query(CrashReport.user_identifier, func.count(CrashReport.user_identifier).label('# crashes')).\
-            group_by(CrashReport.user_identifier)
+        q = db.session.query(CrashReport.uuid, func.count(CrashReport.uuid).label('# crashes')).\
+            group_by(CrashReport.uuid)
         data = q.all()
     else:
         return 'Invalid request'

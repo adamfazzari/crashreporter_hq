@@ -2,7 +2,7 @@ from flask import Response
 from sqlalchemy import func
 
 from groups import *
-from ..models import Statistic, State, Timer, Sequence
+from ..models import Statistic, State, Timer, Sequence, UUID
 
 import json
 
@@ -21,7 +21,7 @@ def view_usage_stats():
 def get_usage_stats():
     if request.args.get('type') == 'statistics':
         data = {'stats': db.session.query(Statistic.name, func.sum(Statistic.count)).group_by(Statistic.name).all(),
-                'n_users': len(db.session.query(Statistic.user_identifier).group_by(Statistic.user_identifier).all())}
+                'n_users': len(db.session.query(Statistic.uuid).group_by(Statistic.uuid).all())}
     elif request.args.get('type') == 'states':
         if request.args.get('name'):
             data = {'name': request.args.get('name'),
@@ -56,9 +56,14 @@ def upload_stats():
     else:
         for trackable_name, data in payload.get('Data', {}).iteritems():
             cls = TRACKABLES.get(data['type'])
-            trackable = cls.query.filter(cls.name==trackable_name, cls.user_identifier==payload['User Identifier'], cls.group_id==user.group_id).first()
+            # Get the UUID row or create one if it doesn't exist
+            uuid = UUID.query.filter(UUID.user_identifier==payload['User Identifier']).first()
+            if uuid is None:
+                uuid = UUID(payload['User Identifier'])
+
+            trackable = cls.query.filter(cls.name==trackable_name, cls.uuid_id==uuid.id, cls.group_id==user.group_id).first()
             if trackable is None:
-                trackable = cls(trackable_name, payload['User Identifier'], payload['Application Name'], payload['Application Version'], user.group)
+                trackable = cls(trackable_name, uuid, payload['Application Name'], payload['Application Version'], user.group)
                 db.session.add(trackable)
             # Apply the value of the data to the row
             if data['type'] == 'State':

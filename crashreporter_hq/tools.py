@@ -25,12 +25,9 @@ def save_report(payload):
     if user is not None:
         cr = CrashReport(**payload)
         if user.group:
-            user.group.reports.append(cr)
+            user.group.add_report(cr)
 
-        db.session.add(cr)
-        for tb in cr['Traceback']:
-            db.session.add(tb)
-        db.session.commit()
+        cr.commit()
 
         return cr, 'Success'
     else:

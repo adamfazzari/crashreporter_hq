@@ -2,7 +2,7 @@
 from flask import request, render_template, flash, redirect, url_for
 import flask.ext.login as flask_login
 from ..forms import CreateAliasForm, PasswordChangeform
-from ..models import User, Alias
+from ..models import User, Alias, UUID
 
 from .. import app, db
 
@@ -58,9 +58,11 @@ def alias():
     if request.args.get('action') == 'create':
         form = CreateAliasForm()
         if form.validate_on_submit():
-            alias = Alias(flask_login.current_user.group, form.data['alias'], form.data['uuid'])
-            db.session.add(alias)
-            db.session.commit()
+            uuid = UUID.query.filter(UUID.user_identifier==form.data['uuid']).first()
+            if uuid:
+                alias = Alias(flask_login.current_user.group, form.data['alias'], uuid)
+                db.session.add(alias)
+                db.session.commit()
             return redirect(request.referrer)
         else:
             return render_template('user_profile.html', user=flask_login.current_user, form=form)

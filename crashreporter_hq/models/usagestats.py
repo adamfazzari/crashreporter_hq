@@ -13,15 +13,19 @@ class TrackableBase(object):
     '''
     Base class for trackables. Each row represents a trackable for a particular user and application
     '''
-    def __init__(self, name, user_identifier, application_name, application_version, group):
+    def __init__(self, name, uuid, application_name, application_version, group):
         super(TrackableBase, self).__init__()
         self.name = name
-        self.user_identifier = user_identifier
+        self.uuid = uuid
         self.application_name = application_name
         self.application_version = application_version
         self.group_id = group.id
         self.group = group
         getattr(self.group, self.__class__.__name__.lower()).append(self)
+
+    @property
+    def user_identifier(self):
+        return self.uuid.user_identifier
 
 
 class Statistic(TrackableBase, db.Model):
@@ -31,7 +35,8 @@ class Statistic(TrackableBase, db.Model):
     count = Column(Integer, default=0, unique=False)
     name = Column(String(20), unique=False)
     description = Column(String(150), unique=False)
-    user_identifier = Column(String(100), unique=False)
+    uuid_id = Column(Integer, ForeignKey('uuid.id'), unique=False)
+    uuid = relationship('UUID', backref='usage_statistics', foreign_keys=[uuid_id])
     application_name = Column(String(50), unique=False)
     application_version = Column(Integer, unique=False)
     group_id = Column(Integer, ForeignKey('group.id'))
@@ -49,7 +54,8 @@ class State(TrackableBase, db.Model):
     state = Column(String, unique=False)
     name = Column(String(20), unique=False)
     description = Column(String(150), unique=False)
-    user_identifier = Column(String(100), unique=False)
+    uuid_id = Column(Integer, ForeignKey('uuid.id'), unique=False)
+    uuid = relationship('UUID', backref='usage_states', foreign_keys=[uuid_id])
     application_name = Column(String(50), unique=False)
     application_version = Column(Integer, unique=False)
     group_id = Column(Integer, ForeignKey('group.id'))
@@ -68,7 +74,8 @@ class Timer(TrackableBase, db.Model):
     time = Column(Integer, unique=False)
     name = Column(String(20), unique=False)
     description = Column(String(150), unique=False)
-    user_identifier = Column(String(100), unique=False)
+    uuid_id = Column(Integer, ForeignKey('uuid.id'), unique=False)
+    uuid = relationship('UUID', backref='usage_timers', foreign_keys=[uuid_id])
     application_name = Column(String(50), unique=False)
     application_version = Column(Integer, unique=False)
     group_id = Column(Integer, ForeignKey('group.id'))
@@ -86,7 +93,8 @@ class Sequence(TrackableBase, db.Model):
     count = Column(Integer, default=0, unique=False)
     name = Column(String(20), unique=False)
     description = Column(String(150), unique=False)
-    user_identifier = Column(String(100), unique=False)
+    uuid_id = Column(Integer, ForeignKey('uuid.id'), unique=False)
+    uuid = relationship('UUID', backref='usage_sequences', foreign_keys=[uuid_id])
     application_name = Column(String(50), unique=False)
     application_version = Column(Integer, unique=False)
     group_id = Column(Integer, ForeignKey('group.id'))

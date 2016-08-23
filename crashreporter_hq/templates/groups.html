@@ -104,7 +104,7 @@
                 {% endfor %}
             </table>
 
-
+            {# The following section is visible only to administrators #}
             {% if user.group_admin and group.name == user.group.name %}
                 <h3> Invitations </h3>
                 <table border="1" class="sortable", style="width:100%">
@@ -132,6 +132,28 @@
                         </tr>
                     {% endfor %}
                 </table>
+
+                <h3> Users </h3>
+
+                <table border="1" class="sortable", style="width:100%">
+                    <tr class="tableheader">
+
+                        {% for header in ('UUID', 'Ignore Usage Stats', 'Ignore Crash Reports') %}
+                            <td class="tableheader">{{ header }}</td>
+                        {% endfor %}
+
+                    </tr>
+
+                    {% for uuid in uuids %}
+                        <tr>
+                            <td>{{ uuid.user_identifier }}</td>
+                            <td>{{ 'Yes' if uuid.usagestats_black_listed else 'No'}}</td>
+                            <td>{{ 'Yes' if uuid.crashreports_black_listed else 'No'}}</td>
+                        </tr>
+                    {% endfor %}
+                </table>
+
+
             {% endif %}
 
         {% endif %}

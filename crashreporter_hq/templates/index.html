@@ -70,7 +70,7 @@
                                 <td style="text-align: center"> <a href="{{ url_for('view_related_reports', report_id=r.id) }}">{{ r.related_reports|length + 1}}</a></td>
                                 <td style="text-align: center"> {{ r['Application Name'] }} </td>
                                 <td style="text-align: center"> {{ r['Application Version'] }} </td>
-                                <td style="text-align: center"> {{ aliases.get(r['User'], r['User']) }} </td>
+                                <td style="text-align: center"> {{ aliases.get(r['User'].user_identifier, r['User'].user_identifier) }} </td>
                                 <td style="text-align: center"> {{ r['Error Type'] }} </td>
                                 <td style="padding-left: 10px"> {{ r['Error Message'] }} </td>
                                 <td style="text-align: center"> {{ r['Date'].strftime('%d %B %Y') }} </td>
