@@ -4,9 +4,8 @@ from flask import request, render_template, flash, redirect, url_for
 import flask.ext.login as flask_login
 
 from .. import app, db
-from ..extensions.views import *
-from ..forms import CreateGroupForm, SearchForm
-from ..models import Group, User, CrashReport
+from ..forms import CreateGroupForm, SearchForm, CreateAliasForm
+from ..models import Group, User
 
 
 @app.route('/groups', methods=['GET', 'POST'], defaults={'group': None})
@@ -15,6 +14,8 @@ from ..models import Group, User, CrashReport
 def groups(group):
     sform = SearchForm(prefix='search')
     cform = CreateGroupForm(prefix='create')
+    alias_form = CreateAliasForm()
+
     if request.method == 'GET':
         if group is None:
             g = flask_login.current_user.group
@@ -29,8 +30,8 @@ def groups(group):
         else:
             uuids = []
 
-        return render_template('groups.html', sform=sform, cform=cform, group=g, user=flask_login.current_user,
-                               uuids=uuids)
+        return render_template('groups.html', sform=sform, cform=cform, alias_form = alias_form,
+                                group=g, user=flask_login.current_user, uuids=uuids)
     elif cform.validate_on_submit() and cform.data['submit']:
         # Creating a group
         group = Group.query.filter(Group.name == cform.data['name']).first()

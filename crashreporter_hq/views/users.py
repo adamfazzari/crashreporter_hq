@@ -32,10 +32,8 @@ def users():
 @flask_login.login_required
 def user_profile():
     if request.method == 'GET':
-        alias_form = CreateAliasForm()
         password_change_form = PasswordChangeform()
-        return render_template('user_profile.html', user=flask_login.current_user,
-                               alias_form=alias_form, pw_form=password_change_form)
+        return render_template('user_profile.html', user=flask_login.current_user, pw_form=password_change_form)
 
 
 @app.route('/users/profile/update_password', methods=['POST'])

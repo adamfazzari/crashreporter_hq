@@ -9,54 +9,8 @@
 
     {% extends "base.html" %}
 
-    {% macro render_field(field, required=False, field_name=None) %}
-        <span>{{ '* ' if required else '' }}{{ field_name if field_name is not none else field.name.capitalize() }}</span> {{ field(**kwargs)|safe }}
-        {% if field.errors %}
-            <ul>
-            {% for error in field.errors %}
-                <li style="color: red;">{{ error }}</li>
-            {% endfor %}
-
-            </ul>
-        {% endif %}
-    {% endmacro %}
-
     {% block content %}
 
-        <div class="form">
-            <h3>Aliases</h3>
-        <table border="1" class="sortable", style="width:100%">
-            <tr class="tableheader">
-
-                {% for header in ('Alias', 'UUID') %}
-                    <td class="tableheader">{{ header }}</td>
-                {% endfor %}
-
-            </tr>
-            {% for alias in user.group.aliases %}
-                <tr>
-                    <td>{{ alias.alias }}</td>
-                    <td>{{ alias.user_identifier}}</td>
-                    <td>
-                        <form method='POST' action="{{ url_for('alias', action='delete', uuid=alias.user_identifier) }}">
-                            <input type="submit" value="Delete" >
-                        </form>
-                    </td>
-                </tr>
-            {% endfor %}
-        </table>
-        <br>
-            <form action="{{ url_for('alias', action='create') }}" method="post" name="aliases">
-                {{ alias_form.hidden_tag() }}
-                <div style="display:flex">
-                    {{ render_field(alias_form.alias) }}
-                    {{ render_field(alias_form.uuid, field_name='UUID') }}
-                    {{ alias_form.submit }}
-                </div>
-            </form>
-
-        </div>
-        <br>
         <div class="form">
             <h3>Change Password</h3>
 
