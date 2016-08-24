@@ -2,7 +2,7 @@ from flask import Response
 from sqlalchemy import func, asc
 from datetime import datetime
 from groups import *
-from ..models import CrashReport
+from ..models import CrashReport, UUID
 
 import json
 
@@ -32,8 +32,8 @@ def get_report_stats():
             data.append((d.year, d.month-1, d.day, d.hour, n))
 
     elif request.args.get('type') == 'user':
-        q = db.session.query(CrashReport.uuid, func.count(CrashReport.uuid).label('# crashes')).\
-            group_by(CrashReport.uuid)
+        # https://stackoverflow.com/questions/25500904/counting-relationships-in-sqlalchemy/25525771#25525771
+        q = db.session.query(UUID.user_identifier, func.count(CrashReport.id)).join(UUID.reports).group_by(UUID.user_identifier)
         data = q.all()
     else:
         return 'Invalid request'
