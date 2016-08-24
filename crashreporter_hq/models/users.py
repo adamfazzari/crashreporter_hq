@@ -13,8 +13,7 @@ class Group(db.Model):
     id = Column(Integer, primary_key=True)
     name = Column(String(120), unique=True)
     description = Column(String, unique=False)
-    uuid_id = Column(Integer,  ForeignKey('uuid.id'))
-    uuids = relationship('UUID', uselist=True, foreign_keys=[uuid_id])
+    uuids = relationship('UUID', uselist=True)
     join_requests_id = Column(Integer,  ForeignKey('users.id'))
     join_requests = relationship('User', uselist=True, foreign_keys=[join_requests_id])
 
@@ -27,10 +26,8 @@ class Group(db.Model):
                     self.users.append(user)
 
     def add_report(self, report):
-        if report not in self.reports:
-            self.reports.append(report)
-        if report.uuid not in self.uuids:
-            self.uuids.append(report.uuid)
+        self.reports.append(report)
+        self.uuids.append(report.uuid)
 
 
 class Alias(db.Model):
