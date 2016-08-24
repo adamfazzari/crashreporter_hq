@@ -25,6 +25,9 @@ class UUID(db.Model):
     def __init__(self, user_identifier):
         self.user_identifier = user_identifier
 
+    def __repr__(self):
+        return "%d. %s" % (self.id, self.user_identifier)
+
 
 class CrashReport(db.Model):
 
