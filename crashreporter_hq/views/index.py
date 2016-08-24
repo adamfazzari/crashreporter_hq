@@ -27,7 +27,9 @@ def home():
 
                 if field == 'user_identifier':
                     # Search the user identifiers associated with any aliases that may be part of the search
-                    logic_or = or_(UUID.user_identifier.contains(a.user_identifier) for a in flask_login.current_user.group.aliases if value in a.alias)
+                    conditions = [UUID.user_identifier.contains(a.user_identifier) for a in flask_login.current_user.group.aliases if value in a.alias]
+                    conditions.append(UUID.user_identifier.contains(value))
+                    logic_or = or_(*conditions)
                     q = q.filter(CrashReport.group == flask_login.current_user.group, logic_or).join(UUID)
 
                 elif field == 'before_date':
