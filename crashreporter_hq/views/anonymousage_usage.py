@@ -21,7 +21,7 @@ def view_usage_stats():
 def get_usage_stats():
     if request.args.get('type') == 'statistics':
         data = {'stats': db.session.query(Statistic.name, func.sum(Statistic.count)).group_by(Statistic.name).all(),
-                'n_users': len(db.session.query(Statistic.uuid).group_by(Statistic.uuid).all())}
+                'n_users': len(db.session.query(Statistic.uuid_id).group_by(Statistic.uuid_id).all())}
     elif request.args.get('type') == 'states':
         if request.args.get('name'):
             data = {'name': request.args.get('name'),
