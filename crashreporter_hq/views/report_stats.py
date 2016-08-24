@@ -1,6 +1,6 @@
 from flask import Response
 from sqlalchemy import func, asc
-
+from datetime import datetime
 from groups import *
 from ..models import CrashReport
 
@@ -17,9 +17,20 @@ def view_report_stats():
 @app.route('/reports/get_stats', methods=['GET'])
 def get_report_stats():
     if request.args.get('type') == 'date':
-        q = db.session.query(CrashReport.date, func.count(CrashReport.date)).group_by(CrashReport.uuid_id).\
-                               order_by(asc(CrashReport.date))
-        data = [(d.year, d.month-1, d.day, d.hour, n) for d, n in q.all() if d.year == 2016]
+        # Query for the number of reports for each day
+        q = db.session.query(func.date(CrashReport.date), func.count(func.DATE(CrashReport.date)))
+        # Only dates that are before today (so we take out units with time-stamps in the future)
+        q = q.filter(CrashReport.date <= datetime.now())
+        # Group / bin the results by day in ascending order
+        q = q.group_by(func.date(CrashReport.date)).order_by(asc(CrashReport.date))
+
+        # Because SQLite does not support the Date class in queries, we cannot cast the results
+        # Instead, do the casting ourselves
+        data = []
+        for datestr, n in q.all():
+            d = datetime.strptime(datestr, '%Y-%m-%d')
+            data.append((d.year, d.month-1, d.day, d.hour, n))
+
     elif request.args.get('type') == 'user':
         q = db.session.query(CrashReport.uuid, func.count(CrashReport.uuid).label('# crashes')).\
             group_by(CrashReport.uuid)

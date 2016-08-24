@@ -17,6 +17,7 @@ app.directive('datechart', function($http) {
                 var done = function(resp) {
                     var dates = [];
                     for (var ii=0; ii < resp.data.length; ii++){
+                        // year, month (zero index), day, hour, Y-value
                         dates.push([new Date(resp.data[ii][0], resp.data[ii][1], resp.data[ii][2], resp.data[ii][3]), resp.data[ii][4]])
                     }
                     data.addColumn('date', 'Date of Report');
