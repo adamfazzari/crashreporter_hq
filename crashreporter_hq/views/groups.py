@@ -5,7 +5,8 @@ import flask.ext.login as flask_login
 
 from .. import app, db
 from ..forms import CreateGroupForm, SearchForm, CreateAliasForm
-from ..models import Group, User
+from ..models import Group, User, UUID, CrashReport, Alias
+from ..models.usagestats import TrackableTables
 
 
 @app.route('/groups', methods=['GET', 'POST'], defaults={'group': None})
@@ -108,3 +109,25 @@ def request_group_invite():
         else:
             flash('Request to join group "{name}" has already been submitted.'.format(name=group))
         return redirect(url_for('groups', group=group))
+
+
+@app.route('/uuids/<int:uuid_id>', methods=['POST'])
+@flask_login.login_required
+def manage_uuid(uuid_id):
+    uuid = UUID.query.filter(UUID.id == uuid_id).first()
+    if request.method == 'POST' and uuid:
+        if request.args.get('action') == 'toggle_usage_stats':
+            uuid.usagestats_black_listed = not uuid.usagestats_black_listed
+            db.session.commit()
+        elif request.args.get('action') == 'toggle_crash_reports':
+            uuid.crashreport_black_listed = not uuid.crashreport_black_listed
+            db.session.commit()
+        elif request.args.get('action') == 'delete':
+            for table in TrackableTables[:] + [CrashReport, Alias]:
+                n_deleted = table.query.filter(table.uuid_id==uuid_id).delete()
+                print n_deleted, table.__class__.__name__
+            db.session.delete(uuid)
+            db.session.commit()
+
+    return redirect(request.referrer)
+

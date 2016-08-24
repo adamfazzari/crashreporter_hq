@@ -159,7 +159,7 @@
                     <table border="1" class="sortable", style="width:100%">
                         <tr class="tableheader">
 
-                            {% for header in ('UUID', 'Ignore Usage Stats', 'Ignore Crash Reports') %}
+                            {% for header in ('UUID', 'Usage Stats', 'Crash Reports', '') %}
                                 <td class="tableheader">{{ header }}</td>
                             {% endfor %}
 
@@ -168,8 +168,21 @@
                         {% for uuid in uuids %}
                             <tr>
                                 <td>{{ uuid.user_identifier }}</td>
-                                <td>{{ 'Yes' if uuid.usagestats_black_listed else 'No'}}</td>
-                                <td>{{ 'Yes' if uuid.crashreports_black_listed else 'No'}}</td>
+                                <td>
+                                    <form method='POST' action="{{ url_for('manage_uuid', uuid_id=uuid.id, action='toggle_usage_stats') }}">
+                                        <input type="submit" value={{ 'Off' if uuid.usagestats_black_listed else 'On'}} >
+                                    </form>
+                                </td>
+                                <td>
+                                    <form method='POST' action="{{ url_for('manage_uuid', uuid_id=uuid.id, action='toggle_crash_reports') }}">
+                                        <input type="submit" value={{ 'Off' if uuid.crashreport_black_listed else 'On'}} >
+                                    </form>
+                                </td>
+                                <td>
+                                    <form method='POST' action="{{ url_for('manage_uuid', uuid_id=uuid.id, action='delete') }}">
+                                        <input type="submit" value='Delete' >
+                                    </form>
+                                </td>
                             </tr>
                         {% endfor %}
                     </table>

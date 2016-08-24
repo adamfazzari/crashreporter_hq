@@ -103,3 +103,6 @@ class Sequence(TrackableBase, db.Model):
 
     def __repr__(self):
         return '%s = %s' % (self.name, self.count)
+
+
+TrackableTables = [Statistic, State, Sequence, Timer]

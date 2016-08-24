@@ -17,8 +17,8 @@ class UUID(db.Model):
 
     id = Column(Integer, primary_key=True)
     user_identifier = Column(String(100), unique=True)
-    crashreport_black_listed = Column(Boolean(False))
-    usagestats_black_listed = Column(Boolean(False))
+    crashreport_black_listed = Column(Boolean(False), default=False)
+    usagestats_black_listed = Column(Boolean(False), default=False)
     group_id = Column(Integer, ForeignKey('group.id'))
     group = relationship('Group', uselist=True, foreign_keys=[group_id])
 
