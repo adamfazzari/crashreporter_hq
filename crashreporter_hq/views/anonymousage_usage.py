@@ -2,7 +2,7 @@ from flask import Response
 from sqlalchemy import func
 
 from groups import *
-from ..models import Statistic, State, Timer, Sequence, UUID
+from ..models import Statistic, State, Timer, Sequence, UUID, StatisticBarPlot
 
 import json
 
@@ -13,27 +13,39 @@ TRACKABLES = {'Statistic': Statistic, 'State': State, 'Timer': Timer, 'Sequence'
 @flask_login.login_required
 def view_usage_stats():
     state_trackables = [q.name for q in db.session.query(State.name.distinct().label('name'))]
-    html = render_template('anonymous_usage.html', user=flask_login.current_user, states=state_trackables)
+    plot_ids = [t[0] for t in db.session.query(StatisticBarPlot.id).filter(StatisticBarPlot.group_id==flask_login.current_user.group.id).all()]
+    html = render_template('anonymous_usage.html', user=flask_login.current_user, plot_ids=plot_ids, states=state_trackables)
     return html
 
 
-@app.route('/usage/get_stats', methods=['GET'])
-def get_usage_stats():
-    if request.args.get('type') == 'statistics':
-        data = {'stats': db.session.query(Statistic.name, func.sum(Statistic.count)).group_by(Statistic.name).all(),
-                'n_users': len(db.session.query(Statistic.uuid_id).group_by(Statistic.uuid_id).all())}
-    elif request.args.get('type') == 'states':
-        if request.args.get('name'):
+@app.route('/usage/get_state_list', methods=['GET'])
+def get_state_list():
+    data = [q.name for q in db.session.query(State.name.distinct().label('name'))]
+    json_response = json.dumps(data)
+    response = Response(json_response, content_type='application/json; charset=utf-8')
+    response.headers.add('content-length', len(json_response))
+    response.status_code = 200
+    return response
+
+
+@app.route('/usage/get_data/plot', methods=['GET'])
+def get_plot_data():
+    if request.args.get('type') == 'statistic':
+        if request.args.get('id'):
+            plot = StatisticBarPlot.query.filter(StatisticBarPlot.id==int(request.args.get('id'))).first()
+            q = db.session.query(Statistic.name, func.sum(Statistic.count))
+            q = q.group_by(Statistic.name)
+            q = q.filter(Statistic.id.in_([s.id for s in plot.statistics]))
+            data = {'stats': q.all(),
+                    'n_users': len(set(s.uuid for s in plot.statistics))}
+    elif request.args.get('type') == 'state':
             data = {'name': request.args.get('name'),
                     'counts': db.session.query(State.state, func.count(State.id)).
                                        filter(State.name==request.args.get('name')).
                                        group_by(State.state).all()
-                    }
-        else:
-            data = [q.name for q in db.session.query(State.name.distinct().label('name'))]
-
-    else:
-        return 'Invalid query.'
+                    }    #
+    # else:
+    #     return 'Invalid query.'
     json_response = json.dumps(data)
     response = Response(json_response, content_type='application/json; charset=utf-8')
     response.headers.add('content-length', len(json_response))

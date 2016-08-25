@@ -17,9 +17,12 @@
     {% extends "base.html" %}
 
     {% block content %}
-        {% raw %}
 
-        <div statisticchart></div>
+        {% for id in plot_ids %}
+            <div statisticchart plotid="{{id}}"></div>
+        {% endfor %}
+
+        {% raw %}
 
         <select id="stateSelection" ng-model="stateSelection" ng-options="s for s in states">
             <option value="" selected>Select a Trackable State</option>

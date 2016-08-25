@@ -4,8 +4,8 @@ from flask import request, render_template, flash, redirect, url_for
 import flask.ext.login as flask_login
 
 from .. import app, db
-from ..forms import CreateGroupForm, SearchForm, CreateAliasForm
-from ..models import Group, User, UUID, CrashReport, Alias
+from ..forms import CreateGroupForm, SearchForm, CreateAliasForm, PlotCreationForm
+from ..models import Group, User, UUID, CrashReport, Alias, StatisticBarPlot, Statistic
 from ..models.usagestats import TrackableTables
 
 
@@ -16,6 +16,7 @@ def groups(group):
     sform = SearchForm(prefix='search')
     cform = CreateGroupForm(prefix='create')
     alias_form = CreateAliasForm()
+    plot_form = PlotCreationForm()
 
     if request.method == 'GET':
         if group is None:
@@ -31,7 +32,7 @@ def groups(group):
         else:
             uuids = []
 
-        return render_template('groups.html', sform=sform, cform=cform, alias_form = alias_form,
+        return render_template('groups.html', sform=sform, cform=cform, alias_form=alias_form, plot_form=plot_form,
                                 group=g, user=flask_login.current_user, uuids=uuids)
     elif cform.validate_on_submit() and cform.data['submit']:
         # Creating a group
@@ -130,4 +131,23 @@ def manage_uuid(uuid_id):
             db.session.commit()
 
     return redirect(request.referrer)
+
+
+@app.route('/plots/manage', methods=['GET', 'POST'])
+@flask_login.login_required
+def manage_plots():
+    if request.method == 'POST':
+        if request.args.get('action') == 'create_bar_plot':
+            plot_form = PlotCreationForm()
+            if plot_form.validate_on_submit():
+                fields = plot_form.data['fields'].split(',')
+                stats = Statistic.query.filter(Statistic.name.in_(fields)).all()
+                if stats:
+                    plot = StatisticBarPlot(plot_form.data['name'],
+                                            flask_login.current_user.group, *stats)
+                    db.session.add(plot)
+                    db.session.commit()
+                    flash("New plot '%s' has been created" % plot.name)
+                return redirect(request.referrer)
+
 

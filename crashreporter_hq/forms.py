@@ -33,6 +33,12 @@ class CreateGroupForm(Form):
     submit = SubmitField('Create')
 
 
+class PlotCreationForm(Form):
+    name = StringField('name')
+    fields = StringField('fields')
+    submit = SubmitField('Create')
+
+
 class SearchReportsForm(Form):
     choices = [('user_identifier', 'User'), ('application_name', 'Application Name'),
                ('application_version', 'Application Version'), ('id', 'Report Number'),

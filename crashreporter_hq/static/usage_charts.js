@@ -10,7 +10,7 @@ app.controller('UsageStats', function($scope, $http) {
     var fail=function(err){
         $scope.states = [];
     };
-    $http.get('/usage/get_stats?type=states').then(done, fail);
+    $http.get('/usage/get_state_list').then(done, fail);
 });
 
 app.controller('stateSelection', function($scope, $http) {
@@ -19,29 +19,30 @@ app.controller('stateSelection', function($scope, $http) {
 
 app.directive('statisticchart', function($http) {
         return {
-          restrict: 'A',
-          link: function($scope, $elm, $attr) {
-                // Create the data table.
-                var data = new google.visualization.DataTable();
-                var fail=function(err){ };
-                var done = function(resp) {
+                  restrict: 'A',
+                  link: function($scope, $elm, $attr) {
+                        // Create the data table.
+                        var data = new google.visualization.DataTable();
+                        var fail=function(err){ };
+                        console.log($attr)
+                        var done = function(resp) {
 
-                    data.addColumn('string', 'Statistic');
-                    data.addColumn('number', 'Count');
-                    data.addRows(resp.data['stats']);
-                    // Set chart options
-                    var options = {'title':'Anonymous Statistics (Submissions from ' + resp.data['n_users'] + ' Users)',
-                                   'width':'100%',
-                                   'height':600};
-                    // Instantiate and draw our chart, passing in some options.
-                    var chart = new google.visualization.ColumnChart($elm[0]);
-                    chart.draw(data, options);
-                    };
+                            data.addColumn('string', 'Statistic');
+                            data.addColumn('number', 'Count');
+                            data.addRows(resp.data['stats']);
+                            // Set chart options
+                            var options = {'title':'Anonymous Statistics (Submissions from ' + resp.data['n_users'] + ' Users)',
+                                           'width':'100%',
+                                           'height':600};
+                            // Instantiate and draw our chart, passing in some options.
+                            var chart = new google.visualization.ColumnChart($elm[0]);
+                            chart.draw(data, options);
+                            };
 
-                // Make a request to get the chart data
-                $http.get('/usage/get_stats?type=statistics').then(done, fail);
+                        // Make a request to get the chart data
+                        $http.get('/usage/get_data/plot?type=statistic&id=' + $attr.plotid).then(done, fail);
 
-                    }
+                            }
             }
 });
 
@@ -71,7 +72,7 @@ app.directive('statechart', function($http) {
 
                     attr.$observe('state', function(value){
                         // Make a request to get the chart data
-                        $http.get('/usage/get_stats?type=states&name=' + value).then(done, fail);
+                        $http.get('/usage/get_data/plot?type=state&name=' + value).then(done, fail);
 
                         });
                     }

@@ -224,6 +224,22 @@
 
                 </div>
 
+                <br>
+
+                <div class="form">
+                    <h3>Plots</h3>
+
+                    <form action="{{ url_for('manage_plots', action='create_bar_plot') }}" method="post">
+                            {{ plot_form.hidden_tag() }}
+                            <div style="display:flex">
+                                {{ render_field(plot_form.name, field_name='plot name') }}
+                                {{ render_field(plot_form.fields, field_name='fields') }}
+                                {{ plot_form.submit }}
+                            </div>
+                        </form>
+
+                </div>
+
             {% endif %}
 
         {% endif %}
