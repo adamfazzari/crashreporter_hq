@@ -195,7 +195,7 @@
                 <table border="1" class="sortable", style="width:100%">
                     <tr class="tableheader">
 
-                        {% for header in ('Alias', 'UUID') %}
+                        {% for header in ('Alias', 'UUID', '') %}
                             <td class="tableheader">{{ header }}</td>
                         {% endfor %}
 
@@ -229,11 +229,36 @@
                 <div class="form">
                     <h3>Plots</h3>
 
+                    <table border="1" class="sortable", style="width:100%">
+                        <tr class="tableheader">
+
+                            {% for header in ('Plot Name', 'Fields', '') %}
+                                <td class="tableheader">{{ header }}</td>
+                            {% endfor %}
+
+                        </tr>
+                        {% for plot in user.group.barplots %}
+                            <tr>
+                                <td>{{ plot.name}}</td>
+                                <td>
+                                    {%  for s in plot.statistics %}
+                                        <div style="display:flex"> {{ s.name }}</div>
+                                    {% endfor %}
+                                </td>
+                                <td>
+                                    <form method='POST' action="{{ url_for('manage_plots', action='delete', type='statistic', id=plot.id) }}">
+                                        <input type="submit" value="Delete" >
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                    <br>
                     <form action="{{ url_for('manage_plots', action='create_bar_plot') }}" method="post">
                             {{ plot_form.hidden_tag() }}
                             <div style="display:flex">
-                                {{ render_field(plot_form.name, field_name='plot name') }}
-                                {{ render_field(plot_form.fields, field_name='fields') }}
+                                {{ render_field(plot_form.name, field_name='Plot Name') }}
+                                {{ render_field(plot_form.fields, field_name='Fields') }}
                                 {{ plot_form.submit }}
                             </div>
                         </form>

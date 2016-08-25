@@ -34,6 +34,7 @@ def groups(group):
 
         return render_template('groups.html', sform=sform, cform=cform, alias_form=alias_form, plot_form=plot_form,
                                 group=g, user=flask_login.current_user, uuids=uuids)
+
     elif cform.validate_on_submit() and cform.data['submit']:
         # Creating a group
         group = Group.query.filter(Group.name == cform.data['name']).first()
@@ -138,6 +139,7 @@ def manage_uuid(uuid_id):
 def manage_plots():
     if request.method == 'POST':
         if request.args.get('action') == 'create_bar_plot':
+
             plot_form = PlotCreationForm()
             if plot_form.validate_on_submit():
                 fields = plot_form.data['fields'].split(',')
@@ -149,5 +151,18 @@ def manage_plots():
                     db.session.commit()
                     flash("New plot '%s' has been created" % plot.name)
                 return redirect(request.referrer)
+
+        elif request.args.get('action') == 'delete':
+
+            if request.args.get('type') == 'statistic':
+                if request.args.get('id'):
+                    plot = StatisticBarPlot.query.filter(StatisticBarPlot.id == int(request.args.get('id'))).first()
+                    if plot:
+                        db.session.delete(plot)
+                        db.session.commit()
+                        flash("Plot '%s' has been deleted" % plot.name)
+                return redirect(request.referrer)
+
+
 
 

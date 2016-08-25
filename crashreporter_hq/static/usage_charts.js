@@ -5,12 +5,12 @@ var app = angular.module('HQApp', []);
 
 app.controller('UsageStats', function($scope, $http) {
     var done = function(resp) {
-        $scope.states = resp.data;
+        $scope.states = resp.data['states'];
     }
     var fail=function(err){
         $scope.states = [];
     };
-    $http.get('/usage/get_state_list').then(done, fail);
+    $http.get('/usage/trackables').then(done, fail);
 });
 
 app.controller('stateSelection', function($scope, $http) {
@@ -40,7 +40,7 @@ app.directive('statisticchart', function($http) {
                             };
 
                         // Make a request to get the chart data
-                        $http.get('/usage/get_data/plot?type=statistic&id=' + $attr.plotid).then(done, fail);
+                        $http.get('/usage/plots/get_data?type=statistic&id=' + $attr.plotid).then(done, fail);
 
                             }
             }
@@ -72,7 +72,7 @@ app.directive('statechart', function($http) {
 
                     attr.$observe('state', function(value){
                         // Make a request to get the chart data
-                        $http.get('/usage/get_data/plot?type=state&name=' + value).then(done, fail);
+                        $http.get('/usage/plots/get_data?type=state&name=' + value).then(done, fail);
 
                         });
                     }

@@ -18,9 +18,12 @@ def view_usage_stats():
     return html
 
 
-@app.route('/usage/get_state_list', methods=['GET'])
-def get_state_list():
-    data = [q.name for q in db.session.query(State.name.distinct().label('name'))]
+@app.route('/usage/trackables', methods=['GET'])
+@flask_login.login_required
+def get_trackable_list():
+    data = {'states': [q.name for q in db.session.query(State.name.distinct().label('name'))],
+            'statistics': [q.name for q in db.session.query(Statistic.name.distinct().label('name'))]}
+
     json_response = json.dumps(data)
     response = Response(json_response, content_type='application/json; charset=utf-8')
     response.headers.add('content-length', len(json_response))
@@ -28,7 +31,8 @@ def get_state_list():
     return response
 
 
-@app.route('/usage/get_data/plot', methods=['GET'])
+@app.route('/usage/plots/get_data', methods=['GET'])
+@flask_login.login_required
 def get_plot_data():
     if request.args.get('type') == 'statistic':
         if request.args.get('id'):
