@@ -1,5 +1,5 @@
 from flask.ext.wtf import Form
-from wtforms import StringField, PasswordField, TextAreaField, SubmitField, SelectField
+from wtforms import StringField, PasswordField, TextAreaField, SubmitField, SelectField, BooleanField, Label
 from wtforms.validators import DataRequired, EqualTo, Email
 
 
@@ -44,17 +44,20 @@ class SearchReportsForm(Form):
                ('application_version', 'Application Version'), ('id', 'Report Number'),
                ('error_message', 'Error Message'), ('error_type', 'Error Type'),
                ('date', 'Date'), ('before_date', 'Before Date'), ('after_date', 'After Date')]
-    field1 = SelectField('Date', choices=choices)
+    field1 = SelectField(choices=choices)
     value1 = StringField('Value')
 
-    field2 = SelectField('Field', choices=choices)
+    field2 = SelectField(choices=choices)
     value2 = StringField('Value')
 
-    field3 = SelectField('Field', choices=choices)
+    field3 = SelectField(choices=choices)
     value3 = StringField('Value')
 
     fields = field1, field2, field3
     values = value1, value2, value3
+
+    hide_aliased_label = Label('hide_aliased_label', 'Hide Aliased Users')
+    hide_aliased = BooleanField()
 
 
 class CreateAliasForm(Form):

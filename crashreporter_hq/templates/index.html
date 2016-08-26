@@ -38,7 +38,12 @@
                         <span>{{ form.value3(size=80) }}</span>
                     </div>
                 </li>
-
+                <li style="list-style-type: none">
+                    <div style="display:inline ">
+                        <span>{{ form.hide_aliased }}</span>
+                        <span>{{ form.hide_aliased_label }}</span>
+                    </div>
+                </li>
                 <li style="list-style-type: none">
                     <input type='submit' name='search', value="Search"></input>
                 </li>
@@ -54,6 +59,7 @@
             {{ pagination.info }}
             {{ pagination.links }}
         </div>
+
             {% if reports %}
 
                 <table border="1" class="sortable", style="width:100%">
