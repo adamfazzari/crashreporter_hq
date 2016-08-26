@@ -46,8 +46,8 @@ def get_plot_data():
                     count = db.session.query(Statistic.count).filter(Statistic.uuid_id == u.id, Statistic.name == s).first()
                     d2.append(count[0] if count else 0)
                 d.append(d2)
-
-            data = {'uuids': [u.user_identifier for u in uuids],
+            aliases = {a.uuid.id: a.alias for a in plot.group.aliases}
+            data = {'uuids': [aliases.get(u.id, u.user_identifier) for u in uuids],
                     'counts': d,
                     'n_users': len(uuids)}
     elif request.args.get('type') == 'state':
