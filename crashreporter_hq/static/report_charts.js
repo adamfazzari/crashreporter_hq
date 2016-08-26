@@ -7,14 +7,28 @@ app.controller('ReportStats', function($scope, $http) {
 
 });
 
+
+app.controller('hideAliased', function($scope, $http) {
+
+});
+
+
 app.directive('datechart', function($http) {
         return {
           restrict: 'A',
-          link: function($scope, $elm, $attr) {
+          link: function($scope, $elm, attr) {
                 // Create the data table.
-                var data = new google.visualization.DataTable();
+
                 var fail=function(err){ };
                 var done = function(resp) {
+                    // Instantiate and draw our chart
+                    var data = new google.visualization.DataTable();
+                    var chart = new google.visualization.LineChart($elm[0]);
+                    // Set chart options
+                    var options = {'title':'Crash Reports',
+                                   'width':'100%',
+                                   'height':600};
+
                     var dates = [];
                     for (var ii=0; ii < resp.data.length; ii++){
                         // year, month (zero index), day, hour, Y-value
@@ -23,17 +37,17 @@ app.directive('datechart', function($http) {
                     data.addColumn('date', 'Date of Report');
                     data.addColumn('number', 'Number of Reports');
                     data.addRows(dates);
-                    // Set chart options
-                    var options = {'title':'Crash Reports',
-                                   'width':'100%',
-                                   'height':600};
-                    // Instantiate and draw our chart, passing in some options.
-                    var chart = new google.visualization.LineChart($elm[0]);
                     chart.draw(data, options);
                 };
 
+                attr.$observe('aliased', function(value){
+                    // Make a request to get the chart data
+                    $http.get('/reports/get_stats?type=date&hide_aliased=' + value).then(done, fail);
+
+                    });
+
                 // Make a request to get the chart data
-                $http.get('/reports/get_stats?type=date').then(done, fail);
+                // $http.get('/reports/get_stats?type=date').then(done, fail);
 
           }
     }
@@ -44,27 +58,36 @@ app.directive('datechart', function($http) {
 app.directive('userchart', function($http) {
         return {
           restrict: 'A',
-          link: function($scope, $elm, $attr) {
+          link: function($scope, $elm, attr) {
                 // Create the data table.
-                var data = new google.visualization.DataTable();
+
                 var fail=function(err){ };
                 var done = function(resp) {
-
-                    data.addColumn('string', 'User');
-                    data.addColumn('number', 'Number of Reports');
-                    data.addRows(resp.data);
+                    // Instantiate and draw our chart.
+                    var data = new google.visualization.DataTable();
+                    var chart = new google.visualization.PieChart($elm[0]);
                     // Set chart options
                     var options = {'title':'Crash Reports',
                                    'width':'100%',
                                    'height':600};
-                    // Instantiate and draw our chart, passing in some options.
-                    var chart = new google.visualization.PieChart($elm[0]);
+
+                    data.addColumn('string', 'User');
+                    data.addColumn('number', 'Number of Reports');
+                    data.addRows(resp.data);
                     chart.draw(data, options);
                     };
 
-                // Make a request to get the chart data
-                $http.get('/reports/get_stats?type=user').then(done, fail);
+                attr.$observe('aliased', function(value){
+                    // Make a request to get the chart data
+                    $http.get('/reports/get_stats?type=user&hide_aliased=' + value).then(done, fail);
 
+                    });
+
+                // Make a request to get the chart data
+                // $http.get('/reports/get_stats?type=user&show_aliased=False').then(done, fail);
+
+
+              
                     }
             }
 });

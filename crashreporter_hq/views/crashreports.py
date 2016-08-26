@@ -78,6 +78,8 @@ def get_report_stats():
         # Only dates that are before today (so we take out units with time-stamps in the future)
         q = q.filter(CrashReport.date <= datetime.now())
         # Group / bin the results by day in ascending order
+        if request.args.get('hide_aliased', 'false') == 'true':
+            q = q.filter(CrashReport.uuid_id.notin_([a.uuid_id for a in flask_login.current_user.group.aliases]))
         q = q.group_by(func.date(CrashReport.date)).order_by(asc(CrashReport.date))
 
         # Because SQLite does not support the Date class in queries, we cannot cast the results
@@ -90,6 +92,8 @@ def get_report_stats():
     elif request.args.get('type') == 'user':
         # https://stackoverflow.com/questions/25500904/counting-relationships-in-sqlalchemy/25525771#25525771
         q = db.session.query(UUID.user_identifier, func.count(CrashReport.id)).join(UUID.reports).group_by(UUID.user_identifier)
+        if request.args.get('hide_aliased', 'false') == 'true':
+            q = q.filter(CrashReport.uuid_id.notin_([a.uuid_id for a in flask_login.current_user.group.aliases]))
         data = q.all()
     else:
         return 'Invalid request'

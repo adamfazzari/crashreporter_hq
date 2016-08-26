@@ -21,8 +21,13 @@
 
         {% raw %}
 
-        <div datechart></div>
-        <div userchart></div>
+        <div>
+            <label>Hide Aliased</label>
+            <input type="checkbox" id="hideAliased" ng-model="hideAliased" ng-value="y"></input>
+        </div>
+
+        <div datechart aliased="{{hideAliased}}"></div>
+        <div userchart aliased="{{hideAliased}}"></div>
 
         {% endraw %}
 
