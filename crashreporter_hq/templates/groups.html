@@ -226,6 +226,38 @@
 
                 <br>
 
+
+                <div class="form">
+                    <h3>Trackables</h3>
+                    {% for trackable in ('Statistics', 'States', 'Timers', 'Sequences') %}
+                        {% if trackables[trackable.lower()]|length %}
+
+                            <h4>{{ trackable }}</h4>
+
+                            <table border="1" class="sortable", style="width:100%">
+                                <tr class="tableheader">
+
+                                    {% for header in ('Name', 'Number of Users Reported', '') %}
+                                        <td class="tableheader">{{ header }}</td>
+                                    {% endfor %}
+
+                                </tr>
+                                {% for s in trackables[trackable.lower()] %}
+                                    <tr>
+                                        <td>
+                                            {{ s[0].name }}
+                                        </td>
+                                        <td>
+                                            {{ s[1]}}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </table>
+
+                        {% endif %}
+                    {% endfor %}
+                </div>
+
                 <div class="form">
                     <h3>Plots</h3>
 

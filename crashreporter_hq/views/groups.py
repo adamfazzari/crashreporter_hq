@@ -1,11 +1,12 @@
 
 
 from flask import request, render_template, flash, redirect, url_for
+from sqlalchemy import func
 import flask.ext.login as flask_login
 
 from .. import app, db
 from ..forms import CreateGroupForm, SearchForm, CreateAliasForm, PlotCreationForm
-from ..models import Group, User, UUID, CrashReport, Alias, StatisticBarPlot, Statistic
+from ..models import Group, User, UUID, CrashReport, Alias, StatisticBarPlot, Statistic, State, Timer
 from ..models.usagestats import TrackableTables
 
 
@@ -32,8 +33,12 @@ def groups(group):
         else:
             uuids = []
 
+        trackables = {'statistics': db.session.query(Statistic, func.count(Statistic.id)).filter(Statistic.group_id==g.id).group_by(Statistic.name).all(),
+                      'states': db.session.query(State, func.count(State.id)).filter(State.group_id==g.id).group_by(State.name).all(),
+                      'timer': db.session.query(Timer, func.count(Timer.id)).filter(Timer.group_id==g.id).group_by(Timer.name).all(),
+                      }
         return render_template('groups.html', sform=sform, cform=cform, alias_form=alias_form, plot_form=plot_form,
-                                group=g, user=flask_login.current_user, uuids=uuids)
+                                group=g, user=flask_login.current_user, uuids=uuids, trackables=trackables)
 
     elif cform.validate_on_submit() and cform.data['submit']:
         # Creating a group
