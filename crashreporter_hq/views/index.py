@@ -1,7 +1,7 @@
 from flask.ext.paginate import Pagination
 from datetime import datetime
 from math import ceil
-from sqlalchemy import or_
+from sqlalchemy import or_, func
 
 from ..tools import get_similar_reports
 from users import *
@@ -42,7 +42,9 @@ def home():
                     conditions.append(UUID.user_identifier.contains(value))
                     logic_or = or_(*conditions)
                     q = q.filter(CrashReport.group == group, logic_or).join(UUID)
-
+                elif field == 'date':
+                    date = datetime.strptime(value, '%d %B %Y').strftime('%Y-%m-%d')
+                    q = q.filter(CrashReport.group == group, func.date(CrashReport.date) == date)
                 elif field == 'before_date':
                     date = datetime.strptime(value, '%d %B %Y')
                     q = q.filter(CrashReport.group == group, CrashReport.date <= date)
