@@ -37,11 +37,19 @@ def get_plot_data():
     if request.args.get('type') == 'statistic':
         if request.args.get('id'):
             plot = StatisticBarPlot.query.filter(StatisticBarPlot.id==int(request.args.get('id'))).first()
-            q = db.session.query(Statistic.name, func.sum(Statistic.count))
-            q = q.group_by(Statistic.name)
-            q = q.filter(Statistic.id.in_([s.id for s in plot.statistics]))
-            data = {'stats': q.all(),
-                    'n_users': len(set(s.uuid for s in plot.statistics))}
+            uuids = plot.group.uuids
+            d = []
+            stats = db.session.query(Statistic.name.distinct()).filter(Statistic.plots.contains(plot)).all()
+            for s in zip(*stats)[0]:
+                d2 = [s]
+                for u in uuids:
+                    count = db.session.query(Statistic.count).filter(Statistic.uuid_id == u.id, Statistic.name == s).first()
+                    d2.append(count[0] if count else 0)
+                d.append(d2)
+
+            data = {'uuids': [u.user_identifier for u in uuids],
+                    'counts': d,
+                    'n_users': len(uuids)}
     elif request.args.get('type') == 'state':
             data = {'name': request.args.get('name'),
                     'counts': db.session.query(State.state, func.count(State.id)).

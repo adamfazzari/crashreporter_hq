@@ -28,10 +28,13 @@ app.directive('statisticchart', function($http) {
                         var done = function(resp) {
 
                             data.addColumn('string', 'Statistic');
-                            data.addColumn('number', 'Count');
-                            data.addRows(resp.data['stats']);
+                            for (var i=0; i < resp.data['uuids'].length; i++) {
+                                data.addColumn('number', resp.data['uuids'][i]);    
+                            }
+                            data.addRows(resp.data['counts']);
                             // Set chart options
                             var options = {'title':'Anonymous Statistics (Submissions from ' + resp.data['n_users'] + ' Users)',
+                                           'isStacked':true,
                                            'width':'100%',
                                            'height':600};
                             // Instantiate and draw our chart, passing in some options.
