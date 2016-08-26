@@ -7,7 +7,7 @@ import flask.ext.login as flask_login
 from .. import app, db
 from ..forms import CreateGroupForm, SearchForm, CreateAliasForm, PlotCreationForm
 from ..models import Group, User, UUID, CrashReport, Alias, StatisticBarPlot, Statistic, State, Timer
-from ..models.usagestats import TrackableTables
+from ..models.trackables import TrackableTables
 
 
 @app.route('/groups', methods=['GET', 'POST'], defaults={'group': None})
