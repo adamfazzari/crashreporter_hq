@@ -27,6 +27,7 @@ app.directive('datechart', function($http) {
                     // Set chart options
                     var options = {'title':'Crash Reports',
                                    'width':'100%',
+                                   'legend':'none',
                                    'height':600};
 
                     var dates = [];

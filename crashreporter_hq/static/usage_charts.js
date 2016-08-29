@@ -36,6 +36,7 @@ app.directive('statisticchart', function($http) {
                             var options = {'title':'Anonymous Statistics (Submissions from ' + resp.data['n_users'] + ' Users)',
                                            'isStacked':true,
                                            'width':'100%',
+                                           'legend': 'none',
                                            'height':600};
                             // Instantiate and draw our chart, passing in some options.
                             var chart = new google.visualization.ColumnChart($elm[0]);
@@ -67,6 +68,7 @@ app.directive('statechart', function($http) {
                         // Set chart options
                         var options = {'title':resp.data.name,
                                        'width':'100%',
+                                       'legend': 'none',
                                        'height':600};
                         // Instantiate and draw our chart, passing in some options.
                         var chart = new google.visualization.ColumnChart(elm[0]);
