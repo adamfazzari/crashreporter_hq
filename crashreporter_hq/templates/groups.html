@@ -205,7 +205,7 @@
                             <td>{{ alias.alias }}</td>
                             <td>{{ alias.user_identifier}}</td>
                             <td>
-                                <form method='POST' action="{{ url_for('alias', action='delete', uuid=alias.user_identifier) }}">
+                                <form method='POST' action="{{ url_for('manage_aliases', action='delete', uuid=alias.user_identifier) }}">
                                     <input type="submit" value="Delete" >
                                 </form>
                             </td>
@@ -213,7 +213,7 @@
                     {% endfor %}
                 </table>
                 <br>
-                    <form action="{{ url_for('alias', action='create') }}" method="post" name="aliases">
+                    <form action="{{ url_for('manage_aliases', action='create') }}" method="post" name="aliases">
                         {{ alias_form.hidden_tag() }}
                         <div style="display:flex">
                             {{ render_field(alias_form.alias) }}

@@ -52,7 +52,7 @@ def update_password():
 
 @app.route('/users/profile/alias', methods=['POST'])
 @flask_login.login_required
-def alias():
+def manage_aliases():
     if request.args.get('action') == 'create':
         form = CreateAliasForm()
         if form.validate_on_submit():
@@ -65,9 +65,10 @@ def alias():
         else:
             return render_template('user_profile.html', user=flask_login.current_user, form=form)
     elif request.args.get('action') == 'delete':
-        alias = Alias.query.filter(Alias.group_id==flask_login.current_user.group_id,
-                                   Alias.user_identifier==request.args.get('uuid')).first()
-        db.session.delete(alias)
-        db.session.commit()
+        alias = Alias.query.join(UUID).filter(Alias.group_id==flask_login.current_user.group_id,
+                                              UUID.user_identifier == request.args.get('uuid')).first()
+        if alias:
+            db.session.delete(alias)
+            db.session.commit()
         return redirect(request.referrer)
 
