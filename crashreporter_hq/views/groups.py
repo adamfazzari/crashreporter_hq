@@ -32,11 +32,13 @@ def groups(group):
             uuids = g.uuids
         else:
             uuids = []
-
-        trackables = {'statistics': db.session.query(Statistic, func.count(Statistic.id)).filter(Statistic.group_id==g.id).group_by(Statistic.name).all(),
-                      'states': db.session.query(State, func.count(State.id)).filter(State.group_id==g.id).group_by(State.name).all(),
-                      'timer': db.session.query(Timer, func.count(Timer.id)).filter(Timer.group_id==g.id).group_by(Timer.name).all(),
-                      }
+        if g:
+            trackables = {'statistics': db.session.query(Statistic, func.count(Statistic.id)).filter(Statistic.group_id==g.id).group_by(Statistic.name).all(),
+                          'states': db.session.query(State, func.count(State.id)).filter(State.group_id==g.id).group_by(State.name).all(),
+                          'timer': db.session.query(Timer, func.count(Timer.id)).filter(Timer.group_id==g.id).group_by(Timer.name).all(),
+                         }
+        else:
+            trackables = {}
         return render_template('groups.html', sform=sform, cform=cform, alias_form=alias_form, plot_form=plot_form,
                                 group=g, user=flask_login.current_user, uuids=uuids, trackables=trackables)
 
