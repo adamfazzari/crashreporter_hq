@@ -84,6 +84,8 @@ def upload_stats():
             uuid = UUID.query.filter(UUID.user_identifier==payload['User Identifier']).first()
             if uuid is None:
                 uuid = UUID(payload['User Identifier'])
+                uuid.group.append(user.group)
+                db.session.add(uuid)
 
             trackable = cls.query.filter(cls.name==trackable_name, cls.uuid_id==uuid.id, cls.group_id==user.group_id).first()
             if trackable is None:
