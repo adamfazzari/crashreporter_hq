@@ -67,11 +67,12 @@ def home():
         except ValueError:
             page = 1
         page_rev = max_page - page + 1
+        report_numbers = [str(r['Report Number']) for r in reports]
         reports = reports[(page_rev-1) * PER_PAGE: page_rev * PER_PAGE]
         pagination = Pagination(page=page, per_page=PER_PAGE, total=n_total_reports, search=False, record_name='reports')
         aliases = {a.user_identifier: a.alias for a in group.aliases}
         html = render_template('index.html', reports=reports, user=flask_login.current_user, pagination=pagination,
-                               aliases=aliases, form=form)
+                               aliases=aliases, form=form, report_numbers=report_numbers)
         return html
     else:
         return redirect(url_for('groups'))

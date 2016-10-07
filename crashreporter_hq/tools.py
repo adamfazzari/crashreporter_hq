@@ -7,13 +7,17 @@ _report_cache = []
 cr_number_regex = re.compile('crash_report_(\d+)\.json')
 
 
-def delete_report(number):
-    query = CrashReport.query.filter(CrashReport.id == number)
-    cr = query.first()
-    if cr:
-        query.delete()
-        db.session.commit()
-    return len(CrashReport.query.filter(CrashReport.id == number).all()) == 0
+def delete_report(delete_similar=False, *numbers):
+    if delete_similar:
+        for group_id in db.session.query(CrashReport.related_group_id.distinct()).filter(CrashReport.id.in_(numbers)).all():
+            query = db.session.query(CrashReport).filter(CrashReport.related_group_id == group_id[0])
+            query.delete(synchronize_session=False)
+    else:
+        query = CrashReport.query.filter(CrashReport.id.in_(numbers))
+        query.delete(synchronize_session=False)
+    db.session.expire_all()
+    db.session.commit()
+    return len(CrashReport.query.filter(CrashReport.id.in_(numbers)).all()) == 0
 
 
 def save_report(payload):

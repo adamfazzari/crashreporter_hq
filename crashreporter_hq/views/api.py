@@ -7,13 +7,15 @@ from .. import app
 from ..tools import save_report, delete_report as _delete_report
 
 
-@app.route('/reports/delete/<int:report_number>', methods=['POST'])
-def delete_report(report_number):
-    success = _delete_report(report_number)
+@app.route('/reports/delete', methods=['POST'])
+def delete_report():
+    report_numbers = map(int, request.args.get('report_numbers').split(','))
+    delete_similar = request.args.get('delete_similar') == 'True'
+    success = _delete_report(delete_similar, *report_numbers)
     if success:
-        response = 'Success. Crash report #%d deleted' % report_number
+        response = 'Success. Crash report #%s deleted' % request.args.get('report_numbers')
     else:
-        response = 'Failed. Crash report #%d does not exist.' % report_number
+        response = 'Failed. Crash report #%s does not exist.' % request.args.get('report_numbers')
     flash(response)
     return redirect(url_for('home'))
 

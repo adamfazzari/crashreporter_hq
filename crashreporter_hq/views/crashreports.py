@@ -55,9 +55,12 @@ def view_related_reports(report_id):
     pagination = Pagination(page=page, per_page=PER_PAGE, total=n_total_reports, search=False, record_name='reports')
     form = SearchReportsForm()
     aliases = {a.user_identifier: a.alias for a in flask_login.current_user.group.aliases}
+    report_numbers = [str(r['Report Number']) for r in reports]
+
     html = render_template('index.html', reports=reports,
                            user=flask_login.current_user,
                            pagination=pagination,
+                           report_numbers=report_numbers,
                            aliases=aliases,
                            back_link=request.referrer)
     return html
