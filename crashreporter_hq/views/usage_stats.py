@@ -13,8 +13,9 @@ TRACKABLES = {'Statistic': Statistic, 'State': State, 'Timer': Timer, 'Sequence'
 @flask_login.login_required
 def view_usage_stats():
     state_trackables = [q.name for q in db.session.query(State.name.distinct().label('name'))]
-    plot_ids = [t[0] for t in db.session.query(StatisticBarPlot.id).filter(StatisticBarPlot.group_id==flask_login.current_user.group.id).all()]
-    html = render_template('anonymous_usage.html', user=flask_login.current_user, plot_ids=plot_ids, states=state_trackables)
+    statistic_trackables = [t for t in db.session.query(StatisticBarPlot.id, StatisticBarPlot.name).filter(StatisticBarPlot.group_id==flask_login.current_user.group.id).all()]
+    html = render_template('anonymous_usage.html', user=flask_login.current_user,
+                           statistics=statistic_trackables, states=state_trackables)
     return html
 
 
@@ -37,7 +38,11 @@ def get_plot_data():
     if request.args.get('type') == 'statistic':
         if request.args.get('id'):
             plot = StatisticBarPlot.query.filter(StatisticBarPlot.id==int(request.args.get('id'))).first()
-            uuids = plot.group.uuids
+            if request.args.get('hide_aliases'):
+                _aliases = set(u.uuid for u in plot.group.aliases)
+                uuids = filter(lambda x: x not in _aliases, plot.group.uuids)
+            else:
+                uuids = plot.group.uuids
             d = []
             stats = db.session.query(Statistic.name.distinct()).filter(Statistic.plots.contains(plot)).all()
             for s in zip(*stats)[0]:

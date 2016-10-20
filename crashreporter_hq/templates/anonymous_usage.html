@@ -18,9 +18,19 @@
 
     {% block content %}
 
-        {% for id in plot_ids %}
-            <div statisticchart plotid="{{id}}"></div>
-        {% endfor %}
+        <select id="statisticSelection" ng-model="statisticSelection">
+            <option value="" selected>Select a Chart</option>
+
+            {% for id, name in statistics %}
+                <option value="{{ id }}" selected>{{ name }}</option>
+            {% endfor %}
+
+        </select>
+
+        {% raw %}
+        <div statisticchart plotid="{{statisticSelection}}"> </div>
+        {% endraw %}
+
 
         {% raw %}
 

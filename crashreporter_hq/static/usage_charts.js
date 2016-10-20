@@ -17,16 +17,19 @@ app.controller('stateSelection', function($scope, $http) {
 
 });
 
+app.controller('statisticSelection', function($scope, $http) {
+
+});
+
 app.directive('statisticchart', function($http) {
         return {
                   restrict: 'A',
-                  link: function($scope, $elm, $attr) {
+                  link: function($scope, $elm, attr) {
                         // Create the data table.
-                        var data = new google.visualization.DataTable();
                         var fail=function(err){ };
-                        console.log($attr)
+                        console.log(attr);
                         var done = function(resp) {
-
+                            var data = new google.visualization.DataTable();
                             data.addColumn('string', 'Statistic');
                             for (var i=0; i < resp.data['uuids'].length; i++) {
                                 data.addColumn('number', resp.data['uuids'][i]);    
@@ -44,7 +47,11 @@ app.directive('statisticchart', function($http) {
                             };
 
                         // Make a request to get the chart data
-                        $http.get('/usage/plots/get_data?type=statistic&id=' + $attr.plotid).then(done, fail);
+
+                        attr.$observe('plotid', function(value){
+                            // Make a request to get the chart data
+                            $http.get('/usage/plots/get_data?type=statistic&id=' + value).then(done, fail);
+                            });
 
                             }
             }
