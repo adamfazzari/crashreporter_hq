@@ -36,7 +36,7 @@ app.directive('statisticchart', function($http) {
                             var data = new google.visualization.DataTable();
                             data.addColumn('string', 'Statistic');
                             for (var i=0; i < resp.data['uuids'].length; i++) {
-                                data.addColumn('number', resp.data['uuids'][i]);    
+                                data.addColumn('number', resp.data['uuids'][i]);
                             }
                             data.addRows(resp.data['counts']);
                             // Set chart options
@@ -70,24 +70,28 @@ app.directive('statechart', function($http) {
           restrict: 'A',
           link: function(scope, elm, attr) {
 
-
                     var fail=function(err){
                         console.log(err)
                     };
                     var done = function(resp) {
-                        // Create the data table.
-                        var data = new google.visualization.DataTable();
-                        data.addColumn('string', 'State');
-                        data.addColumn('number', 'Count');
-                        data.addRows(resp.data.counts);
-                        // Set chart options
-                        var options = {'title':resp.data.name,
-                                       'width':'100%',
-                                       'legend': 'none',
-                                       'height':'100%'};
-                        // Instantiate and draw our chart, passing in some options.
-                        var chart = new google.visualization.ColumnChart(elm[0]);
-                        chart.draw(data, options);
+                        if (resp.data.counts.length > 0) {
+
+                            // Create the data table.
+                            var data = new google.visualization.DataTable();
+                            data.addColumn('string', 'State');
+                            data.addColumn('number', 'Count');
+                            data.addRows(resp.data.counts);
+                            // Set chart options
+                            var options = {
+                                'title': resp.data.name,
+                                'width': '100%',
+                                'legend': 'none',
+                                'height': '100%'
+                            };
+                            // Instantiate and draw our chart, passing in some options.
+                            var chart = new google.visualization.ColumnChart(elm[0]);
+                            chart.draw(data, options);
+                            };
                         };
 
                     var update = function(value){
