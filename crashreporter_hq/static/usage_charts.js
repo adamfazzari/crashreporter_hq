@@ -21,6 +21,10 @@ app.controller('statisticSelection', function($scope, $http) {
 
 });
 
+app.controller('showaliasSelection', function($scope, $http) {
+
+});
+
 app.directive('statisticchart', function($http) {
         return {
                   restrict: 'A',
@@ -48,10 +52,14 @@ app.directive('statisticchart', function($http) {
 
                         // Make a request to get the chart data
 
-                        attr.$observe('plotid', function(value){
+                        var update = function(value){
                             // Make a request to get the chart data
-                            $http.get('/usage/plots/get_data?type=statistic&id=' + value).then(done, fail);
-                            });
+                            var alias = (attr.showaliases=='') ? "0": attr.showaliases;
+                            $http.get('/usage/plots/get_data?type=statistic&id=' + attr.plotid + '&hide_aliases=' + alias ).then(done, fail);
+                            };
+
+                        attr.$observe('plotid', update);
+                        attr.$observe('showaliases', update);
 
                             }
             }
@@ -82,11 +90,14 @@ app.directive('statechart', function($http) {
                         chart.draw(data, options);
                         };
 
-                    attr.$observe('state', function(value){
+                    var update = function(value){
                         // Make a request to get the chart data
-                        $http.get('/usage/plots/get_data?type=state&name=' + value).then(done, fail);
+                        $http.get('/usage/plots/get_data?type=state&name=' + attr.state + '&hide_aliases=' + attr.showaliases).then(done, fail);
+                        };
+              
+                    attr.$observe('state', update);
+                    attr.$observe('showaliases', update);
 
-                        });
                     }
             }
 });
