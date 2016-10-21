@@ -17,38 +17,43 @@
     {% extends "base.html" %}
 
     {% block content %}
-
-        <label>Chart:</label>
-        <select id="statisticSelection" ng-model="statisticSelection">
-            <option value="" selected>Select a Chart</option>
-            {% for id, name in statistics %}
-                <option value="{{ id }}" selected>{{ name }}</option>
-            {% endfor %}
-        </select>
-
-        <label>Hide Aliases:</label>
-        <select id='show_alias_selector' ng-model="showaliasSelection">
-            <option value="0" selected>All</option>
-            <option value="1" selected>Aliased Only</option>
-            <option value="2" selected>No Aliases</option>
-        </select>
-
-        {% raw %}
-        <div statisticchart plotid="{{statisticSelection}}" showaliases="{{showaliasSelection}}"> </div>
-        {% endraw %}
+        <div style="display: inline-block; float:left; width:100%; height: 100%; ">
+            <div style="display: inline-block; width:100%; float:left;">
+                <label>User Filter:</label>
+                <select id='show_alias_selector' ng-model="showaliasSelection" style="width:100%" value="0">
+                    <option value="0" selected>All</option>
+                    <option value="1" selected>Aliased Only</option>
+                    <option value="2" selected>No Aliases</option>
+                </select>
+            </div>
 
 
-        {% raw %}
+            <div style="display: inline-block; width:50%; height:90%; float:left;">
+                <label>User-Defined Chart:</label>
+                <select id="statisticSelection" ng-model="statisticSelection" style="width:100%">
+                    <option value="" selected>Select a Chart</option>
+                    {% for id, name in statistics %}
+                        <option value="{{ id }}" selected>{{ name }}</option>
+                    {% endfor %}
+                </select>
 
-        <select id="stateSelection" ng-model="stateSelection" ng-options="s for s in states">
-            <option value="" selected>Select a Trackable State</option>
-        </select>
-        <div statechart state="{{stateSelection}}" showaliases="{{showaliasSelection}}">
+                {% raw %}
+                <div statisticchart plotid="{{statisticSelection}}" showaliases="{{showaliasSelection}}" style="height:100%;"> </div>
+                {% endraw %}
+            </div>
+
+            <div style="display: inline-block; width:50%; float:left; height:100%;">
+                {% raw %}
+                <label>State Chart:</label>
+                <select id="stateSelection" ng-model="stateSelection" ng-options="s for s in states" style="width:100%">
+                    <option value="" selected>Select a Trackable State</option>
+                </select>
+                <div statechart state="{{stateSelection}}" showaliases="{{showaliasSelection}}" style="height:90%;"> </div>
+
+
+                {% endraw %}
+            </div>
         </div>
-
-
-        {% endraw %}
-
     {% endblock %}
 
 </body>

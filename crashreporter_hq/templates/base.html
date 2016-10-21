@@ -39,20 +39,22 @@
             </div>
           <br><hr>
         {% endif %}
-    </div>
-    {% with messages = get_flashed_messages() %}
-      {% if messages %}
-        {% for message in messages %}
-            <p> {{ message }} </p><br>
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
-    {% block content %}{% endblock %}
 
-    <div id="page-footer">
-      <hr>
-        <div style="text-align: center;">
-          <p>© Calvin Lobo 2015. All rights reserved.</p>
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            {% for message in messages %}
+                <p> {{ message }} </p><br>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+        <div style="height: 800px">
+            {% block content %}{% endblock %}
+        </div>
+        <div id="page-footer">
+          <hr>
+            <div style="text-align: center;">
+              <p>© Calvin Lobo 2015. All rights reserved.</p>
+            </div>
         </div>
     </div>
 

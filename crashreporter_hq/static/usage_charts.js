@@ -28,7 +28,7 @@ app.controller('showaliasSelection', function($scope, $http) {
 app.directive('statisticchart', function($http) {
         return {
                   restrict: 'A',
-                  link: function($scope, $elm, attr) {
+                  link: function($scope, elm, attr) {
                         // Create the data table.
                         var fail=function(err){ };
                         console.log(attr);
@@ -44,9 +44,9 @@ app.directive('statisticchart', function($http) {
                                            'isStacked':true,
                                            'width':'100%',
                                            'legend': 'none',
-                                           'height':600};
+                                           'height':'%100'};
                             // Instantiate and draw our chart, passing in some options.
-                            var chart = new google.visualization.ColumnChart($elm[0]);
+                            var chart = new google.visualization.ColumnChart(elm[0]);
                             chart.draw(data, options);
                             };
 
@@ -84,7 +84,7 @@ app.directive('statechart', function($http) {
                         var options = {'title':resp.data.name,
                                        'width':'100%',
                                        'legend': 'none',
-                                       'height':600};
+                                       'height':'100%'};
                         // Instantiate and draw our chart, passing in some options.
                         var chart = new google.visualization.ColumnChart(elm[0]);
                         chart.draw(data, options);
