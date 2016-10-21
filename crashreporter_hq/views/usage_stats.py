@@ -1,5 +1,6 @@
 from flask import Response
 from sqlalchemy import func
+from sqlalchemy.orm import aliased
 
 from groups import *
 from ..models import Statistic, State, Timer, Sequence, UUID, StatisticBarPlot
@@ -59,10 +60,19 @@ def get_plot_data():
                     'counts': d,
                     'n_users': len(uuids)}
     elif request.args.get('type') == 'state':
+            alias = aliased(State.uuid)
+            if int(request.args.get('hide_aliases', 0)) == NO_ALIASES:
+                _aliases_id = set(u.uuid.id for u in flask_login.current_user.group.aliases)
+                alias_filter = alias.id.notin_(_aliases_id)
+            elif int(request.args.get('hide_aliases', 0)) == ONLY_ALIASES:
+                _aliases_id = set(u.uuid.id for u in flask_login.current_user.group.aliases)
+                alias_filter = alias.id.in_(_aliases_id)
+            else:
+                alias_filter = True # Do nothing
             data = {'name': request.args.get('name'),
-                    'counts': db.session.query(State.state, func.count(State.id)).
-                                       filter(State.name==request.args.get('name')).
-                                       group_by(State.state).all()
+                    'counts': db.session.query(State.state, func.count(State.id)).join(alias)\
+                                        .filter(State.name==request.args.get('name'), alias_filter)\
+                                        .group_by(State.state).all()
                     }    #
     # else:
     #     return 'Invalid query.'

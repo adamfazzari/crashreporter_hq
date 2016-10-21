@@ -92,7 +92,8 @@ app.directive('statechart', function($http) {
 
                     var update = function(value){
                         // Make a request to get the chart data
-                        $http.get('/usage/plots/get_data?type=state&name=' + attr.state + '&hide_aliases=' + attr.showaliases).then(done, fail);
+                        var alias = (attr.showaliases=='') ? "0": attr.showaliases;
+                        $http.get('/usage/plots/get_data?type=state&name=' + attr.state + '&hide_aliases=' + alias).then(done, fail);
                         };
               
                     attr.$observe('state', update);
