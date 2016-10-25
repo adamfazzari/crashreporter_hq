@@ -17,7 +17,7 @@
     {% extends "base.html" %}
 
     {% block content %}
-        <div style="display: inline-block; float:left; width:100%; height: 100%; ">
+        <div style="display: inline-block; float:left; width:100%; height: 800px; ">
             <div style="display: inline-block; width:100%; float:left;">
                 <label>User Filter:</label>
                 <select id='show_alias_selector' ng-model="showaliasSelection" style="width:100%" value="0">
@@ -28,7 +28,7 @@
             </div>
 
 
-            <div style="display: inline-block; width:50%; height:90%; float:left;">
+            <div style="display: inline-block; width:50%; height:80%; float:left;">
                 <label>User-Defined Chart:</label>
                 <select id="statisticSelection" ng-model="statisticSelection" style="width:100%">
                     <option value="" selected>Select a Chart</option>
@@ -42,13 +42,13 @@
                 {% endraw %}
             </div>
 
-            <div style="display: inline-block; width:50%; float:left; height:100%;">
+            <div style="display: inline-block; width:50%; float:left; height:80%;">
                 {% raw %}
                 <label>State Chart:</label>
                 <select id="stateSelection" ng-model="stateSelection" ng-options="s for s in states" style="width:100%">
                     <option value="" selected>Select a Trackable State</option>
                 </select>
-                <div statechart state="{{stateSelection}}" showaliases="{{showaliasSelection}}" style="height:90%;"> </div>
+                <div statechart state="{{stateSelection}}" showaliases="{{showaliasSelection}}" style="height:100%;"> </div>
 
 
                 {% endraw %}
