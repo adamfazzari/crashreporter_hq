@@ -25,10 +25,10 @@ app.directive('datechart', function($http) {
                     var data = new google.visualization.DataTable();
                     var chart = new google.visualization.LineChart($elm[0]);
                     // Set chart options
-                    var options = {'title':'Crash Reports',
+                    var options = {'title':'Report History',
                                    'width':'100%',
                                    'legend':'none',
-                                   'height':600};
+                                   'height':'100%'};
 
                     var dates = [];
                     for (var ii=0; ii < resp.data.length; ii++){
@@ -68,9 +68,9 @@ app.directive('userchart', function($http) {
                     var data = new google.visualization.DataTable();
                     var chart = new google.visualization.PieChart($elm[0]);
                     // Set chart options
-                    var options = {'title':'Crash Reports',
+                    var options = {'title':'Report Breakdown',
                                    'width':'100%',
-                                   'height':600};
+                                   'height':'100%'};
 
                     data.addColumn('string', 'User');
                     data.addColumn('number', 'Number of Reports');

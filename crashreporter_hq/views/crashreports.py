@@ -69,7 +69,12 @@ def view_related_reports(report_id):
 @app.route('/reports/view_stats', methods=['GET', 'POST'])
 @flask_login.login_required
 def view_report_stats():
-    html = render_template('report_statistics.html', user=flask_login.current_user)
+    top_reports = db.session.query(CrashReport, func.count(CrashReport.id).label('total'))\
+                            .group_by(CrashReport. related_group_id)\
+                            .order_by('total DESC')\
+                            .limit(10).all()
+
+    html = render_template('report_statistics.html', user=flask_login.current_user, top_reports=top_reports)
     return html
 
 

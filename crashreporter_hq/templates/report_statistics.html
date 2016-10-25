@@ -19,18 +19,48 @@
 
     {% block content %}
 
-        {% raw %}
+        <div style="display: inline-block; float:left; width:100%; height: 100%; ">
+            <h3>Most Frequent Reports</h3>
+            <table border="1" class="sortable", style="width:100%;">
+                <tr>
 
-        <div>
-            <label>Hide Aliased</label>
-            <input type="checkbox" id="hideAliased" ng-model="hideAliased" ng-value="y"></input>
+                    {% for header in ('Report #', 'Count', 'Application Name', 'Version', 'Error Type', 'Error Message', 'Date/Time') %}
+                        <td class="tableheader">{{ header }}</td>
+                    {% endfor %}
+                </tr>
+
+                {% for (r, n_similar) in top_reports %}
+                    <tr>
+                            <td style="text-align: center"> {{ r['Report Number'] }} </td>
+                            <td style="text-align: center"> <a href="{{ url_for('view_related_reports', report_id=r.id) }}">{{ n_similar}}</a></td>
+                            <td style="text-align: center"> {{ r['Application Name'] }} </td>
+                            <td style="text-align: center"> {{ r['Application Version'] }} </td>
+                            <td style="text-align: center"> {{ r['Error Type'] }} </td>
+                            <td style="padding-left: 10px"> {{ r['Error Message'] }} </td>
+                            <td style="text-align: center"> {{ r['Date'].strftime('%d %B %Y -- %I:%M %p') }} </td>
+                        <td>
+                            <form method='GET' action="{{ url_for('view_report', report_number=r['Report Number']) }}">
+                                <input type="submit" value="Open" >
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+
+
+
+            <div>
+                <label>Hide Aliased</label>
+                <input type="checkbox" id="hideAliased" ng-model="hideAliased" ng-value="y"></input>
+            </div>
+
+            <div style="display: inline-block; width:100%; height:600px;">
+                {% raw %}
+                <div datechart aliased="{{hideAliased}}" style="width:50%; height:100%; float:left;"></div>
+                <div userchart aliased="{{hideAliased}}" style="width:50%; height:100%; float:left;"></div>
+                {% endraw %}
+{#            </div>#}
         </div>
-
-        <div datechart aliased="{{hideAliased}}"></div>
-        <div userchart aliased="{{hideAliased}}"></div>
-
-        {% endraw %}
-
     {% endblock %}
 
 </body>
