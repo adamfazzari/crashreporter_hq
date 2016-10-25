@@ -27,6 +27,9 @@ app.directive('datechart', function($http) {
                     // Set chart options
                     var options = {'title':'Report History',
                                    'width':'100%',
+                                   'animation': {'startup': true,
+                                                 'duration': 2000,
+                                                 'easing': 'out'},
                                    'legend':'none',
                                    'height':'100%'};
 
@@ -70,6 +73,11 @@ app.directive('userchart', function($http) {
                     // Set chart options
                     var options = {'title':'Report Breakdown',
                                    'width':'100%',
+                                   'legend':'none',
+                                   'is3D': true,
+                                   'chartArea': {'width': '100%',
+                                                 'height': '90%',
+                                                 'easing': 'out'},
                                    'height':'100%'};
 
                     data.addColumn('string', 'User');
