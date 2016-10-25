@@ -24,14 +24,13 @@
             <table border="1" class="sortable", style="width:100%;">
                 <tr>
 
-                    {% for header in ('Report #', 'Count', 'Application Name', 'Version', 'Error Type', 'Error Message', 'Date/Time') %}
+                    {% for header in ('Number of Reports', 'Application Name', 'Version', 'Error Type', 'Error Message', 'Date/Time') %}
                         <td class="tableheader">{{ header }}</td>
                     {% endfor %}
                 </tr>
 
                 {% for (r, n_similar) in top_reports %}
                     <tr>
-                            <td style="text-align: center"> {{ r['Report Number'] }} </td>
                             <td style="text-align: center"> <a href="{{ url_for('view_related_reports', report_id=r.id) }}">{{ n_similar}}</a></td>
                             <td style="text-align: center"> {{ r['Application Name'] }} </td>
                             <td style="text-align: center"> {{ r['Application Version'] }} </td>
