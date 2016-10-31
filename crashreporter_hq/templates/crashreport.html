@@ -63,6 +63,8 @@
                                     {{ source_code[loop.index0] | safe }}
                                 </div>
                             </div>
+
+                            {#            LOCAL VARIABLES                #}
                             {% if tb['Local Variables'] %}
                                 <h4>Local Variables:</h4>
                                     <div class="contentitem">
@@ -80,6 +82,8 @@
                                         </table>
                                     </div>
                             {% endif %}
+
+                            {#            OBJECT VARIABLES                #}
                             {% if tb['Object Variables'] %}
                                 <h4>Object Inspection:</h4>
                                     <div class="contentitem">
@@ -97,6 +101,29 @@
                                         </table>
                                     </div>
                             {% endif %}
+
+                            {#            ADDITIONAL INFORMATION                #}
+                            {% if tb['Custom Inspection'] %}
+                                {% for header, additional_info in tb['Custom Inspection'].iteritems() %}
+                                    <h4>{{ header }}</h4>
+                                    <div class="contentitem">
+                                        <table border="1" class="variabletable">
+                                            <tr class="tableheader">
+                                                <td>Variable</td>
+                                                <td>Value</td>
+                                            </tr>
+                                            {% for field, value in additional_info.iteritems() %}
+                                                <tr>
+                                                    <td class="varcolumn">{{ field|e }}</td>
+                                                    <td class="valcolumn">{{ value|e }}</td>
+                                                </tr>
+                                            {% endfor %}
+                                        </table>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+
+
                         </div> {# End of content #}
                     {% endif %}
                 </div>

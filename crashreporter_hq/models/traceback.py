@@ -16,6 +16,7 @@ class Traceback(db.Model):
     module_line_number = Column(Integer, unique=False)
     local_vars = Column(PickleType(), unique=False)
     object_vars = Column(PickleType(), unique=False)
+    custom_inspection = Column(PickleType(), unique=False)
     source_code = Column(String(), unique=False)
 
     crashreport_id = Column(Integer, ForeignKey('crashreport.id'))
@@ -28,6 +29,7 @@ class Traceback(db.Model):
                     'Module Line Number': 'module_line_number',
                     'Local Variables': 'local_vars',
                     'Object Variables': 'object_vars',
+                    'Custom Inspection': 'custom_inspection',
                     'Source Code': 'source_code'}
 
     def __init__(self, **traceback_fields):
