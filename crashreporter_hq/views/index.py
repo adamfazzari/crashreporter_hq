@@ -9,6 +9,7 @@ from users import *
 from ..forms import SearchReportsForm
 from ..models import CrashReport
 from ..extensions.views import *
+from constants import *
 
 
 @app.route('/', methods=['GET'])
@@ -23,9 +24,13 @@ def home():
     if group:
         form = SearchReportsForm()
 
-        if request.args.get('hide_aliased', False) == 'True':
+        aliased_state = int(request.args.get('hide_aliased', SHOW_ALIASES))
+        if aliased_state == NO_ALIASES:
             q = q.filter(CrashReport.uuid_id.notin_([a.uuid_id for a in group.aliases]))
-            form.hide_aliased.data = True
+            form.hide_aliased.data = str(NO_ALIASES)
+        elif aliased_state == ONLY_ALIASES:
+            q = q.filter(CrashReport.uuid_id.in_([a.uuid_id for a in group.aliases]))
+            form.hide_aliased.data = str(ONLY_ALIASES)
 
         search_fields = [request.args.get('field%d' % (i+1)) for i in xrange(3)]
         search_values = [request.args.get('value%d' % (i+1)) for i in xrange(3)]

@@ -39,10 +39,10 @@ def get_plot_data():
     if request.args.get('type') == 'statistic':
         if request.args.get('id'):
             plot = StatisticBarPlot.query.filter(StatisticBarPlot.id==int(request.args.get('id'))).first()
-            if int(request.args.get('hide_aliases', 0)) == NO_ALIASES:
+            if int(request.args.get('hide_aliases', SHOW_ALIASES)) == NO_ALIASES:
                 _aliases = set(u.uuid for u in plot.group.aliases)
                 uuids = filter(lambda x: x not in _aliases, plot.group.uuids)
-            elif int(request.args.get('hide_aliases', 0)) == ONLY_ALIASES:
+            elif int(request.args.get('hide_aliases', SHOW_ALIASES)) == ONLY_ALIASES:
                 _aliases = set(u.uuid for u in plot.group.aliases)
                 uuids = filter(lambda x: x in _aliases, plot.group.uuids)
             else:
