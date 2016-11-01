@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, Boolean
 
 from .. import db
 
@@ -8,16 +8,17 @@ class Application(db.Model):
     id = Column(Integer, primary_key=True)
     name = Column(String(120), unique=True)
     description = Column(String, unique=False)
-
+    is_release = Column(Boolean)
     # Version info
     version_0 = Column(Integer)
     version_1 = Column(Integer)
     version_2 = Column(Integer)
 
-    def __init__(self, name, version, description='', uuids=None):
+    def __init__(self, name, version, description='', is_release=False, uuids=None):
         self.name = name
         self.description = description
         self.version_0, self.version_1, self.version_2 = map(int, version.split('.'))
+        self.is_release = is_release
 
         if uuids is not None:
             for uuid in uuids:
