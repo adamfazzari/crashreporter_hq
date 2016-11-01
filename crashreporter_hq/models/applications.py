@@ -26,3 +26,6 @@ class Application(db.Model):
     @property
     def version_string(self):
         return '%d.%d.%d' % (self.version_0, self.version_1, self.version_2)
+
+    def __repr__(self):
+        return '{s.name} - v{s.version_0}.{s.version_1}.{s.version_2}'.format(s=self)

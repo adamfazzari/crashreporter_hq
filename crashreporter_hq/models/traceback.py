@@ -40,3 +40,6 @@ class Traceback(db.Model):
 
     def __getitem__(self, item):
         return getattr(self, Traceback.__mappings__[item])
+
+    def __repr__(self):
+        return 'Traceback for {s.crashreport}'.format(s=self)

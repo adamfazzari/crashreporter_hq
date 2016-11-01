@@ -21,3 +21,6 @@ class Alias(db.Model):
     @property
     def user_identifier(self):
         return self.uuid.user_identifier
+
+    def __repr__(self):
+        return '{s.alias}'.format(s=self)
