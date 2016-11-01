@@ -8,11 +8,11 @@
 
 <div style="width: 800px;">
     <h2>
-        {% if info['Application Name'] != None %}
-            {% if info['Application Version'] != None %}
-                {{info['Application Name']}} (v{{info['Application Version']}})
+        {% if info.application.name != None %}
+            {% if info.application.version_string != None %}
+                {{info.application.name}} (v{{info.application.version_string}})
             {% else %}
-                {{info['Application Name']}}
+                {{info.application.name}}
             {% endif %}
 
         {% else %}

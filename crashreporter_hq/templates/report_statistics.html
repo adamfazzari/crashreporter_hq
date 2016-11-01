@@ -32,8 +32,8 @@
                 {% for (r, n_similar) in top_reports %}
                     <tr>
                             <td style="text-align: center"> <a href="{{ url_for('view_related_reports', report_id=r.id) }}">{{ n_similar}}</a></td>
-                            <td style="text-align: center"> {{ r['Application Name'] }} </td>
-                            <td style="text-align: center"> {{ r['Application Version'] }} </td>
+                            <td style="text-align: center"> {{ r.application.name }} </td>
+                            <td style="text-align: center"> {{ r.application.version_string }} </td>
                             <td style="text-align: center"> {{ r['Error Type'] }} </td>
                             <td style="padding-left: 10px"> {{ r['Error Message'] }} </td>
                             <td style="text-align: center"> {{ r['Date'].strftime('%d %B %Y -- %I:%M %p') }} </td>

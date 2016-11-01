@@ -15,11 +15,11 @@
     {% block content %}
         <div style="width: 80%;">
             <h3>
-                {% if report['Application Name'] != None %}
-                    {% if report['Application Version'] != None %}
-                        {{report['Application Name']}} (v{{report['Application Version']}})
+                {% if report.application.name != None %}
+                    {% if report.application.version_string != None %}
+                        {{report.application.name}} (v{{report.application.version_string}})
                     {% else %}
-                        {{report['Application Name']}}
+                        {{report.application.name}}
                     {% endif %}
 
                 {% else %}

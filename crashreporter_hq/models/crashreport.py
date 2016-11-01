@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, Table, ForeignKey, Boolean
+from sqlalchemy import Column, Integer, String, DateTime, Table, ForeignKey
 from datetime import datetime
 from .. import db
 
@@ -6,6 +6,7 @@ from .traceback import Traceback
 from uuid import UUID
 from sqlalchemy.orm import relationship
 
+from applications import Application
 
 SimilarReports = Table("SimilarReports", db.metadata,
                        Column("related_to_id", Integer, ForeignKey("crashreport.id")),
@@ -18,8 +19,8 @@ class CrashReport(db.Model):
 
     id = Column(Integer, primary_key=True)
     date = Column(DateTime())
-    application_name = Column(String(50), unique=False)
-    application_version = Column(Integer, unique=False)
+    application_id = Column(Integer, ForeignKey('application.id'))
+    application = relationship('Application', backref='reports', foreign_keys=[application_id])
     error_message = Column(String(''), unique=False)
     error_type = Column(String(''), unique=False)
     uuid_id = Column(Integer, ForeignKey('uuid.id'), unique=False)
@@ -34,8 +35,6 @@ class CrashReport(db.Model):
     group = relationship('Group', backref='reports', foreign_keys=[group_id])
 
     __mappings__ = {'Report Number': 'id',
-                    'Application Name': 'application_name',
-                    'Application Version': 'application_version',
                     'Error Message': 'error_message',
                     'Error Type': 'error_type',
                     'User': 'uuid',
@@ -43,8 +42,15 @@ class CrashReport(db.Model):
                     'Date': 'date'}
 
     def __init__(self, **report_fields):
-        self.application_name = report_fields['Application Name']
-        self.application_version = report_fields['Application Version']
+        version_0, version_1, version_2 = map(int, report_fields['Application Version'])
+
+        application = Application.query().filter(Application.name == report_fields['Application Name'],
+                                                 Application.version_0 == version_0,
+                                                 Application.version_1 == version_1,
+                                                 Application.version_2 == version_2).first()
+        if application is None:
+            application = Application(report_fields['Application Name'], report_fields['Application Version'])
+        self.application = application
         self.error_message = report_fields['Error Message']
         self.error_type = report_fields['Error Type']
         self.date = datetime.strptime("{Date} {Time}".format(**report_fields), '%d %B %Y %I:%M %p')
@@ -55,6 +61,8 @@ class CrashReport(db.Model):
             self.uuid = existing_uuid
         else:
             self.uuid = UUID(report_fields['User'])
+
+        self.application.uuids.append(self.uuid)
 
         for tb in report_fields['Traceback']:
             tb = Traceback(**tb)
@@ -74,7 +82,7 @@ class CrashReport(db.Model):
         self.commit()
 
     def __getitem__(self, item):
-        return getattr(self, CrashReport.__mappings__[item])
+        return getattr(self, CrashReport.__mappings__[item], '')
 
     def get_similar_reports(self):
         signature = tuple([(tb.module, tb.error_line_number) for tb in self.traceback])
