@@ -64,11 +64,14 @@ class SearchReportsForm(Form):
     values = value1, value2, value3
 
     hide_aliased_label = Label('hide_aliased_label', 'Aliases:')
+    hide_aliased = SelectField(choices=[(str(ANY), '----'),
+                                        (str(NONE), 'No Aliases'),
+                                        (str(ONLY), 'Only Aliases')])
 
-    hide_aliased = SelectField(choices=[(str(SHOW_ALIASES), 'Show Aliases'),
-                                        (str(NO_ALIASES), 'No Aliases'),
-                                        (str(ONLY_ALIASES), 'Only Aliases')])
-    # hide_aliased = BooleanField()
+    releases_only_label = Label('releases_only_label', 'Versions:')
+    releases_only = SelectField(choices=[(str(ANY), '----'),
+                                         (str(NONE), 'Non-Released Versions'),
+                                         (str(ONLY), 'Released Versions')])
 
 
 class CreateAliasForm(Form):

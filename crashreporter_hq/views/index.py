@@ -20,22 +20,32 @@ def home():
     group = user.group
 
     q = get_similar_reports(return_query=True)
+    q = q.join(Application)
 
     if group:
         form = SearchReportsForm()
 
-        aliased_state = int(request.args.get('hide_aliased', SHOW_ALIASES))
-        if aliased_state == NO_ALIASES:
+        # Filter aliased state
+        aliased_state = int(request.args.get('hide_aliased', ANY))
+        if aliased_state == NONE:
             q = q.filter(CrashReport.uuid_id.notin_([a.uuid_id for a in group.aliases]))
-            form.hide_aliased.data = str(NO_ALIASES)
-        elif aliased_state == ONLY_ALIASES:
+            form.hide_aliased.data = str(NONE)
+        elif aliased_state == ONLY:
             q = q.filter(CrashReport.uuid_id.in_([a.uuid_id for a in group.aliases]))
-            form.hide_aliased.data = str(ONLY_ALIASES)
+            form.hide_aliased.data = str(ONLY)
+
+        # Filter released state
+        released_state = int(request.args.get('releases_only', ANY))
+        if released_state == NONE:
+            q = q.filter(Application.is_release == False)
+            form.releases_only.data = str(NONE)
+        elif released_state == ONLY:
+            q = q.filter(Application.is_release == True)
+            form.hide_aliased.data = str(ONLY)
 
         search_fields = [request.args.get('field%d' % (i+1)) for i in xrange(3)]
         search_values = [request.args.get('value%d' % (i+1)) for i in xrange(3)]
         if any(search_values):
-            q = q.join(Application)
             for ii, (field, value) in enumerate(zip(search_fields, search_values)):
                 if not value:
                     continue

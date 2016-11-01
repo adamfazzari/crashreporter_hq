@@ -39,10 +39,10 @@ def get_plot_data():
     if request.args.get('type') == 'statistic':
         if request.args.get('id'):
             plot = StatisticBarPlot.query.filter(StatisticBarPlot.id==int(request.args.get('id'))).first()
-            if int(request.args.get('hide_aliases', SHOW_ALIASES)) == NO_ALIASES:
+            if int(request.args.get('hide_aliases', ANY)) == NONE:
                 _aliases = set(u.uuid for u in plot.group.aliases)
                 uuids = filter(lambda x: x not in _aliases, plot.group.uuids)
-            elif int(request.args.get('hide_aliases', SHOW_ALIASES)) == ONLY_ALIASES:
+            elif int(request.args.get('hide_aliases', ANY)) == ONLY:
                 _aliases = set(u.uuid for u in plot.group.aliases)
                 uuids = filter(lambda x: x in _aliases, plot.group.uuids)
             else:
@@ -61,10 +61,10 @@ def get_plot_data():
                     'n_users': len(uuids)}
     elif request.args.get('type') == 'state':
             alias = aliased(State.uuid)
-            if int(request.args.get('hide_aliases', 0)) == NO_ALIASES:
+            if int(request.args.get('hide_aliases', 0)) == NONE:
                 _aliases_id = set(u.uuid.id for u in flask_login.current_user.group.aliases)
                 alias_filter = alias.id.notin_(_aliases_id)
-            elif int(request.args.get('hide_aliases', 0)) == ONLY_ALIASES:
+            elif int(request.args.get('hide_aliases', 0)) == ONLY:
                 _aliases_id = set(u.uuid.id for u in flask_login.current_user.group.aliases)
                 alias_filter = alias.id.in_(_aliases_id)
             else:
