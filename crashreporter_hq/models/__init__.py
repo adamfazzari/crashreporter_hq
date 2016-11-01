@@ -1,4 +1,6 @@
-from users import User, Group, Alias
+from users import User
+from group import Group
+from alias import Alias
 from traceback import Traceback
 from crashreport import CrashReport, UUID
 from plots import StatisticBarPlot, Stat2BarPlot

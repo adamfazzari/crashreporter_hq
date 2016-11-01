@@ -3,30 +3,13 @@ from datetime import datetime
 from .. import db
 
 from .traceback import Traceback
+from uuid import UUID
 from sqlalchemy.orm import relationship
 
 
 SimilarReports = Table("SimilarReports", db.metadata,
                        Column("related_to_id", Integer, ForeignKey("crashreport.id")),
                        Column("related_by_id", Integer, ForeignKey("crashreport.id")))
-
-
-class UUID(db.Model):
-
-    __tablename__ = 'uuid'
-
-    id = Column(Integer, primary_key=True)
-    user_identifier = Column(String(100), unique=True)
-    crashreport_black_listed = Column(Boolean(False), default=False)
-    usagestats_black_listed = Column(Boolean(False), default=False)
-    group_id = Column(Integer, ForeignKey('group.id'))
-    group = relationship('Group', uselist=True, foreign_keys=[group_id])
-
-    def __init__(self, user_identifier):
-        self.user_identifier = user_identifier
-
-    def __repr__(self):
-        return "%d. %s" % (self.id, self.user_identifier)
 
 
 class CrashReport(db.Model):

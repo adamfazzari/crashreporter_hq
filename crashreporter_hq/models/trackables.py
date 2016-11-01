@@ -1,5 +1,5 @@
 
-from sqlalchemy import Column, Integer, String, DateTime, Table, ForeignKey, UniqueConstraint
+from sqlalchemy import Column, Integer, String, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import relationship
 
 from .. import db
@@ -8,11 +8,10 @@ from .. import db
 __all__ = ['Statistic', 'State', 'Timer', 'Sequence']
 
 
-
 class TrackableBase(object):
-    '''
+    """
     Base class for trackables. Each row represents a trackable for a particular user and application
-    '''
+    """
     def __init__(self, name, uuid, application_name, application_version, group):
         super(TrackableBase, self).__init__()
         self.name = name
