@@ -1,6 +1,6 @@
 import re
 
-from models import CrashReport, Group, User
+from models import CrashReport, Group, User, Traceback
 from . import db
 
 _report_cache = []
@@ -9,12 +9,21 @@ cr_number_regex = re.compile('crash_report_(\d+)\.json')
 
 def delete_report(delete_similar=False, *numbers):
     if delete_similar:
+        # Go through all the crash reports that are related and delete them and their traceback
         for group_id in db.session.query(CrashReport.related_group_id.distinct()).filter(CrashReport.id.in_(numbers)).all():
-            query = db.session.query(CrashReport).filter(CrashReport.related_group_id == group_id[0])
-            query.delete(synchronize_session=False)
+            query = db.session.query(CrashReport.id).filter(CrashReport.related_group_id == group_id[0])
+            report_ids = zip(*query.all())[0]
+
+            db.session.query(Traceback).filter(Traceback.crashreport_id.in_(report_ids)).delete(synchronize_session='fetch')
+            query.delete(synchronize_session='fetch')
+
     else:
         query = CrashReport.query.filter(CrashReport.id.in_(numbers))
-        query.delete(synchronize_session=False)
+        query.delete(synchronize_session='fetch')
+
+        query = Traceback.query.filter(Traceback.crashreport_id.in_(numbers))
+        query.delete(synchronize_session='fetch')
+
     db.session.expire_all()
     db.session.commit()
     return len(CrashReport.query.filter(CrashReport.id.in_(numbers)).all()) == 0
