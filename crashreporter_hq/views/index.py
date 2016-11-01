@@ -68,7 +68,7 @@ def home():
                     date = datetime.strptime(value, '%d %B %Y')
                     q = q.filter(CrashReport.group == group, CrashReport.date >= date)
                 elif field == 'application_name':
-                    q = q.filter(CrashReport.group == group, Application.name == value)
+                    q = q.filter(CrashReport.group == group, Application.name.contains(value))
                 elif field in ('application_version', 'after_version', 'before_version'):
                     v0, v1, v2 = map(int, value.split('.'))
                     op = {'application_version': operator.eq,
