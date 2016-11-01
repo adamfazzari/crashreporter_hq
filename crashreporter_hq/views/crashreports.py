@@ -7,7 +7,7 @@ from sqlalchemy import func, asc
 from datetime import datetime
 
 from groups import *
-from ..models import CrashReport, UUID, Traceback
+from ..models import CrashReport, UUID, Traceback, Application
 from ..forms import YoutrackSubmitForm, SearchReportsForm
 
 from pygments import highlight
@@ -88,6 +88,8 @@ def get_report_stats():
         # Group / bin the results by day in ascending order
         if request.args.get('hide_aliased', 'false') == 'true':
             q = q.filter(CrashReport.uuid_id.notin_([a.uuid_id for a in flask_login.current_user.group.aliases]))
+        if request.args.get('released_only', 'false') == 'true':
+            q = q.join(Application).filter(Application.is_release == True)
         q = q.group_by(func.date(CrashReport.date)).order_by(asc(CrashReport.date))
 
         # Because SQLite does not support the Date class in queries, we cannot cast the results
@@ -102,6 +104,8 @@ def get_report_stats():
         q = db.session.query(UUID.user_identifier, func.count(CrashReport.id)).join(UUID.reports).group_by(UUID.user_identifier)
         if request.args.get('hide_aliased', 'false') == 'true':
             q = q.filter(CrashReport.uuid_id.notin_([a.uuid_id for a in flask_login.current_user.group.aliases]))
+        if request.args.get('released_only', 'false') == 'true':
+            q = q.join(Application).filter(Application.is_release == True)
         data = q.all()
     else:
         return 'Invalid request'

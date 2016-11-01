@@ -49,14 +49,16 @@
 
 
             <div>
-                <label>Hide Aliased</label>
-                <input type="checkbox" id="hideAliased" ng-model="hideAliased" ng-value="y"></input>
+                <label>Hide Aliased:</label>
+                <input type="checkbox" id="hideAliased" ng-model="hideAliased"></input>
+                <label>Released Versions Only:</label>
+                <input type="checkbox" id="releasedOnly" ng-model="releasedOnly"></input>
             </div>
 
             <div style="display: inline-block; width:100%; height:600px;">
                 {% raw %}
-                <div datechart aliased="{{hideAliased}}" style="width:65%; height:100%; float:left;"></div>
-                <div userchart aliased="{{hideAliased}}" style="width:35%; height:100%; float:left;"></div>
+                <div datechart aliased="{{hideAliased}}" released="{{releasedOnly}}" style="width:65%; height:100%; float:left;"></div>
+                <div userchart aliased="{{hideAliased}}" released="{{releasedOnly}}" style="width:35%; height:100%; float:left;"></div>
                 {% endraw %}
 {#            </div>#}
         </div>

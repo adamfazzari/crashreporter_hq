@@ -12,6 +12,9 @@ app.controller('hideAliased', function($scope, $http) {
 
 });
 
+app.controller('releasedOnly', function($scope, $http) {
+});
+
 
 app.directive('datechart', function($http) {
         return {
@@ -23,13 +26,14 @@ app.directive('datechart', function($http) {
                 var done = function(resp) {
                     // Instantiate and draw our chart
                     var data = new google.visualization.DataTable();
-                    var chart = new google.visualization.LineChart($elm[0]);
+                    var chart = new google.visualization.ColumnChart($elm[0]);
                     // Set chart options
                     var options = {'title':'Report History',
                                    'width':'100%',
                                    'animation': {'startup': true,
                                                  'duration': 2000,
                                                  'easing': 'out'},
+                                   'bar': {'groupWidth': '100%'},
                                    'legend':'none',
                                    'height':'100%'};
 
@@ -44,11 +48,13 @@ app.directive('datechart', function($http) {
                     chart.draw(data, options);
                 };
 
-                attr.$observe('aliased', function(value){
+                var update = function(value){
                     // Make a request to get the chart data
-                    $http.get('/reports/get_stats?type=date&hide_aliased=' + value).then(done, fail);
+                    $http.get('/reports/get_stats?type=date&hide_aliased=' + attr.aliased + '&released_only=' + attr.released).then(done, fail);
+                    };
 
-                    });
+                attr.$observe('aliased', update);
+                attr.$observe('released', update);
 
                 // Make a request to get the chart data
                 // $http.get('/reports/get_stats?type=date').then(done, fail);
@@ -85,12 +91,19 @@ app.directive('userchart', function($http) {
                     data.addRows(resp.data);
                     chart.draw(data, options);
                     };
-
-                attr.$observe('aliased', function(value){
+                //
+                // attr.$observe('aliased', function(value){
+                //     // Make a request to get the chart data
+                //     $http.get('/reports/get_stats?type=user&hide_aliased=' + value).then(done, fail);
+                //
+                //     });
+                var update = function(value){
                     // Make a request to get the chart data
-                    $http.get('/reports/get_stats?type=user&hide_aliased=' + value).then(done, fail);
+                    $http.get('/reports/get_stats?type=user&hide_aliased=' + attr.aliased + '&released_only=' + attr.released).then(done, fail);
+                    };
 
-                    });
+                attr.$observe('aliased', update);
+                attr.$observe('released', update);
 
                 // Make a request to get the chart data
                 // $http.get('/reports/get_stats?type=user&show_aliased=False').then(done, fail);
