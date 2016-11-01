@@ -39,6 +39,12 @@ class PlotCreationForm(Form):
     submit = SubmitField('Create')
 
 
+class AddReleaseForm(Form):
+    name = StringField('name')
+    version = StringField('fields')
+    submit = SubmitField('Add')
+
+
 class SearchReportsForm(Form):
     choices = [('user_identifier', 'User'), ('application_name', 'Application Name'),
                ('application_version', 'Application Version'), ('after_version', 'After Version'),

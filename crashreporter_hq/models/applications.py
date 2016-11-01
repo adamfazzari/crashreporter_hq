@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String, Boolean
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
+from sqlalchemy.orm import relationship
 
 from .. import db
 
@@ -9,6 +10,8 @@ class Application(db.Model):
     name = Column(String(120), unique=True)
     description = Column(String, unique=False)
     is_release = Column(Boolean)
+    group_id = Column(Integer, ForeignKey('group.id'))
+    group = relationship('Group', foreign_keys=[group_id])
     # Version info
     version_0 = Column(Integer)
     version_1 = Column(Integer)

@@ -5,8 +5,8 @@ from sqlalchemy import func
 import flask.ext.login as flask_login
 
 from .. import app, db
-from ..forms import CreateGroupForm, SearchForm, CreateAliasForm, PlotCreationForm
-from ..models import Group, User, UUID, CrashReport, Alias, StatisticBarPlot, Statistic, State, Timer
+from ..forms import CreateGroupForm, SearchForm, CreateAliasForm, PlotCreationForm, AddReleaseForm
+from ..models import Group, User, UUID, CrashReport, Alias, StatisticBarPlot, Statistic, State, Timer, Application
 from ..models.trackables import TrackableTables
 
 
@@ -18,6 +18,7 @@ def groups(group):
     cform = CreateGroupForm(prefix='create')
     alias_form = CreateAliasForm()
     plot_form = PlotCreationForm()
+    release_form = AddReleaseForm()
 
     if request.method == 'GET':
         if group is None:
@@ -39,7 +40,7 @@ def groups(group):
                          }
         else:
             trackables = {}
-        return render_template('groups.html', sform=sform, cform=cform, alias_form=alias_form, plot_form=plot_form,
+        return render_template('groups.html', sform=sform, cform=cform, release_form=release_form, alias_form=alias_form, plot_form=plot_form,
                                 group=g, user=flask_login.current_user, uuids=uuids, trackables=trackables)
 
     elif cform.validate_on_submit() and cform.data['submit']:
@@ -171,5 +172,25 @@ def manage_plots():
                 return redirect(request.referrer)
 
 
+@app.route('/applications', methods=['GET', 'POST'])
+@flask_login.login_required
+def manage_application():
+    if request.method == 'POST':
+        if request.args.get('action') == 'add_release':
+            release_form = AddReleaseForm()
+            if release_form.validate_on_submit():
+                v0, v1, v2 = map(int, release_form.data['version'].split('.'))
+                application = Application.query.filter(Application.name == release_form.data['name'],
+                                                       Application.version_0 == v0,
+                                                       Application.version_1 == v1,
+                                                       Application.version_2 == v2,).first()
+                if application:
+                    application.is_release = True
+                    db.session.commit()
+        elif request.args.get('action') == 'remove_release':
+            application = Application.query.filter(Application.id == request.args.get('id')).first()
+            if application:
+                application.is_release = False
+                db.session.commit()
 
-
+        return redirect(request.referrer)

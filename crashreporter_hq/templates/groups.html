@@ -155,6 +155,45 @@
                 <br>
 
                 <div class="form">
+                    <h3>Application Versions </h3>
+
+                    <table border="1" class="sortable", style="width:100%">
+                        <tr class="tableheader">
+
+                            {% for header in ('Application Name', 'Application Version', '') %}
+                                <td class="tableheader">{{ header }}</td>
+                            {% endfor %}
+
+                        </tr>
+                        {% for app in group.applications %}
+                            {% if app.is_release %}
+                                <tr>
+                                    <td>{{ app.name }}</td>
+                                    <td>{{ app.version_string }}</td>
+                                    <td>
+                                        <form method='POST' action="{{ url_for('manage_application', action='remove_release', id=app.id)}}">
+                                            <input type="submit" value="Remove" >
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        {% endfor %}
+
+                        <form action="{{ url_for('manage_application', action='add_release') }}" method="post">
+                            {{ release_form.hidden_tag() }}
+                            <div style="display:flex">
+                                {{ render_field(release_form.name, field_name='Application Name') }}
+                                {{ render_field(release_form.version, field_name='Version') }}
+                                {{ release_form.submit }}
+                            </div>
+                        </form>
+
+                    </table>
+                    <br>
+                </div>
+
+
+                <div class="form">
                     <h3> Users </h3>
                     <table border="1" class="sortable", style="width:100%">
                         <tr class="tableheader">

@@ -10,6 +10,7 @@ class Group(db.Model):
     name = Column(String(120), unique=True)
     description = Column(String, unique=False)
     uuids = relationship('UUID', uselist=True)
+    applications = relationship('Application', uselist=True)
     join_requests_id = Column(Integer,  ForeignKey('users.id'))
     join_requests = relationship('User', uselist=True, foreign_keys=[join_requests_id])
 
