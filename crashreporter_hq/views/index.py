@@ -7,10 +7,10 @@ from ..tools import get_similar_reports
 from users import *
 
 from ..forms import SearchReportsForm
-from ..models import CrashReport
+from ..models import CrashReport, Application
 from ..extensions.views import *
 from constants import *
-
+import operator
 
 @app.route('/', methods=['GET'])
 @flask_login.login_required
@@ -35,6 +35,7 @@ def home():
         search_fields = [request.args.get('field%d' % (i+1)) for i in xrange(3)]
         search_values = [request.args.get('value%d' % (i+1)) for i in xrange(3)]
         if any(search_values):
+            q = q.join(Application)
             for ii, (field, value) in enumerate(zip(search_fields, search_values)):
                 if not value:
                     continue
@@ -56,6 +57,17 @@ def home():
                 elif field == 'after_date':
                     date = datetime.strptime(value, '%d %B %Y')
                     q = q.filter(CrashReport.group == group, CrashReport.date >= date)
+                elif field == 'application_name':
+                    q = q.filter(CrashReport.group == group, Application.name == value)
+                elif field in ('application_version', 'after_version', 'before_version'):
+                    v0, v1, v2 = map(int, value.split('.'))
+                    op = {'application_version': operator.eq,
+                          'after_version': operator.ge,
+                          'before_version': operator.le}[field]
+                    q = q.filter(CrashReport.group == group,
+                                                   op(Application.version_0, v0),
+                                                   op(Application.version_1, v1),
+                                                   op(Application.version_2, v2))
 
                 else:
                     attr = getattr(CrashReport, field)

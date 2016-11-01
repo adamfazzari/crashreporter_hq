@@ -41,7 +41,8 @@ class PlotCreationForm(Form):
 
 class SearchReportsForm(Form):
     choices = [('user_identifier', 'User'), ('application_name', 'Application Name'),
-               ('application_version', 'Application Version'), ('id', 'Report Number'),
+               ('application_version', 'Application Version'), ('after_version', 'After Version'),
+               ('before_version', 'Before Version'), ('id', 'Report Number'),
                ('error_message', 'Error Message'), ('error_type', 'Error Type'),
                ('date', 'Date'), ('before_date', 'Before Date'), ('after_date', 'After Date')]
     field1 = SelectField(choices=choices)
