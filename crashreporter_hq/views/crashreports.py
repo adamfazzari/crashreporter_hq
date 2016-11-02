@@ -60,7 +60,7 @@ def view_related_reports(report_id):
                            reports=reports_on_page,
                            user=flask_login.current_user,
                            user_set=set(r['User'] for r in reports),
-                           most_recent=reports[0],
+                           most_recent=reports[-1],
                            pagination=pagination,
                            n_total_reports=n_total_reports,
                            report_numbers=report_numbers,
