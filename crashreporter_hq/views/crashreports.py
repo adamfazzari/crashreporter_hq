@@ -48,12 +48,11 @@ def view_related_reports(report_id):
     reports = CrashReport.query.filter(CrashReport.related_group_id == report.related_group_id).order_by('date').all()
     n_total_reports = len(reports)
     try:
-        page = max(1, int(request.args.get('page', n_total_reports / PER_PAGE)))
+        page = max(1, int(request.args.get('page', 1)))
     except ValueError:
         page = 1
     reports = reports[(page-1) * PER_PAGE: page * PER_PAGE]
     pagination = Pagination(page=page, per_page=PER_PAGE, total=n_total_reports, search=False, record_name='reports')
-    form = SearchReportsForm()
     aliases = {a.user_identifier: a.alias for a in flask_login.current_user.group.aliases}
     report_numbers = [str(r['Report Number']) for r in reports]
 
