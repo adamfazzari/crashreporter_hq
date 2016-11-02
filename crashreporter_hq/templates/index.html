@@ -83,7 +83,13 @@
                                 <td style="text-align: center"> {{ r['Report Number'] }} </td>
                                 <td style="text-align: center"> <a href="{{ url_for('view_related_reports', report_id=r.id) }}">{{ r.related_reports|length + 1}}</a></td>
                                 <td style="text-align: center"> {{ r.application.name }} </td>
-                                <td style="text-align: center"> {{ r.application.version_string }} </td>
+                                <td style="text-align: center">
+                                    {% if r.application.is_release %}
+                                        <b>{{ r.application.version_string }}</b>
+                                    {% else %}
+                                        {{ r.application.version_string }}
+                                    {% endif %}
+                                </td>
                                 <td style="text-align: center"> {{ aliases.get(r['User'].user_identifier, r['User'].user_identifier) }} </td>
                                 <td style="text-align: center"> {{ r['Error Type'] }} </td>
                                 <td style="padding-left: 10px"> {{ r['Error Message'] }} </td>
