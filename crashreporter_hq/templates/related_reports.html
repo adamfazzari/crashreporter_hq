@@ -14,55 +14,24 @@
     {% extends "base.html" %}
 
     {% block content %}
-        {% if form %}
-            <form action="{{ url_for('view_reports') }}" method="post" name="login" >
-                {{ form.hidden_tag() }}
-            <ul>
-                <li style="list-style-type: none">
-                    <div style="display:inline ">
-                        <span>{{ form.field1() }}</span>
-                        <span>{{ form.value1(size=80) }}</span>
-                    </div>
-                </li>
-
-                <li style="list-style-type: none">
-                    <div style="display:inline ">
-                        <span>{{ form.field2() }}</span>
-                        <span>{{ form.value2(size=80) }}</span>
-                    </div>
-                </li>
-
-                <li style="list-style-type: none">
-                    <div style="display:inline ">
-                        <span>{{ form.field3() }}</span>
-                        <span>{{ form.value3(size=80) }}</span>
-                    </div>
-                </li>
-                <li style="list-style-type: none">
-                    <div style="display:inline ">
-                        <span>{{ form.hide_aliased }}</span>
-                        <span>{{ form.hide_aliased_label }}</span>
-                    </div>
-                </li>
-                <li style="list-style-type: none">
-                    <div style="display:inline ">
-                        <span>{{ form.releases_only }}</span>
-                        <span>{{ form.releases_only_label }}</span>
-                    </div>
-                </li>
-                <li style="list-style-type: none">
-                    <input type='submit' name='search', value="Search"></input>
-                </li>
-            </ul>
-
-                {% for error in form.errors %}
-                    <span style="color: red;">[{{ error }}]</span>
-                {% endfor %}<br>
-            </form>
-
-        {% endif %}
-
-
+        <div style="display: inline-block; float:left; width:100%; height:160px; text-align: center;">
+            <div style="display: inline-block; width:30%;">
+                <h1>{{ user_set|length }}</h1>
+                <h3>Users Affected</h3>
+            </div>
+            <div style="display: inline-block; width:30%">
+                <h1>{{ n_total_reports }}</h1>
+                <h3>Crashes</h3>
+            </div>
+            <div style="display: inline-block; width:30%">
+                <h1>{{ most_recent['Date'].strftime('%d %B %Y') }}<br>
+                    {{ most_recent['Date'].strftime('%I:%M %p') }}
+                </h1>
+                <h3>Most Recent Report</h3>
+            </div>
+        <br>
+        <br>
+        </div>
         <div style="text-align: center;">
             {{ pagination.info }}
             {{ pagination.links }}
@@ -73,7 +42,7 @@
                 <table border="1" class="sortable", style="width:100%">
                     <tr>
 
-                        {% for header in ('Report #', 'Application Name', 'Version', 'User', 'Error Type', 'Error Message', 'Date/Time') %}
+                        {% for header in ('Report #', 'Application Name', 'Version', 'User', 'Error Type', 'Error Message', 'Date/Time', '', '') %}
                             <td class="tableheader">{{ header }}</td>
                         {% endfor %}
                     </tr>

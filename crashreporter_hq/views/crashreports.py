@@ -51,14 +51,18 @@ def view_related_reports(report_id):
         page = max(1, int(request.args.get('page', 1)))
     except ValueError:
         page = 1
-    reports = reports[(page-1) * PER_PAGE: page * PER_PAGE]
+    reports_on_page = reports[(page-1) * PER_PAGE: page * PER_PAGE]
     pagination = Pagination(page=page, per_page=PER_PAGE, total=n_total_reports, search=False, record_name='reports')
     aliases = {a.user_identifier: a.alias for a in flask_login.current_user.group.aliases}
     report_numbers = [str(r['Report Number']) for r in reports]
 
-    html = render_template('related_reports.html', reports=reports,
+    html = render_template('related_reports.html',
+                           reports=reports_on_page,
                            user=flask_login.current_user,
+                           user_set=set(r['User'] for r in reports),
+                           most_recent=reports[0],
                            pagination=pagination,
+                           n_total_reports=n_total_reports,
                            report_numbers=report_numbers,
                            aliases=aliases,
                            show_delete=True,
