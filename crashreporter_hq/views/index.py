@@ -95,15 +95,18 @@ def view_reports():
     except ValueError:
         page = 1
 
+    search = 'field1' in request.args
     page_rev = max_page - page + 1
     report_numbers = [str(r['Report Number']) for r in reports]
     reports = reports[(page_rev-1) * PER_PAGE: page_rev * PER_PAGE]
     pagination = Pagination(page=page,
                             per_page=PER_PAGE,
                             total=n_total_reports,
-                            search=False,
                             outer_window=25,
                             inner_window=25,
+                            search=search,
+                            search_msg='%d Reports found matching your criteria' % n_total_reports,
+                            found=n_total_reports,
                             record_name='reports')
     aliases = {a.user_identifier: a.alias for a in group.aliases}
     html = render_template('index.html', reports=reports, user=flask_login.current_user, pagination=pagination,
