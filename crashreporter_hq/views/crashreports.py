@@ -37,7 +37,7 @@ def view_report(report_number):
                            inspection_level=10000,
                            user=flask_login.current_user,
                            form=form,
-                           back_link=url_for('home'))
+                           back_link=url_for('view_reports'))
     return html
 
 

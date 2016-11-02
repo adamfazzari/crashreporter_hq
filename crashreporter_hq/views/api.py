@@ -17,7 +17,7 @@ def delete_report():
     else:
         response = 'Failed. Crash report #%s does not exist.' % request.args.get('report_numbers')
     flash(response)
-    return redirect(url_for('home'))
+    return redirect(url_for('view_reports'))
 
 
 @app.route('/reports/upload', methods=['POST'])

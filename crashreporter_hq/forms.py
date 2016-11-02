@@ -51,13 +51,13 @@ class SearchReportsForm(Form):
                ('before_version', 'Before Version'), ('id', 'Report Number'),
                ('error_message', 'Error Message'), ('error_type', 'Error Type'),
                ('date', 'Date'), ('before_date', 'Before Date'), ('after_date', 'After Date')]
-    field1 = SelectField(choices=choices)
+    field1 = SelectField(choices=choices, default='user')
     value1 = StringField('Value')
 
-    field2 = SelectField(choices=choices)
+    field2 = SelectField(choices=choices, default='application_name')
     value2 = StringField('Value')
 
-    field3 = SelectField(choices=choices)
+    field3 = SelectField(choices=choices, default='application_version')
     value3 = StringField('Value')
 
     fields = field1, field2, field3

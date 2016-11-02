@@ -20,7 +20,7 @@ def login():
         if user:
             if request.form['password'] == user.password:
                 flask_login.login_user(user)
-                return redirect(request.args.get('next') or url_for('home'))
+                return redirect(request.args.get('next') or url_for('view_reports'))
             else:
                 flash('Incorrect password. Please try again.')
                 return redirect(url_for('login'))
