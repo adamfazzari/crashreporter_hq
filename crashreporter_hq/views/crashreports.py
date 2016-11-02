@@ -61,6 +61,7 @@ def view_related_reports(report_id):
                            pagination=pagination,
                            report_numbers=report_numbers,
                            aliases=aliases,
+                           show_delete=True,
                            back_link=request.referrer)
     return html
 
