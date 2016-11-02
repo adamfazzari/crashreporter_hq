@@ -105,7 +105,10 @@ def upload_stats():
                 uuid.group.append(user.group)
                 db.session.add(uuid)
 
-            trackable = cls.query.filter(cls.name==trackable_name, cls.uuid_id==uuid.id, cls.group_id==user.group_id).first()
+            trackable = cls.query.filter(cls.name == trackable_name,
+                                         cls.application_name == payload['Application Name'],
+                                         cls.uuid_id == uuid.id,
+                                         cls.group_id == user.group_id).first()
             if trackable is None:
                 trackable = cls(trackable_name, uuid, payload['Application Name'], payload['Application Version'], user.group)
                 db.session.add(trackable)
