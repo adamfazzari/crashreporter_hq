@@ -115,7 +115,7 @@
             {{ pagination.links }}
         </div>
 
-        {% if user.group_admin %}
+        {% if user.group_admin and show_delete %}
             <form action={{ url_for('delete_report', delete_similar=True, report_numbers=','.join(report_numbers)) }} method="post" name="login" >
                 <input type='submit' name='search', value="Delete Results">
                 </input>

@@ -19,6 +19,7 @@ def view_reports():
     PER_PAGE = 25
     user = flask_login.current_user
     group = user.group
+    show_delete = False
 
     if not group:
         return redirect(url_for('groups'))
@@ -28,7 +29,7 @@ def view_reports():
 
     form = SearchReportsForm()
     if form.validate_on_submit():
-
+        show_delete = True
         # Filter aliased state
         aliased_state = int(form.data.get('hide_aliased', ANY))
         if aliased_state == NONE:
@@ -101,5 +102,5 @@ def view_reports():
     pagination = Pagination(page=page, per_page=PER_PAGE, total=n_total_reports, search=False, record_name='reports')
     aliases = {a.user_identifier: a.alias for a in group.aliases}
     html = render_template('index.html', reports=reports, user=flask_login.current_user, pagination=pagination,
-                           aliases=aliases, form=form, report_numbers=report_numbers)
+                           aliases=aliases, form=form, report_numbers=report_numbers, show_delete=show_delete)
     return html
