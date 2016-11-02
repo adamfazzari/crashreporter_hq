@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='crashreport.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='pagination.css') }}">
+    <script src="{{ url_for('static', filename='sorttable.js') }}"></script>
+    <meta charset="UTF-8">
+    <title>Crash Reporter HQ</title>
+</head>
+
+
+<body>
+
+    {% extends "base.html" %}
+
+    {% block content %}
+        {% if form %}
+            <form action="{{ url_for('view_reports') }}" method="post" name="login" >
+                {{ form.hidden_tag() }}
+            <ul>
+                <li style="list-style-type: none">
+                    <div style="display:inline ">
+                        <span>{{ form.field1() }}</span>
+                        <span>{{ form.value1(size=80) }}</span>
+                    </div>
+                </li>
+
+                <li style="list-style-type: none">
+                    <div style="display:inline ">
+                        <span>{{ form.field2() }}</span>
+                        <span>{{ form.value2(size=80) }}</span>
+                    </div>
+                </li>
+
+                <li style="list-style-type: none">
+                    <div style="display:inline ">
+                        <span>{{ form.field3() }}</span>
+                        <span>{{ form.value3(size=80) }}</span>
+                    </div>
+                </li>
+                <li style="list-style-type: none">
+                    <div style="display:inline ">
+                        <span>{{ form.hide_aliased }}</span>
+                        <span>{{ form.hide_aliased_label }}</span>
+                    </div>
+                </li>
+                <li style="list-style-type: none">
+                    <div style="display:inline ">
+                        <span>{{ form.releases_only }}</span>
+                        <span>{{ form.releases_only_label }}</span>
+                    </div>
+                </li>
+                <li style="list-style-type: none">
+                    <input type='submit' name='search', value="Search"></input>
+                </li>
+            </ul>
+
+                {% for error in form.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}<br>
+            </form>
+
+        {% endif %}
+
+
+        <div style="text-align: center;">
+            {{ pagination.info }}
+            {{ pagination.links }}
+        </div>
+
+            {% if reports %}
+
+                <table border="1" class="sortable", style="width:100%">
+                    <tr>
+
+                        {% for header in ('Report #', 'Application Name', 'Version', 'User', 'Error Type', 'Error Message', 'Date/Time') %}
+                            <td class="tableheader">{{ header }}</td>
+                        {% endfor %}
+                    </tr>
+
+                    {% for r in reports %}
+                        <tr>
+                                <td style="text-align: center"> {{ r['Report Number'] }} </td>
+                                <td style="text-align: center"> {{ r.application.name }} </td>
+                                <td style="text-align: center">
+                                    {% if r.application.is_release %}
+                                        <b>{{ r.application.version_string }}</b>
+                                    {% else %}
+                                        {{ r.application.version_string }}
+                                    {% endif %}
+                                </td>
+                                <td style="text-align: center"> {{ aliases.get(r['User'].user_identifier, r['User'].user_identifier) }} </td>
+                                <td style="text-align: center"> {{ r['Error Type'] }} </td>
+                                <td style="padding-left: 10px"> {{ r['Error Message'] }} </td>
+                                <td style="text-align: center"> {{ r['Date'].strftime('%d %B %Y -- %I:%M %p') }} </td>
+                            <td>
+                                <form method='GET' action="{{ url_for('view_report', report_number=r['Report Number']) }}">
+                                    <input type="submit" value="Open" >
+                                </form>
+                            </td>
+                            {% if user.group_admin %}
+                                <td>
+                                    <form method='POST' action="{{ url_for('delete_report', report_numbers=r['Report Number']) }}">
+                                        <input type="submit" value="Delete" >
+                                    </form>
+                                </td>
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+                </table>
+            {% endif %}
+
+        <div style="text-align: center;">
+            {{ pagination.links }}
+        </div>
+
+        {% if user.group_admin and show_delete %}
+            <form action={{ url_for('delete_report', delete_similar=True, report_numbers=','.join(report_numbers)) }} method="post" name="login" >
+                <input type='submit' name='search', value="Delete Results">
+                </input>
+            </form>
+        {% endif %}
+
+    {% endblock %}
+
+
+</body>
+</html>
