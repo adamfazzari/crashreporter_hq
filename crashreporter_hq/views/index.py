@@ -102,6 +102,8 @@ def view_reports():
                             per_page=PER_PAGE,
                             total=n_total_reports,
                             search=False,
+                            outer_window=25,
+                            inner_window=25,
                             record_name='reports')
     aliases = {a.user_identifier: a.alias for a in group.aliases}
     html = render_template('index.html', reports=reports, user=flask_login.current_user, pagination=pagination,
