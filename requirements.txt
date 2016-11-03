@@ -2,6 +2,7 @@ Flask==0.10.1
 Flask-Login==0.3.2
 Flask-SQLAlchemy==2.1
 Flask-WTF==0.12
+Flask-Celery==2.4.3
 flask-paginate==0.4.1
 Jinja2==2.8
 Pygments==2.0.2

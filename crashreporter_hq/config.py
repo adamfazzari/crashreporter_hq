@@ -13,6 +13,15 @@ DB_ABSOLUTE_PATH = os.path.join(HQ_FOLDER, 'tmp/database.db')
 SQLALCHEMY_DATABASE_URI = 'sqlite:///' + DB_ABSOLUTE_PATH
 SQLALCHEMY_MIGRATE_REPO = os.path.join(HQ_FOLDER, 'db_repository')
 
+
+# Redis
+REDIS_URL = 'redis://127.0.0.1:6379/0'
+
+# Celery
+CELERY_BROKER_URL = REDIS_URL
+CELERY_RESULT_BACKEND = REDIS_URL
+
+
 if not os.path.isdir(TMP_FOLDER):
     os.makedirs(TMP_FOLDER)
 
