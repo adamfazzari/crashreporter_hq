@@ -20,7 +20,7 @@
     {% block content %}
 
         <div style="display: inline-block; float:left; width:100%; height: 100%; ">
-            <h3>Most Frequent Reports</h3>
+            <h3>Crash Reports in Released Versions</h3>
             {% for name, top_reports in top_reports.iteritems() %}
                 <h4>{{ name }} - {{ top_reports[0][0].application.version_string }}</h4>
                 <table border="1" class="sortable", style="width:100%;">
@@ -47,6 +47,7 @@
             {% endfor %}
 
             <br>
+            <h3>Report Breakdown</h3>
 
             <div style="background: #FFFFFF">
                 <div style="margin-left: 50px;">

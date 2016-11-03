@@ -28,13 +28,16 @@ app.directive('datechart', function($http) {
                     var data = new google.visualization.DataTable();
                     var chart = new google.visualization.ColumnChart($elm[0]);
                     // Set chart options
-                    var options = {'title':'Report History',
-                                   'width':'100%',
+                    var options = {'width':'100%',
+                                   'vAxis': {'title': 'Number of Crash Reports'},
+                                   'hAxis': {'title': 'Date'},
                                    'animation': {'startup': true,
                                                  'duration': 2000,
                                                  'easing': 'out'},
                                    'bar': {'groupWidth': '100%'},
                                    'legend':'none',
+                                   'chartArea': {'width': '80%',
+                                                 'height': '80%'},
                                    'height':'100%'};
 
                     var dates = [];
@@ -73,11 +76,15 @@ app.directive('userchart', function($http) {
 
                 var fail=function(err){ };
                 var done = function(resp) {
+                    var n_reports = 0;
+                    var n_users = resp.data.length;
+                    for (var ii=0; ii < resp.data.length; ii++)
+                        n_reports += resp.data[ii][1];
                     // Instantiate and draw our chart.
                     var data = new google.visualization.DataTable();
                     var chart = new google.visualization.PieChart($elm[0]);
                     // Set chart options
-                    var options = {'title':'Report Breakdown',
+                    var options = {'title':'Total Reports: ' + n_reports + '  (' + n_users + ' Users)',
                                    'width':'100%',
                                    'legend':'none',
                                    'is3D': true,
