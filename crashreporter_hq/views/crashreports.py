@@ -73,10 +73,20 @@ def view_related_reports(report_id):
 @app.route('/reports/view_stats', methods=['GET', 'POST'])
 @flask_login.login_required
 def view_report_stats():
-    top_reports = db.session.query(CrashReport, func.count(CrashReport.id).label('total'))\
-                            .group_by(CrashReport. related_group_id)\
-                            .order_by('total DESC')\
-                            .limit(10).all()
+    latest_applications = db.session.query(func.max(Application.version_0),
+                                           func.max(Application.version_1),
+                                           func.max(Application.version_2)) \
+                                    .filter(Application.is_release == True) \
+                                    .group_by(Application.name).all()
+
+    top_reports = {}
+    for v0, v1, v2 in latest_applications:
+        r = db.session.query(CrashReport, func.count(CrashReport.id).label('total'))\
+                      .group_by(CrashReport.related_group_id) \
+                      .filter(CrashReport.application.has(version_0=v0, version_1=v1, version_2=v2)) \
+                      .order_by('total DESC').all()
+        if r:
+            top_reports[r[0][0].application.name] = r
 
     html = render_template('report_statistics.html', user=flask_login.current_user, top_reports=top_reports)
     return html
