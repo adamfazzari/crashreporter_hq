@@ -18,6 +18,7 @@
   ],
   "dependencies": {
     "AngularJS": "angular-latest#^1.5.0",
-    "angular-google-chart": "^0.1.0"
+    "angular-google-chart": "^0.1.0",
+    "angular-material": "^1.1.1"
   }
 }

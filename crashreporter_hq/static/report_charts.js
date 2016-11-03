@@ -1,7 +1,7 @@
 'use strict';
 
 
-var app = angular.module('HQApp', []);
+var app = angular.module('HQApp', ['ngMaterial', 'ngMessages']);
 
 app.controller('ReportStats', function($scope, $http) {
 
@@ -15,6 +15,8 @@ app.controller('hideAliased', function($scope, $http) {
 app.controller('releasedOnly', function($scope, $http) {
 });
 
+app.controller('tabsDemoDynamicHeight',function($scope, $http) {
+});
 
 app.directive('datechart', function($http) {
         return {
