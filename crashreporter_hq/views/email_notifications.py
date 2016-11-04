@@ -48,9 +48,9 @@ def send_status_report():
         aliases = {a.user_identifier: a.alias for a in group.aliases}
         html = render_template('weekly_report.html', top_reports=top_reports, aliases=aliases)
 
-        msg = Message('Hello from Flask',
+        msg = Message('Weekly Application Summary Report',
                       html=html,
-                      recipients=['test.sensoft@gmail.com'])
+                      recipients=['test.sensoft@gmail.com'])#[u.email for u in group.users])
 
         mail.send(msg)
 
