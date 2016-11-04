@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Weekly Crash Reporter</title>
+</head>
+
+<p>Here is your weekly summary report.</p>
+<hr>
+
+{% if top_reports %}
+
+    {% for name, reports in top_reports.iteritems() %}
+
+            <h3> {{ name }}</h3>
+
+            <table border="1" class="sortable", style="width:100%">
+            <tr>
+
+                {% for header in ('Report #', 'Count', 'Application Name', 'Version', 'User Affected', 'Error Type', 'Error Message', 'Most Recent') %}
+                    <td class="tableheader">{{ header }}</td>
+                {% endfor %}
+            </tr>
+                {% for r, n_similar, users_affected in reports %}
+                <tr>
+                        <td style="text-align: center"> {{ r['Report Number'] }} </td>
+                        <td style="text-align: center"> {{ n_similar }}</td>
+                        <td style="text-align: center"> {{ r.application.name }} </td>
+                        <td style="text-align: center">
+                            {% if r.application.is_release %}
+                                <b>{{ r.application.version_string }}</b>
+                            {% else %}
+                                {{ r.application.version_string }}
+                            {% endif %}
+                        </td>
+                        <td style="text-align: center"> {{ users_affected }}</td>
+                        <td style="text-align: center"> {{ r['Error Type'] }} </td>
+                        <td style="padding-left: 10px"> {{ r['Error Message'] }} </td>
+                        <td style="text-align: center"> {{ r['Date'].strftime('%d %B %Y -- %I:%M %p') }} </td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% endfor %}
+
+
+{% endif %}
