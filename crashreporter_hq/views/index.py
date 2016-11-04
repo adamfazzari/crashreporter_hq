@@ -45,7 +45,7 @@ def view_reports():
         form.releases_only.data = str(NONE)
     elif released_state == ONLY:
         q = q.filter(Application.is_release == True)
-        form.hide_aliased.data = str(ONLY)
+        form.releases_only.data = str(ONLY)
 
     search_fields = [request.args.get('field%d' % (i+1)) for i in xrange(3)]
     search_values = [request.args.get('value%d' % (i+1)) for i in xrange(3)]
