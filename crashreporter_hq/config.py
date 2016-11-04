@@ -1,4 +1,4 @@
-
+from celery.schedules import crontab
 import os
 
 
@@ -20,6 +20,16 @@ REDIS_URL = 'redis://127.0.0.1:6379/0'
 # Celery
 CELERY_BROKER_URL = REDIS_URL
 CELERY_RESULT_BACKEND = REDIS_URL
+
+# Celery Beat (Periodic Task Manager)
+CELERYBEAT_SCHEDULE = {
+    # Executes every Monday morning at 7:30 A.M
+    'summary-every-monday-morning': {
+        'task': 'tasks.send_status_report',
+        'schedule': crontab(hour=7, minute=30, day_of_week=1),
+    },
+}
+
 
 # Flask-Mail
 
