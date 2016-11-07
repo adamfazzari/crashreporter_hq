@@ -12,6 +12,10 @@ from ..extensions.views import *
 from constants import *
 import operator
 
+@app.route('/hq', methods=['GET'])
+def hq():
+    return render_template('hq.html')
+
 
 @app.route('/', methods=['GET'])
 @flask_login.login_required

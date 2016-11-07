@@ -1,21 +1,20 @@
-'use strict';
 
+var app = angular.module('hq-app', ['ngMaterial', 'ngMessages']);
 
-var app = angular.module('hq-app');
-
-app.controller('ReportStats', function($scope, $http) {
+app.controller('Hq', function($scope, $http) {
 
 });
 
+
+app.controller('HQController', function($scope, $http) {
+
+});
 
 app.controller('hideAliased', function($scope, $http) {
 
 });
 
 app.controller('releasedOnly', function($scope, $http) {
-});
-
-app.controller('tabsDemoDynamicHeight',function($scope, $http) {
 });
 
 app.directive('datechart', function($http) {
@@ -111,7 +110,7 @@ app.directive('userchart', function($http) {
                 // $http.get('/reports/get_stats?type=user&show_aliased=False').then(done, fail);
 
 
-              
+
                     }
             }
 });

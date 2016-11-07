@@ -1,62 +1,63 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-  </head>
-  <body>
-    <div>
-        {% if user %}
-            <div class="page-header">
-                <div class="right-just">
-                    <span class="nav-item">
-                        Logged in as user: <b>{{ user.email }}  (<a href=" {{ url_for('logout') }}">logout</a>)</b>
-                    </span>
-                    <span class="nav-item">
-                        <a href="{{ url_for('view_reports') }}">Home</a>
-                    </span>
-                    <span class="nav-item">
-                        <a href="{{ url_for('view_report_stats') }}">Crash Statistics</a>
-                    </span>
-                    <span class="nav-item">
-                        <a href="{{ url_for('view_usage_stats') }}">Usage Statistics</a>
-                    </span>
-                    <span class="nav-item">
-                        <a href="{{ url_for('groups') }}">Group {% if user.group %} ({{ user.group.name }}) {% endif %}</a>
-                    </span>
-                    {% if user.admin %}
-                        <span class="nav-item">
-                            <a href=" {{ url_for('users') }}">Users</a>
-                        </span>
-                    {% endif %}
-                    <span class="nav-item">
-                        <a href=" {{ url_for('users', id=user.id) }}">Profile</a>
-                    </span>
-                    {% if back_link %}
-                        <span class="nav-item">
-                            <a href=" {{ back_link }}">Back</a>
-                        </span>
-                    {% endif%}
+<html lang="en" ng-app="hq-app">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='hq.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bower_components/angular-material/angular-material.css') }}">
+    <script src="{{ url_for('static', filename='bower_components/angular/angular.js') }}"></script>
+    <script src="{{ url_for('static', filename='bower_components/angular-animate/angular-animate.js') }}"></script>
+    <script src="{{ url_for('static', filename='bower_components/angular-material/angular-material.js') }}"></script>
+    <script src="{{ url_for('static', filename='bower_components/angular-aria/angular-aria.js') }}"></script>
+    <script src="{{ url_for('static', filename='bower_components/angular-messages/angular-messages.js') }}"></script>
+
+    <script src="{{ url_for('static', filename='hq.js') }}"></script>
+
+</head>
+
+<body>
+
+    <div ng-cloak layout="column" ng-controller="HQController" style="height:100%;">
+
+          <div flex layout="row">
+
+              {#   Side Navigation Bar   #}
+              <md-sidenav md-is-locked-open="$mdMedia('gt-sm')" md-component-id="left" class="navbar">
+
+                <md-toolbar>
+                    Crash Reporter HQ
+                </md-toolbar>
+                <md-toolbar>
+                    {% set menuitems =[('Home', url_for('view_reports')),
+                                       ('Groups', url_for('groups')),
+                                       ('Users', url_for('users')),
+                                       ('Crash Statistics', url_for('view_report_stats')),
+                                       ('Usage Statistics', url_for('view_usage_stats'))] %}
+
+                    {% for (name, url) in menuitems %}
+                        <md-button style="" href="{{ url }}" ng-href="{{ url }}">
+                                <span>{{ name }} </span><!-- ngIf: isSelected() -->
+                        </md-button>
+                    {% endfor %}
+                </md-toolbar>
+
+
+            </md-sidenav>
+
+            {# Main Content #}
+            <md-content flex id="content">
+                <div style="margin: 1%">
+                    {% block content %}
+                    {# Individual pages go here#}
+                    {% endblock %}
                 </div>
-            </div>
-          <br><hr>
-        {% endif %}
+            </md-content>
 
-        {% with messages = get_flashed_messages() %}
-          {% if messages %}
-            {% for message in messages %}
-                <p> {{ message }} </p><br>
-            {% endfor %}
-          {% endif %}
-        {% endwith %}
-        <div style="height: 100%">
-            {% block content %}{% endblock %}
-        </div>
-        <div id="page-footer">
-          <hr>
-            <div style="text-align: center;">
-              <p>© Calvin Lobo 2015. All rights reserved.</p>
-            </div>
-        </div>
+          </div>
+
+
     </div>
-
-  </body>
+</body>
 </html>
