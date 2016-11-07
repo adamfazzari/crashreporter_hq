@@ -86,7 +86,7 @@ def view_reports():
                 attr = getattr(CrashReport, field)
                 q = q.filter(attr.contains(str(value)))
 
-    reports = q.order_by(CrashReport.id.asc()).all()
+    reports = q.order_by(CrashReport.date.asc()).all()
     n_total_reports = len(reports)
 
     max_page = int(ceil(n_total_reports / float(PER_PAGE)))
