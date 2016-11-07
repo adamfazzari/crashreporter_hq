@@ -33,7 +33,7 @@
                 <md-toolbar>
                     Crash Reporter HQ
                 </md-toolbar>
-                <md-toolbar>
+                <md-toolbar style="height: 100%">
                     {% set menuitems =[('Home', url_for('view_reports')),
                                        ('Groups', url_for('groups')),
                                        ('Users', url_for('users')),
@@ -46,6 +46,12 @@
                         </md-button>
                     {% endfor %}
                 </md-toolbar>
+
+              <div id="copywrite">
+                <md-toolbar style="text-align: center; font-size: inherit">
+                  <p>© Calvin Lobo 2015.<br> All rights reserved.</p>
+                </md-toolbar>
+              </div>
 
 
             </md-sidenav>
