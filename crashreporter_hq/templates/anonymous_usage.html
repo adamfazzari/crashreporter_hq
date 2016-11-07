@@ -9,10 +9,11 @@
 <body>
 
     {% block content %}
+
         <div style="display: inline-block; float:left; width:100%; height: 800px; ">
             <div style="display: inline-block; width:100%; float:left;">
                 <label>User Filter:</label>
-                <select id='show_alias_selector' ng-model="showaliasSelection" style="width:100%" value="0">
+                <select id='show_alias_selector' ng-model="showaliasSelection" style="width:100%">
                     <option value="0" selected>All</option>
                     <option value="1" selected>Aliased Only</option>
                     <option value="2" selected>No Aliases</option>
@@ -35,14 +36,15 @@
             </div>
 
             <div style="display: inline-block; width:50%; float:left; height:80%;">
-                {% raw %}
                 <label>State Chart:</label>
-                <select id="stateSelection" ng-model="stateSelection" ng-options="s for s in states" style="width:100%">
+                <select id="stateSelection" ng-model="stateSelection" style="width:100%">
                     <option value="" selected>Select a Trackable State</option>
+                    {% for s in states %}
+                        <option value="{{ s }}" selected>{{ s }}</option>
+                    {% endfor %}
                 </select>
+                {% raw %}
                 <div statechart state="{{stateSelection}}" showaliases="{{showaliasSelection}}" style="height:100%;"> </div>
-
-
                 {% endraw %}
             </div>
         </div>
