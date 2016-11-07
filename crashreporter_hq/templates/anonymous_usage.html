@@ -1,18 +1,27 @@
 <!DOCTYPE html>
-<html ng-app="HQApp" lang="en">
+<html lang="en" ng-app="hq-app">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='crashreport.css') }}">
+    <title>Title</title>
 
-    <title>Usage Statistics</title>
 
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='hq.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bower_components/angular-material/angular-material.css') }}">
     <script src="{{ url_for('static', filename='bower_components/angular/angular.js') }}"></script>
-    <script src="https://www.google.com/jsapi" type="text/javascript"></script>
+    <script src="{{ url_for('static', filename='bower_components/angular-animate/angular-animate.js') }}"></script>
+    <script src="{{ url_for('static', filename='bower_components/angular-material/angular-material.js') }}"></script>
+    <script src="{{ url_for('static', filename='bower_components/angular-aria/angular-aria.js') }}"></script>
+    <script src="{{ url_for('static', filename='bower_components/angular-messages/angular-messages.js') }}"></script>
+
     <script src="{{ url_for('static', filename='bower_components/angular-google-chart/ng-google-chart.js') }}"></script>
-    <script src="{{ url_for('static', filename='usage_charts.js') }}"></script>
+    <script src="https://www.google.com/jsapi" type="text/javascript"></script>
+    <script src="{{ url_for('static', filename='hq.js') }}"></script>
+    <script src="{{ url_for('static', filename='plots.js') }}"></script>
+
 
 </head>
-<body ng-controller="UsageStats">
+
+<body>
 
     {% extends "base.html" %}
 

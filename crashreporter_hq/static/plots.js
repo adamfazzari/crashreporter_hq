@@ -3,10 +3,6 @@
 
 var app = angular.module('hq-app');
 
-app.controller('ReportStats', function($scope, $http) {
-
-});
-
 
 app.controller('hideAliased', function($scope, $http) {
 
@@ -15,8 +11,6 @@ app.controller('hideAliased', function($scope, $http) {
 app.controller('releasedOnly', function($scope, $http) {
 });
 
-app.controller('tabsDemoDynamicHeight',function($scope, $http) {
-});
 
 app.directive('datechart', function($http) {
         return {
@@ -112,6 +106,89 @@ app.directive('userchart', function($http) {
 
 
               
+                    }
+            }
+});
+
+
+app.directive('statisticchart', function($http) {
+        return {
+                  restrict: 'A',
+                  link: function($scope, elm, attr) {
+                        // Create the data table.
+                        var fail=function(err){ };
+                        console.log(attr);
+                        var done = function(resp) {
+                            var data = new google.visualization.DataTable();
+                            data.addColumn('string', 'Statistic');
+                            for (var i=0; i < resp.data['uuids'].length; i++) {
+                                data.addColumn('number', resp.data['uuids'][i]);
+                            }
+                            data.addRows(resp.data['counts']);
+                            // Set chart options
+                            var options = {'title':'Anonymous Statistics (Submissions from ' + resp.data['n_users'] + ' Users)',
+                                           'isStacked':true,
+                                           'width':'100%',
+                                           'legend': 'none',
+                                           'height':'%100'};
+                            // Instantiate and draw our chart, passing in some options.
+                            var chart = new google.visualization.ColumnChart(elm[0]);
+                            chart.draw(data, options);
+                            };
+
+                        // Make a request to get the chart data
+
+                        var update = function(value){
+                            // Make a request to get the chart data
+                            var alias = (attr.showaliases=='') ? "0": attr.showaliases;
+                            $http.get('/usage/plots/get_data?type=statistic&id=' + attr.plotid + '&hide_aliases=' + alias ).then(done, fail);
+                            };
+
+                        attr.$observe('plotid', update);
+                        attr.$observe('showaliases', update);
+
+                            }
+            }
+});
+
+app.directive('statechart', function($http) {
+        return {
+          restrict: 'A',
+          link: function(scope, elm, attr) {
+
+                    var fail=function(err){
+                        console.log(err)
+                    };
+                    var done = function(resp) {
+                        if (resp.data.counts.length > 0) {
+
+                            // Create the data table.
+                            var data = new google.visualization.DataTable();
+                            data.addColumn('string', 'State');
+                            data.addColumn('number', 'Count');
+                            data.addRows(resp.data.counts);
+                            // Set chart options
+                            var options = {
+                                'title': resp.data.name,
+                                'width': '100%',
+                                'legend': 'none',
+                                'height': '100%'
+                            };
+                            // Instantiate and draw our chart, passing in some options.
+                            var chart = new google.visualization.ColumnChart(elm[0]);
+                            chart.draw(data, options);
+                            };
+                        };
+
+                    var update = function(value){
+                        // Make a request to get the chart data
+                        var alias = (attr.showaliases=='') ? "0": attr.showaliases;
+                        $http.get('/usage/plots/get_data?type=state&name=' + attr.state + '&hide_aliases=' + alias).then(done, fail);
+                        };
+              
+                    attr.$observe('state', update);
+                    attr.$observe('showaliases', update);
+
                     }
             }
 });
