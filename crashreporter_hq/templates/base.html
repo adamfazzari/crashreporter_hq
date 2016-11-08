@@ -31,8 +31,12 @@
               <md-sidenav md-is-locked-open="$mdMedia('gt-sm')" md-component-id="left" class="navbar">
 
                 <md-toolbar>
-                    Crash Reporter HQ
+                    <h3>Crash Reporter HQ</h3>
                 </md-toolbar>
+                <md-toolbar id="logged-in-info">
+                  You are logged in as {{ user.name }}
+                </md-toolbar>
+
                 <md-toolbar style="height: 100%">
                     {% set menuitems =[('Home', url_for('view_reports')),
                                        ('Groups', url_for('groups')),
@@ -41,10 +45,14 @@
                                        ('Usage Statistics', url_for('view_usage_stats'))] %}
 
                     {% for (name, url) in menuitems %}
-                        <md-button style="" href="{{ url }}" ng-href="{{ url }}">
+                        <md-button href="{{ url }}" ng-href="{{ url }}">
                                 <span>{{ name }} </span><!-- ngIf: isSelected() -->
                         </md-button>
                     {% endfor %}
+
+                    <md-button style="" href="{{ url_for('logout') }}" ng-href="{{ url_for('logout') }}">
+                            <span>Logout</span><!-- ngIf: isSelected() -->
+                    </md-button>
                 </md-toolbar>
 
               <div id="copywrite">
