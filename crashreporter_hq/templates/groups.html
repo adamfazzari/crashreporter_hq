@@ -123,34 +123,41 @@
 
             {# The following section is visible only to administrators #}
             {% if user.group_admin and group.name == user.group.name %}
-                <div class="form">
-                    <h3> Invitations </h3>
-                    <table border="1" class="sortable", style="width:100%">
-                        <tr>
 
-                            {% for header in ('User', 'Company', 'Action') %}
-                                <td class="tableheader">{{ header }}</td>
-                            {% endfor %}
-                        </tr>
-
-                        {% for u in group.join_requests %}
+                    <div class="form">
+                        <h3> Invitations </h3>
+                        {% if group.join_requests %}
+                        <table border="1" class="sortable", style="width:100%">
                             <tr>
-                                <td style="text-align: center; width: 33%"> {{ u.name }}</td>
-                                <td style="text-align: center; width: 33%"> {{ u.company }}</td>
-                                <td style="text-align: center; width: 33%">
-                                    <div style="display:inline-flex">
-                                        <form method='POST' action="{{ url_for('group_join_request', group=group.name, user_email=u.email, action='accept') }}">
-                                            <input type="submit" value="Accept" >
-                                        </form>
-                                        <form method='POST' action="{{ url_for('group_join_request', group=group.name, user_email=u.email, action='reject') }}">
-                                            <input type="submit" value="Reject" >
-                                        </form>
-                                    </div>
-                                </td>
+
+                                {% for header in ('User', 'Company', 'Action') %}
+                                    <td class="tableheader">{{ header }}</td>
+                                {% endfor %}
                             </tr>
-                        {% endfor %}
-                    </table>
-                </div>
+
+                            {% for u in group.join_requests %}
+                                <tr>
+                                    <td style="text-align: center; width: 33%"> {{ u.name }}</td>
+                                    <td style="text-align: center; width: 33%"> {{ u.company }}</td>
+                                    <td style="text-align: center; width: 33%">
+                                        <div style="display:inline-flex">
+                                            <form method='POST' action="{{ url_for('group_join_request', group=group.name, user_email=u.email, action='accept') }}">
+                                                <input type="submit" value="Accept" >
+                                            </form>
+                                            <form method='POST' action="{{ url_for('group_join_request', group=group.name, user_email=u.email, action='reject') }}">
+                                                <input type="submit" value="Reject" >
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                        {% else %}
+                            <p>There are no pending invitations.</p>
+                        {% endif %}
+                    </div>
+
+
 
                 <br>
 
