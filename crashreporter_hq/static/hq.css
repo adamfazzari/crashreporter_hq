@@ -1,5 +1,5 @@
 
-
+/* Shown on the right hand side of the screen (ie everything not in the side navigation bar*/
 #content {
     background-image:url(images/bg.gif);
 	background-repeat:repeat-x;
@@ -27,6 +27,8 @@
 	color:#BECF96;
 	}
 
+
+/* Tables */
 table {
     background-color:#FFFFFF;
     border-collapse: collapse;
@@ -34,6 +36,14 @@ table {
     width: 100%;
     color: #000000;
 
+}
+
+.tableheader {
+    background-color:#FFFFC7;
+    font-weight: bold;
+    color: #FFFFFF;
+    background-image:url(images/bg_navigation.gif);
+    text-align: center;
 }
 
 .tableheader:hover{
@@ -44,10 +54,13 @@ table {
     background-image:url(images/bg_navigation_hover.gif);
 }
 
-.tableheader {
-    background-color:#FFFFC7;
-    font-weight: bold;
+
+.bubblebox {
+    padding: 0px 30px 20px 20px;
     color: #FFFFFF;
-    background-image:url(images/bg_navigation.gif);
-    text-align: center;
+    background-image:url(images/bg_content.gif);
+    background-color: #3e3e3e;
+    background-repeat:repeat-x;
+	border-radius: 10px;
+    border: 2px solid #000000;
 }
