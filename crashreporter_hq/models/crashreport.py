@@ -42,12 +42,12 @@ class CrashReport(db.Model):
                     'Date': 'date'}
 
     def __init__(self, **report_fields):
-        version_0, version_1, version_2 = map(int, report_fields['Application Version'])
+        version_0, version_1, version_2 = map(int, report_fields['Application Version'].split('.'))
 
-        application = Application.query().filter(Application.name == report_fields['Application Name'],
-                                                 Application.version_0 == version_0,
-                                                 Application.version_1 == version_1,
-                                                 Application.version_2 == version_2).first()
+        application = Application.query.filter(Application.name == report_fields['Application Name'],
+                                               Application.version_0 == version_0,
+                                               Application.version_1 == version_1,
+                                               Application.version_2 == version_2).first()
         if application is None:
             application = Application(report_fields['Application Name'], report_fields['Application Version'])
         self.application = application
@@ -61,8 +61,6 @@ class CrashReport(db.Model):
             self.uuid = existing_uuid
         else:
             self.uuid = UUID(report_fields['User'])
-
-        self.application.uuids.append(self.uuid)
 
         for tb in report_fields['Traceback']:
             tb = Traceback(**tb)
