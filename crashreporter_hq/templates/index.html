@@ -15,51 +15,28 @@
 
     {% block content %}
         {% if form %}
-            <form action="{{ url_for('search') }}" method="post" name="login" id="search_form">
-                {{ form.hidden_tag() }}
-            <ul>
-                <li style="list-style-type: none">
-                    <div style="display:inline ">
-                        <span>{{ form.field1() }}</span>
-                        <span>{{ form.value1(size=80) }}</span>
-                    </div>
-                </li>
+            <div ng-controller="SearchController" layout="column" style="background: white; color:black;">
 
-                <li style="list-style-type: none">
-                    <div style="display:inline ">
-                        <span>{{ form.field2() }}</span>
-                        <span>{{ form.value2(size=80) }}</span>
-                    </div>
-                </li>
+                <ul>
+                    {% for i in range(3) %}
+                        <li style="list-style-type: none">
+                            <div layout-gt-sm="row">
 
-                <li style="list-style-type: none">
-                    <div style="display:inline ">
-                        <span>{{ form.field3() }}</span>
-                        <span>{{ form.value3(size=80) }}</span>
-                    </div>
-                </li>
-                <li style="list-style-type: none">
-                    <div style="display:inline ">
-                        <span>{{ form.hide_aliased }}</span>
-                        <span>{{ form.hide_aliased_label }}</span>
-                    </div>
-                </li>
-                <li style="list-style-type: none">
-                    <div style="display:inline ">
-                        <span>{{ form.releases_only }}</span>
-                        <span>{{ form.releases_only_label }}</span>
-                    </div>
-                </li>
-                <li style="list-style-type: none">
-                    <input type='submit' name='search', value="Search"></input>
-                </li>
-            </ul>
+                                <md-input-container style="width: 20%">
+                                    <md-select ng-model={{ "searchform.field%d" % i }} placeholder="Choose a field">
+                                    {% raw %}
+                                        <md-option ng-repeat="s in searchfields" ng-value="s.value">{{ s.field }}</md-option>
+                                    {% endraw %}
+                                    </md-select>
+                                </md-input-container>
+                                <md-input-container style="width: 40%">
+                                <input ng-model='{{ "searchform.value%d" % i }}' ng-value={{ "searchform.field%d" % i }}>
+                                </md-input-container>
+                            </div>
+                        </li>
+                    {% endfor %}
 
-                {% for error in form.errors %}
-                    <span style="color: red;">[{{ error }}]</span>
-                {% endfor %}<br>
-            </form>
-
+            </div>
         {% endif %}
 
 
