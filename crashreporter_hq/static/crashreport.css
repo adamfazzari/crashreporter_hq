@@ -1,236 +1,55 @@
 
-/*.appbody {*/
-	/*background-image:url(images/bg.gif);*/
-	/*background-repeat:repeat-x;*/
-	/*background-color:#121212;*/
-	/*font-family: Arial, Helvetica, sans-serif;*/
-    /*font-size:16px;*/
-    /*color: #FFFFFF;*/
-    /*margin: 1%;*/
-/*}*/
 
-/*a:link {*/
-    /*color: red;*/
-/*}*/
+.container {
+    margin: 10px;
+    padding: 0px 10px;
+    color: #000000;
+    background-color:#FFFFC7;
+    border:1px solid #000000;
+}
+.container div {
+    width:100%;
+}
 
-/*a:visited {*/
-    /*color: red;*/
-/*}*/
+.container .header {
+    background-color:#FFFFC7;
+    padding: 0px;
+    cursor: pointer;
+    font-weight: bold;
+}
+.container .content {
+    display: none;
+    width: 100%;
+    padding : 0px;
+}
 
-/*.nav-item {*/
-    /*padding: 5px;*/
-/*}*/
-
-/*#page-header {*/
-    /*width: 100%;*/
-/*}*/
-
-/*.left-just {*/
-    /*display:block;*/
-    /*float:left;*/
-/*}*/
-
-/*.right-just {*/
-    /*display:block;*/
-    /*float:right;*/
-/*}*/
-
-/*#page-footer {*/
-	/*height:90px;*/
-	/*line-height:30px;*/
-	/*padding:8px 0px;*/
-	/*background-repeat:no-repeat;*/
-    /*font-family: Arial, Helvetica, sans-serif;*/
-	/*font-size:12px;*/
-	/*color:#BECF96;*/
-	/*}*/
-
-/*.container {*/
-    /*margin: 10px;*/
-    /*padding: 0px 10px;*/
-    /*color: #000000;*/
-    /*background-color:#FFFFC7;*/
+.contentitem {
+    max-width: 95%;
+    margin: 20px;
+    padding: 10px;
     /*border:1px solid #000000;*/
-/*}*/
+    display: block;
+}
 
-/*.password div {*/
-    /*width:100%;*/
-    /*background-color:#FFF099;*/
-    /*margin: 20%;*/
+.codeblock {
+    background-color:#FFFFFF;
+    border-style:solid;
+    border-width: 1px;
+    font-weight: bold;
+}
 
-/*}*/
+.variabletable {
+    background-color:#FFFFFF;
+}
 
-/*.container div {*/
-    /*width:100%;*/
-/*}*/
+.varcolumn {
+    padding: 5px;
+    width: 30%;
+    font-weight: bold;
+}
 
-/*.container .header {*/
-    /*background-color:#FFFFC7;*/
-    /*padding: 0px;*/
-    /*cursor: pointer;*/
-    /*font-weight: bold;*/
-/*}*/
-/*.container .content {*/
-    /*display: none;*/
-    /*width: 100%;*/
-    /*padding : 0px;*/
-/*}*/
-
-/*.contentitem {*/
-    /*max-width: 95%;*/
-    /*margin: 20px;*/
-    /*padding: 10px;*/
-    /*!*border:1px solid #000000;*!*/
-    /*display: block;*/
-/*}*/
-
-/*.codeblock {*/
-    /*background-color:#FFFFFF;*/
-    /*border-style:solid;*/
-    /*border-width: 1px;*/
-    /*font-weight: bold;*/
-/*}*/
-
-/*.variabletable {*/
-    /*background-color:#FFFFFF;*/
-/*}*/
-
-/*table {*/
-    /*background-color:#FFFFFF;*/
-    /*border-collapse: collapse;*/
-    /*border-color: #000000;*/
-    /*width: 100%;*/
-    /*color: #000000;*/
-
-/*}*/
-
-/*.varcolumn {*/
-    /*padding: 5px;*/
-    /*width: 30%;*/
-    /*font-weight: bold;*/
-/*}*/
-
-/*.valcolumn {*/
-    /*padding: 5px;*/
-    /*width: 70%;*/
-    /*font-weight: bold;*/
-/*}*/
-
-/*.tableheader:hover{*/
-    /*background-color:#FFFFC7;*/
-    /*font-weight: bold;*/
-    /*color: #FFFFFF;*/
-    /*cursor: pointer;*/
-    /*background-image:url(images/bg_navigation_hover.gif);*/
-/*}*/
-
-/*.tableheader {*/
-    /*background-color:#FFFFC7;*/
-    /*font-weight: bold;*/
-    /*color: #FFFFFF;*/
-    /*background-image:url(images/bg_navigation.gif);*/
-    /*text-align: center;*/
-/*}*/
-
-
-/*#form-page {*/
-    /*background-color:#121212;*/
-    /*!*margin: 10% 20%;*!*/
-/*}*/
-
-/*.form {*/
-    /*padding: 0px 30px 20px 20px;*/
-    /*color: #FFFFFF;*/
-    /*background-image:url(images/bg_content.gif);*/
-    /*background-color: #3e3e3e;*/
-    /*background-repeat:repeat-x;*/
-	/*border-radius: 10px;*/
-    /*border: 2px solid #000000;*/
-/*}*/
-
-/*.form ul {*/
-    /*margin: 0px;*/
-    /*padding: 0px 0px 0px 0px;*/
-/*}*/
-
-/*.form input:not([type=submit]) {*/
-    /*width: 100%;*/
-	/*padding: 5px;*/
-	/*margin-right: 10px;*/
-	/*margin-bottom: 10px;*/
-	/*border: 1px solid rgba(0, 0, 0, 0.3);*/
-	/*border-radius: 3px;*/
-	/*box-shadow: inset 0px 1px 3px 0px rgba(0, 0, 0, 0.1),*/
-				/*0px 1px 0px 0px rgba(250, 250, 250, 0.5) ;*/
-/*}*/
-
-/*.form li {*/
-    /*display: inline-block;*/
-    /*width: 100%;*/
-/*}*/
-
-/*.form span {*/
-	/*display: block;*/
-	/*padding: 5px 15px 5px 15px;*/
-/*}*/
-
-/*.form form input[type=submit] {*/
-	/*border: 1px solid rgba(0, 0, 0, 0.3);*/
-	/*background: #64c8ef; !* Old browsers *!*/
-	/*background: -moz-linear-gradient(top,  #64c8ef 0%, #00a2e2 100%); !* FF3.6+ *!*/
-	/*background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#64c8ef), color-stop(100%,#00a2e2)); !* Chrome,Safari4+ *!*/
-	/*background: -webkit-linear-gradient(top,  #64c8ef 0%,#00a2e2 100%); !* Chrome10+,Safari5.1+ *!*/
-	/*background: -o-linear-gradient(top,  #64c8ef 0%,#00a2e2 100%); !* Opera 11.10+ *!*/
-	/*background: -ms-linear-gradient(top,  #64c8ef 0%,#00a2e2 100%); !* IE10+ *!*/
-	/*background: linear-gradient(to bottom,  #64c8ef 0%,#00a2e2 100%); !* W3C *!*/
-	/*filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#64c8ef', endColorstr='#00a2e2',GradientType=0 ); !* IE6-9 *!*/
-	/*color: #fff;*/
-	/*padding: 5px 15px;*/
-	/*margin-right: 0;*/
-	/*margin-top: 0px;*/
-	/*border-radius: 3px;*/
-	/*text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.3);*/
-/*}*/
-
-/*.form textarea {*/
-  /*width: 100%;*/
-  /*height: 100px;*/
-  /*float: left;*/
-  /*background-color: #fafafa;*/
-  /*-webkit-border-radius: 3px;*/
-     /*-moz-border-radius: 3px;*/
-          /*border-radius: 3px;*/
-  /*border: 1px solid #cccccc;*/
-  /*margin-bottom: 10px;*/
-  /*padding: 5px;*/
-  /*font-size: 1.1em;*/
-/*}*/
-
-/*form legend {*/
-  /*font-size: 1.2em;*/
-  /*font-weight: bold;*/
-/*}*/
-
-/*form label {*/
-  /*font-size: 1.1em;*/
-  /*font-weight: bold;*/
-  /*display: inline-block;*/
-  /*width: 150px;*/
-  /*float: left;*/
-/*}*/
-
-/*fieldset p {*/
-    /*width: 100%;*/
-    /*clear: both;*/
-    /*padding: 0px;*/
-/*}*/
-
-/*!*.tabsdemoDynamicHeight md-content {*!*/
-  /*!*background-color: transparent !important; }*!*/
-  /*!*.tabsdemoDynamicHeight md-content md-tabs {*!*/
-    /*!*background: #f6f6f6;*!*/
-    /*!*border: 1px solid #e1e1e1; }*!*/
-    /*!*.tabsdemoDynamicHeight md-content md-tabs md-tabs-wrapper {*!*/
-      /*!*background: white; }*!*/
-  /*!*.tabsdemoDynamicHeight md-content h1:first-child {*!*/
-    /*!*margin-top: 0; }*!*/
+.valcolumn {
+    padding: 5px;
+    width: 70%;
+    font-weight: bold;
+}
