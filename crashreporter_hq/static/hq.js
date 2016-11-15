@@ -57,6 +57,7 @@ app.controller('SearchController', function($scope, $http, reportService){
         $http.post('/search', JSON.stringify($scope.searchform)).success(function(data){
             $scope.pagination = {page: data.page,
                                  pages: data.pages,
+                                 max_page: data.max_page,
                                  total_reports: data.total_reports};
             $scope.reports = data.reports;
         })

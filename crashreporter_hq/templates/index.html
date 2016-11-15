@@ -41,22 +41,26 @@
                  </section>
             </ul>
 
-
-            <div layout="row" layout-sm="column" layout-align="center center" style="height: 50px">
+            <div layout="column" layout-sm="column" layout-align="center center" style="height: 100px">
+                <div layout-gt-sm="row">
+                    <p> Page {a pagination.page a} of {a pagination.max_page a}</p>
+                </div>
+                <div layout-gt-sm="row">
                     <md-button style="width: 10px" ng-repeat="p in pagination.pages" ng-click="submitSearch(p)">
                         {a p a}
                     </md-button>
+                </div>
             </div>
 
 
-            <table border="1" style="width:100%;">
+            <table border="1" style="width:100%;" class="reporttable">
                 <tr>
                     {% for header in ('Report #', 'Count', 'Application Name', 'Version', 'User', 'Error Type', 'Error Message', 'Date/Time', '', '') %}
                         <td class="tableheader">{{ header }}</td>
                     {% endfor %}
                 </tr>
 
-                <tr ng-repeat="r in reports" class="reporttable">
+                <tr ng-repeat="r in reports">
                     <td>{a r.report_number a}</td>
                     <td><a href="/reports/related/{a r.report_number a}">{a r.n_similar a}</a></td>
                     <td>{a r.application_name a}</td>

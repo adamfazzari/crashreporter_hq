@@ -87,7 +87,11 @@ def filter_reports(criteria):
     n_reports = q.count()
     max_page = int(ceil(float(n_reports) / n_per_page))
     reports = q[n_per_page * (page-1):n_per_page * page]
-    response = {'reports': [], 'page': page, 'pages': range(1, max_page+1), 'total_reports': n_reports}
+    response = {'reports': [],
+                'page': page,
+                'pages': range(1, max_page+1),
+                'max_page': max_page,
+                'total_reports': n_reports}
     aliases = {a.user_identifier: a.alias for a in group.aliases}
 
     for r in reports:
