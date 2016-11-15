@@ -14,83 +14,62 @@
     {% extends "base.html" %}
 
     {% block content %}
-        {% if form %}
-            <div ng-controller="SearchController" layout="column" style="background: white; color:black;">
 
-                <ul>
-                    {% for i in range(3) %}
-                        <li style="list-style-type: none">
-                            <div layout-gt-sm="row">
+        <form ng-controller="SearchController" ng-submit="submitSearch()" method="post" layout="column" style="background: white; color:black;">
+            <ul>
+                {% for i in range(3) %}
+                    <li style="list-style-type: none">
+                        <div layout-gt-sm="row">
 
-                                <md-input-container style="width: 20%">
-                                    <md-select ng-model={{ "searchform.field%d" % i }} placeholder="Choose a field">
-                                    {% raw %}
-                                        <md-option ng-repeat="s in searchfields" ng-value="s.value">{{ s.field }}</md-option>
-                                    {% endraw %}
-                                    </md-select>
-                                </md-input-container>
-                                <md-input-container style="width: 40%">
-                                <input ng-model='{{ "searchform.value%d" % i }}' ng-value={{ "searchform.field%d" % i }}>
-                                </md-input-container>
-                            </div>
-                        </li>
+                            <md-input-container style="width: 20%">
+                                <md-select ng-model={{ "searchform.field%d" % i }} placeholder="Choose a field">
+                                {% raw %}
+                                    <md-option ng-repeat="s in searchfields" ng-value="s.value">{{ s.field }}</md-option>
+                                {% endraw %}
+                                </md-select>
+                            </md-input-container>
+                            <md-input-container style="width: 40%">
+                            <input ng-model='{{ "searchform.value%d" % i }}' ng-value={{ "searchform.field%d" % i }}>
+                            </input>
+                            </md-input-container>
+                        </div>
+                    </li>
+                {% endfor %}
+                 <section layout="row" layout-sm="column" layout-align="left center" layout-wrap>
+                    <md-button type='submit' class="md-raised" name="search_button">
+                        Search
+                    </md-button>
+                 </section>
+            </ul>
+        </form>
+
+
+            <table ng-controller="SearchResultsController" border="1" style="width:100%;">
+                <tr>
+                    {% for header in ('Report #', 'Count', 'Application Name', 'Version', 'User', 'Error Type', 'Error Message', 'Date/Time') %}
+                        <td class="tableheader">{{ header }}</td>
                     {% endfor %}
+                </tr>
 
-            </div>
-        {% endif %}
-
-
-        <div style="text-align: center;">
-            {{ pagination.info }}
-            {{ pagination.links }}
-        </div>
-
-            {% if reports %}
-
-                <table border="1" class="sortable", style="width:100%">
-                    <tr>
-
-                        {% for header in ('Report #', 'Count', 'Application Name', 'Version', 'User', 'Error Type', 'Error Message', 'Date/Time') %}
-                            <td class="tableheader">{{ header }}</td>
-                        {% endfor %}
-                    </tr>
-
-                    {% for r in reports %}
-                        <tr>
-                                <td style="text-align: center"> {{ r['Report Number'] }} </td>
-                                <td style="text-align: center"> <a href="{{ url_for('view_related_reports', report_id=r.id) }}">{{ r.related_reports|length + 1}}</a></td>
-                                <td style="text-align: center"> {{ r.application.name }} </td>
-                                <td style="text-align: center">
-                                    {% if r.application.is_release %}
-                                        <b>{{ r.application.version_string }}</b>
-                                    {% else %}
-                                        {{ r.application.version_string }}
-                                    {% endif %}
-                                </td>
-                                <td style="text-align: center"> {{ aliases.get(r['User'].user_identifier, r['User'].user_identifier) }} </td>
-                                <td style="text-align: center"> {{ r['Error Type'] }} </td>
-                                <td style="padding-left: 10px"> {{ r['Error Message'] }} </td>
-                                <td style="text-align: center"> {{ r['Date'].strftime('%d %B %Y -- %I:%M %p') }} </td>
-                            <td>
-                                <form method='GET' action="{{ url_for('view_report', report_number=r['Report Number']) }}">
-                                    <input type="submit" value="Open" >
-                                </form>
-                            </td>
-                            {% if user.group_admin %}
-                                <td>
-                                    <form method='POST' action="{{ url_for('delete_report', report_numbers=r['Report Number']) }}">
-                                        <input type="submit" value="Delete" >
-                                    </form>
-                                </td>
-                            {% endif %}
-                        </tr>
-                    {% endfor %}
-                </table>
-            {% endif %}
-
-        <div style="text-align: center;">
-            {{ pagination.links }}
-        </div>
+            {% raw %}
+              <tr ng-repeat="r in reports">
+                  <td>{{ r.report_number}}</td>
+                  <td><a href="/reports/related/{{r.report_number}}">{{ r.n_similar}}</a></td>
+                  <td>{{ r.application_name}}</td>
+                  <td>{{ r.application_version}}</td>
+                  <td>{{ r.user}}</td>
+                  <td>{{ r.error_type}}</td>
+                  <td>{{ r.error_message}}</td>
+                  <td>{{ r.date}}</td>
+                  <td>
+                      <a href="/reports/{{r.report_number}}" class="md-raised">Open</a>
+                  </td>
+                  <td>
+                      <a href="/reports/{{r.report_number}}/delete" class="md-raised">Delete</a>
+                  </td>
+              </tr>
+            {% endraw %}
+            </table>
 
         {% if user.group_admin and show_delete %}
             <form action={{ url_for('delete_report', delete_similar=True, report_numbers=','.join(report_numbers)) }} method="post" name="login" >

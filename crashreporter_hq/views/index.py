@@ -1,3 +1,5 @@
+import flask
+from flask import Response
 from flask.ext.paginate import Pagination
 from datetime import datetime
 from math import ceil
@@ -10,11 +12,92 @@ from ..forms import SearchReportsForm
 from ..models import CrashReport, Application
 from ..extensions.views import *
 from constants import *
+
+import httplib
 import operator
+
 
 @app.route('/hq', methods=['GET'])
 def hq():
     return render_template('hq.html')
+
+
+def filter_reports(criteria):
+    user = flask_login.current_user
+    group = user.group
+
+    q = get_similar_reports(return_query=True)
+    q = q.join(Application).filter(CrashReport.group == group)
+
+    # Filter aliased state
+    aliased_state = int(request.args.get('hide_aliased', ANY))
+    if aliased_state == NONE:
+        q = q.filter(CrashReport.uuid_id.notin_([a.uuid_id for a in group.aliases]))
+    elif aliased_state == ONLY:
+        q = q.filter(CrashReport.uuid_id.in_([a.uuid_id for a in group.aliases]))
+
+    # Filter released state
+    released_state = int(request.args.get('releases_only', ANY))
+    if released_state == NONE:
+        q = q.filter(Application.is_release == False)
+    elif released_state == ONLY:
+        q = q.filter(Application.is_release == True)
+
+    search_fields = [criteria.get('field%d' % i) for i in xrange(3)]
+    search_values = [criteria.get('value%d' % i) for i in xrange(3)]
+    if any(search_values):
+        for ii, (field, value) in enumerate(zip(search_fields, search_values)):
+            if not value:
+                continue
+
+            if field == 'user_identifier':
+                # Search the user identifiers associated with any aliases that may be part of the search
+                conditions = [UUID.user_identifier.contains(a.user_identifier) for a in group.aliases if
+                              value in a.alias]
+                conditions.append(UUID.user_identifier.contains(value))
+                logic_or = or_(*conditions)
+                q = q.filter(logic_or).join(UUID)
+            elif field == 'date':
+                date = datetime.strptime(value, '%d %B %Y').strftime('%Y-%m-%d')
+                q = q.filter(func.date(CrashReport.date) == date)
+            elif field == 'before_date':
+                date = datetime.strptime(value, '%d %B %Y')
+                q = q.filter(CrashReport.date <= date)
+            elif field == 'after_date':
+                date = datetime.strptime(value, '%d %B %Y')
+                q = q.filter(CrashReport.date >= date)
+            elif field == 'application_name':
+                q = q.filter(Application.name.contains(value))
+            elif field in ('application_version', 'after_version', 'before_version'):
+                v0, v1, v2 = map(int, value.split('.'))
+                op = {'application_version': operator.eq,
+                      'after_version': operator.ge,
+                      'before_version': operator.le}[field]
+                q = q.filter(op(Application.version_0, v0),
+                             op(Application.version_1, v1),
+                             op(Application.version_2, v2))
+
+            else:
+                attr = getattr(CrashReport, field)
+                q = q.filter(attr.contains(str(value)))
+
+    reports = q.order_by(CrashReport.id.asc()).all()
+    response = {'reports': []}
+    aliases = {a.user_identifier: a.alias for a in group.aliases}
+
+    for r in reports:
+        response['reports'].append({'report_number': r.id,
+                                    'n_similar': len(r.related_reports),
+                                    'application_name': r.application.name,
+                                    'application_version': r.application.version_string,
+                                    'is_release': r.application.is_release,
+                                    'user': aliases.get(r.uuid.user_identifier, r.uuid.user_identifier),
+                                    'error_type': r.error_type,
+                                    'error_message': r.error_message,
+                                    'date': r.date.strftime('%d %B %Y -- %I:%M %p')
+                                    })
+    json = flask.jsonify(response)
+    return json
 
 
 @app.route('/', methods=['GET'])
@@ -120,11 +203,13 @@ def view_reports():
 
 # This search view is needed because there doesn't seem to be a way to get the pagination links to update
 # the page number while maintaining the search form.
-@app.route('/search', methods=['GET', 'POST'])
+@app.route('/search', methods=['POST'])
 @flask_login.login_required
 def search():
-    form = SearchReportsForm()
-    if flask_login.current_user.group and form.validate_on_submit():
-        return redirect(url_for('view_reports', **form.data))
+    if flask_login.current_user.group:
+        form_data = request.get_json()
+        return filter_reports(form_data)
     else:
-        return redirect(url_for('view_reports'))
+        r = Response()
+        r.status_code = httplib.FORBIDDEN
+        r.data = 'Invalid access. You must log in first.'

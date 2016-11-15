@@ -1,6 +1,11 @@
 
 var app = angular.module('hq-app', ['ngMaterial', 'ngMessages']);
 
+app.factory('reportService', function(){
+   return {'reports': []}
+
+});
+
 app.controller('Hq', function($scope, $http) {
 
 });
@@ -11,7 +16,16 @@ app.controller('HQController', function($scope, $http) {
 });
 
 
-app.controller('SearchController', function($scope){
+app.controller('SearchResultsController', function($scope, $http, reportService){
+    $scope.reportService = reportService;
+
+    $scope.$watch('reportService.reports', function(newVal){
+        $scope.reports = newVal;
+    });
+
+});
+
+app.controller('SearchController', function($scope, $http, reportService){
 
     $scope.searchfields = [
                           {field: 'User', value: 'user_identifier'},
@@ -32,6 +46,12 @@ app.controller('SearchController', function($scope){
                          field2: '', value2: '',
                          field3: '', value3: ''
                         };
+
+    $scope.submitSearch = function() {
+        $http.post('/search', JSON.stringify($scope.searchform)).success(function(data){
+            reportService.reports = data.reports;
+        })
+    };
 
 });
 
