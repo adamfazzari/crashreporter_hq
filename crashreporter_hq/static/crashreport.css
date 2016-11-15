@@ -1,23 +1,18 @@
-
-
 .container {
-    margin: 10px;
+    margin: 5px 0px;
     padding: 0px 10px;
     color: #000000;
     background-color:#FFFFC7;
-    border:1px solid #000000;
+    border: 2px solid #000000;
+    border-radius: 5px;
 }
-.container div {
-    width:100%;
-}
-
-.container .header {
+.header {
     background-color:#FFFFC7;
     padding: 0px;
     cursor: pointer;
     font-weight: bold;
 }
-.container .content {
+.content {
     display: none;
     width: 100%;
     padding : 0px;
@@ -25,20 +20,23 @@
 
 .contentitem {
     max-width: 95%;
-    margin: 20px;
+    margin: 0px;
     padding: 10px;
-    /*border:1px solid #000000;*/
     display: block;
 }
 
 .codeblock {
     background-color:#FFFFFF;
+    width: 100%;
     border-style:solid;
-    border-width: 1px;
+    border-width: 2px;
+    border-radius: 5px;
+    padding: 5px;
     font-weight: bold;
 }
 
 .variabletable {
+    width: 100%;
     background-color:#FFFFFF;
 }
 
