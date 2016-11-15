@@ -48,6 +48,11 @@ table {
 
 }
 
+.reporttable td {
+    text-align: center;
+}
+
+
 .tableheader {
     background-color:#FFFFC7;
     font-weight: bold;
