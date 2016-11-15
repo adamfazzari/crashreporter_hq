@@ -1,6 +1,12 @@
 
 var app = angular.module('hq-app', ['ngMaterial', 'ngMessages']);
 
+// Change the templating symbol for angularjs so it doesn't conflict with Jinja
+app.config(['$interpolateProvider', function($interpolateProvider) {
+  $interpolateProvider.startSymbol('{a');
+  $interpolateProvider.endSymbol('a}');
+}]);
+
 app.factory('reportService', function(){
    return {'reports': []}
 
