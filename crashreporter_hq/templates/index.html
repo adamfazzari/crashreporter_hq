@@ -33,39 +33,49 @@
                         </div>
                     </li>
                 {% endfor %}
+
                  <section layout="row" layout-sm="column" layout-align="left center" layout-wrap>
-                    <md-button type='submit' class="md-raised" name="search_button">
+                    <md-button ng-click="submitSearch()" class="md-raised" name="search_button">
                         Search
                     </md-button>
                  </section>
             </ul>
+
+
+            <div layout="row" layout-sm="column" layout-align="center center" style="height: 50px">
+                    <md-button style="width: 10px" ng-repeat="p in pagination.pages" ng-click="submitSearch(p)">
+                        {a p a}
+                    </md-button>
+            </div>
+
+
+            <table border="1" style="width:100%;">
+                <tr>
+                    {% for header in ('Report #', 'Count', 'Application Name', 'Version', 'User', 'Error Type', 'Error Message', 'Date/Time', '', '') %}
+                        <td class="tableheader">{{ header }}</td>
+                    {% endfor %}
+                </tr>
+
+                <tr ng-repeat="r in reports" class="reporttable">
+                    <td>{a r.report_number a}</td>
+                    <td><a href="/reports/related/{a r.report_number a}">{a r.n_similar a}</a></td>
+                    <td>{a r.application_name a}</td>
+                    <td>{a r.application_version a}</td>
+                    <td>{a r.user a}</td>
+                    <td>{a r.error_type a}</td>
+                    <td>{a r.error_message a}</td>
+                    <td>{a r.date a}</td>
+                    <td>
+                        <a href="/reports/{a r.report_number a}" class="md-raised">Open</a>
+                    </td>
+                    <td>
+                        <a href="/reports/{a r.report_number a}/delete" class="md-raised">Delete</a>
+                    </td>
+                </tr>
+            </table>
+
         </form>
 
-
-        <table ng-controller="SearchResultsController" border="1" style="width:100%;">
-            <tr>
-                {% for header in ('Report #', 'Count', 'Application Name', 'Version', 'User', 'Error Type', 'Error Message', 'Date/Time', '', '') %}
-                    <td class="tableheader">{{ header }}</td>
-                {% endfor %}
-            </tr>
-
-            <tr ng-repeat="r in reports" class="reporttable">
-                <td>{a r.report_number a}</td>
-                <td><a href="/reports/related/{a r.report_number a}">{a r.n_similar a}</a></td>
-                <td>{a r.application_name a}</td>
-                <td>{a r.application_version a}</td>
-                <td>{a r.user a}</td>
-                <td>{a r.error_type a}</td>
-                <td>{a r.error_message a}</td>
-                <td>{a r.date a}</td>
-                <td>
-                    <a href="/reports/{a r.report_number a}" class="md-raised">Open</a>
-                </td>
-                <td>
-                    <a href="/reports/{a r.report_number a}/delete" class="md-raised">Delete</a>
-                </td>
-            </tr>
-        </table>
 
         {% if user.group_admin and show_delete %}
             <form action={{ url_for('delete_report', delete_similar=True, report_numbers=','.join(report_numbers)) }} method="post" name="login" >

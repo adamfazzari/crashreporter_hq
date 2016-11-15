@@ -22,17 +22,9 @@ app.controller('HQController', function($scope, $http) {
 });
 
 
-app.controller('SearchResultsController', function($scope, $http, reportService){
-    $scope.reportService = reportService;
-
-    $scope.$watch('reportService.reports', function(newVal){
-        $scope.reports = newVal;
-    });
-
-});
-
 app.controller('SearchController', function($scope, $http, reportService){
-
+    $scope.reports = [];
+    
     $scope.searchfields = [
                           {field: 'User', value: 'user_identifier'},
                           {field: 'Application Name', value: 'application_name'},
@@ -50,14 +42,27 @@ app.controller('SearchController', function($scope, $http, reportService){
 
     $scope.searchform = {field1: '', value1: '',
                          field2: '', value2: '',
-                         field3: '', value3: ''
+                         field3: '', value3: '',
+                         page: 1, reports_per_page : 25
                         };
+    
 
-    $scope.submitSearch = function() {
+    $scope.submitSearch = function(page) {
+        if (page == undefined) {
+            $scope.searchform.page = 1;
+        } else {
+            $scope.searchform.page = page;
+        }
+        
         $http.post('/search', JSON.stringify($scope.searchform)).success(function(data){
-            reportService.reports = data.reports;
+            $scope.pagination = {page: data.page,
+                                 pages: data.pages,
+                                 total_reports: data.total_reports};
+            $scope.reports = data.reports;
         })
     };
+
+    $scope.submitSearch();
 
 });
 

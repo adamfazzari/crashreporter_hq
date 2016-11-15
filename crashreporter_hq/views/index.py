@@ -81,8 +81,13 @@ def filter_reports(criteria):
                 attr = getattr(CrashReport, field)
                 q = q.filter(attr.contains(str(value)))
 
-    reports = q.order_by(CrashReport.id.asc()).all()
-    response = {'reports': []}
+    page = criteria.get('page', 1)
+    n_per_page = criteria.get('reports_per_page')
+    q = q.order_by(CrashReport.id.asc())
+    n_reports = q.count()
+    max_page = int(ceil(float(n_reports) / n_per_page))
+    reports = q[n_per_page * (page-1):n_per_page * page]
+    response = {'reports': [], 'page': page, 'pages': range(1, max_page+1), 'total_reports': n_reports}
     aliases = {a.user_identifier: a.alias for a in group.aliases}
 
     for r in reports:
