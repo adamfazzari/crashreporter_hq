@@ -84,7 +84,7 @@ def view_report_stats():
         r = db.session.query(CrashReport, func.count(CrashReport.id).label('total'))\
                       .group_by(CrashReport.related_group_id) \
                       .filter(CrashReport.application.has(version_0=v0, version_1=v1, version_2=v2)) \
-                      .order_by('total DESC').all()
+                      .order_by('total DESC').limit(5)
         if r:
             top_reports[r[0][0].application.name] = r
 
