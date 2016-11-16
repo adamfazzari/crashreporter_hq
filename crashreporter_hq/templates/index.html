@@ -16,31 +16,55 @@
     {% block content %}
 
         <form ng-controller="SearchController" ng-submit="submitSearch()" method="post" layout="column" style="background: white; color:black;">
-            <ul>
-                {% for i in range(3) %}
-                    <li style="list-style-type: none">
-                        <div layout-gt-sm="row">
 
-                            <md-input-container style="width: 20%">
-                                <md-select ng-model={{ "searchform.field%d" % i }} placeholder="Choose a field">
-                                    <md-option ng-repeat="s in searchfields" ng-value="s.value">{a s.field a}</md-option>
-                                </md-select>
-                            </md-input-container>
-                            <md-input-container style="width: 40%">
-                            <input ng-model='{{ "searchform.value%d" % i }}' ng-value={{ "searchform.field%d" % i }}>
+            {#   Search form starts here     #}
+            <div layout="column" style="padding: 0px 50px">
+                <div layout-gt-sm="column" ng-repeat="c in searchform.filters">
+                    <div layout-gt-sm="row">
+
+                        <md-input-container style="width: 15%">
+                            <md-select  ng-model="c[0]" placeholder="Choose a field">
+                                <md-option ng-repeat="s in searchfields"
+                                           ng-value="s.value">
+
+                                                {a s.field a}
+
+                                </md-option>
+                            </md-select>
+                        </md-input-container>
+
+                        <md-input-container style="width: 30%">
+                            <input ng-model="c[1]"
+                                   ng-value="c[1]">
+
                             </input>
-                            </md-input-container>
-                        </div>
-                    </li>
-                {% endfor %}
+                        </md-input-container>
 
-                 <section layout="row" layout-sm="column" layout-align="left center" layout-wrap>
-                    <md-button ng-click="submitSearch()" class="md-raised" name="search_button">
-                        Search
-                    </md-button>
-                     <md-progress-circular id="searchprogress" class="ng-hide" md-mode="indeterminate" ng-hide="!is_searching"></md-progress-circular>
-                 </section>
-            </ul>
+                        <md-input-container>
+                            <md-button ng-click="removeFilter(c)"
+                                       ng-hide="searchform.filters.indexOf(c)==0"
+                                       class="md-raised"
+                                       name="remove_filter_button">
+
+                                            Remove Field
+                            </md-button>
+                        </md-input-container>
+
+                    </div>
+                </div>
+                <div layout-gt-sm="row" layout-align="left">
+                    <md-input-container>
+                        <md-button ng-click="addFilter()" class="md-raised" name="add_filter_button">Add Field</md-button>
+                    </md-input-container>
+
+                    <section layout="row" layout-sm="column" layout-align="left center" layout-wrap>
+                        <md-button ng-click="submitSearch()" class="md-raised" name="search_button">Search</md-button>
+                        <md-progress-circular id="searchprogress" class="ng-hide" md-mode="indeterminate" ng-hide="!is_searching"></md-progress-circular>
+                    </section>
+                </div>
+            </div>
+            {#   Search form ends here     #}
+
 
             <div layout="column" layout-sm="column" layout-align="center center" style="height: 100px">
                 <div layout-gt-sm="row">

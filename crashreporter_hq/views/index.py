@@ -43,8 +43,8 @@ def filter_reports(criteria):
     elif released_state == ONLY:
         q = q.filter(Application.is_release == True)
 
-    search_fields = [criteria.get('field%d' % i) for i in xrange(3)]
-    search_values = [criteria.get('value%d' % i) for i in xrange(3)]
+    search_fields, search_values = zip(*criteria.get('filters', [('', '')]))
+
     if any(search_values):
         for ii, (field, value) in enumerate(zip(search_fields, search_values)):
             if not value:

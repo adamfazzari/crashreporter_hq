@@ -40,12 +40,19 @@ app.controller('SearchController', function($scope, $http){
     ];
 
 
-    $scope.searchform = {field1: '', value1: '',
-                         field2: '', value2: '',
-                         field3: '', value3: '',
+    $scope.searchform = {filters: [['', '']],
                          page: 1, reports_per_page : 25
                         };
     
+    $scope.addFilter = function() {
+        $scope.searchform.filters.push(['', '']);
+    };
+    
+
+    $scope.removeFilter = function(criteria) {
+        $scope.searchform.filters.splice($scope.searchform.filters.indexOf(criteria), 1);
+    };
+
 
     $scope.submitSearch = function(page) {
         $scope.is_searching = true;
