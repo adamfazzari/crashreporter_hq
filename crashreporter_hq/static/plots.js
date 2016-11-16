@@ -3,14 +3,10 @@
 
 var app = angular.module('hq-app');
 
-
-app.controller('hideAliased', function($scope, $http) {
-
+app.controller('ReportPlotsController', function($scope) {
+    $scope.hide_aliased = true;
+    $scope.released_only = false;
 });
-
-app.controller('releasedOnly', function($scope, $http) {
-});
-
 
 app.directive('datechart', function($http) {
         return {

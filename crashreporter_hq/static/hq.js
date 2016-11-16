@@ -21,7 +21,6 @@ app.controller('HQController', function($scope, $http) {
 
 });
 
-
 app.controller('SearchController', function($scope, $http){
     $scope.reports = [];
     $scope.is_searching = false;

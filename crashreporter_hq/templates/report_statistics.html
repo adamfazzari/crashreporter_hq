@@ -10,63 +10,63 @@
 
     <h3>Most Frequent Reports</h3>
     <div ng-cloak="">
+
       <md-content>
+          <md-tabs md-dynamic-height md-border-bottom>
+            {% for name, top_reports in top_reports.iteritems() %}
 
-      <md-tabs md-dynamic-height md-border-bottom>
-        {% for name, top_reports in top_reports.iteritems() %}
+                    <md-tab label="{{ name }}">
+                        <md-content class="md-padding">
 
-                <md-tab label="{{ name }}">
-                    <md-content class="md-padding">
-
-                        <h1 class="md-title">{{ name }} - {{ top_reports[0][0].application.version_string }}</h1>
-                        <div style="height: 160px;">
-                            <table border="1" class="sortable", style="width:100%;">
-                                <tr>
-                                    {% for header in ('Number of Reports', 'Error Type', 'Error Message', 'Date/Time', '') %}
-                                        <td class="tableheader">{{ header }}</td>
-                                    {% endfor %}
-                                </tr>
-
-                                {% for (r, n_similar) in top_reports %}
+                            <h1 class="md-title">{{ name }} - {{ top_reports[0][0].application.version_string }}</h1>
+                            <div style="height: 160px;">
+                                <table border="1" class="sortable", style="width:100%;">
                                     <tr>
-                                            <td style="text-align: center"> <a href="{{ url_for('view_related_reports', report_id=r.id) }}">{{ n_similar}}</a></td>
-                                            <td style="text-align: center"> {{ r['Error Type'] }} </td>
-                                            <td style="padding-left: 10px"> {{ r['Error Message'] }} </td>
-                                            <td style="text-align: center"> {{ r['Date'].strftime('%d %B %Y -- %I:%M %p') }} </td>
-                                        <td>
-                                            <form method='GET' action="{{ url_for('view_report', report_number=r['Report Number']) }}">
-                                                <input type="submit" value="Open" >
-                                            </form>
-                                        </td>
+                                        {% for header in ('Number of Reports', 'Error Type', 'Error Message', 'Date/Time', '') %}
+                                            <td class="tableheader">{{ header }}</td>
+                                        {% endfor %}
                                     </tr>
-                                {% endfor %}
-                            </table>
-                        </div>
-                    </md-content>
-                </md-tab>
-        {% endfor %}
-      </md-tabs>
 
-
+                                    {% for (r, n_similar) in top_reports %}
+                                        <tr>
+                                                <td style="text-align: center"> <a href="{{ url_for('view_related_reports', report_id=r.id) }}">{{ n_similar}}</a></td>
+                                                <td style="text-align: center"> {{ r['Error Type'] }} </td>
+                                                <td style="padding-left: 10px"> {{ r['Error Message'] }} </td>
+                                                <td style="text-align: center"> {{ r['Date'].strftime('%d %B %Y -- %I:%M %p') }} </td>
+                                            <td>
+                                                <form method='GET' action="{{ url_for('view_report', report_number=r['Report Number']) }}">
+                                                    <input type="submit" value="Open" >
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </table>
+                            </div>
+                        </md-content>
+                    </md-tab>
+            {% endfor %}
+          </md-tabs>
       </md-content>
+
+
+      <div ng-controller="ReportPlotsController" style="background: #FFFFFF">
+          <div style="margin-left: 50px;">
+              <label style="color: #000000; margin-left:50px;">Hide Aliased:</label>
+              <md-checkbox ng-model="hide_aliased"></md-checkbox>
+              <label style="color: #000000; margin-left:50px;">Released Versions Only:</label>
+              <md-checkbox type="checkbox" id="releasedOnly" ng-model="released_only"></md-checkbox>
+          </div>
+
+          <div style="display: inline-block; width:100%; height:600px;">
+              {% raw %}
+              <div datechart aliased="{a hide_aliased a}" released="{a released_only a}" style="width:65%; height:100%; float:left;"></div>
+              <div userchart aliased="{a hide_aliased a}" released="{a released_only a}" style="width:35%; height:100%; float:left;"></div>
+              {% endraw %}
+          </div>
+      </div>
+
     </div>
 
-            <div style="background: #FFFFFF">
-                <div style="margin-left: 50px;">
-                    <label style="color: #000000; margin-left:50px;">Hide Aliased:</label>
-                    <input type="checkbox" id="hideAliased" ng-model="hideAliased"></input>
-                    <label style="color: #000000; margin-left:50px;">Released Versions Only:</label>
-                    <input type="checkbox" id="releasedOnly" ng-model="releasedOnly"></input>
-                </div>
-
-                <div style="display: inline-block; width:100%; height:600px;">
-                    {% raw %}
-                    <div datechart aliased="{{hideAliased}}" released="{{releasedOnly}}" style="width:65%; height:100%; float:left;"></div>
-                    <div userchart aliased="{{hideAliased}}" released="{{releasedOnly}}" style="width:35%; height:100%; float:left;"></div>
-                    {% endraw %}
-    {#            </div>#}
-                </div>
-            </div>
     {% endblock %}
 
 </html>
