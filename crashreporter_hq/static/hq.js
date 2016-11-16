@@ -22,9 +22,9 @@ app.controller('HQController', function($scope, $http) {
 });
 
 
-app.controller('SearchController', function($scope, $http, reportService){
+app.controller('SearchController', function($scope, $http){
     $scope.reports = [];
-    
+    $scope.is_searching = false;
     $scope.searchfields = [
                           {field: 'User', value: 'user_identifier'},
                           {field: 'Application Name', value: 'application_name'},
@@ -48,18 +48,23 @@ app.controller('SearchController', function($scope, $http, reportService){
     
 
     $scope.submitSearch = function(page) {
+        $scope.is_searching = true;
         if (page == undefined) {
             $scope.searchform.page = 1;
         } else {
             $scope.searchform.page = page;
         }
-        
+
         $http.post('/search', JSON.stringify($scope.searchform)).success(function(data){
             $scope.pagination = {page: data.page,
                                  pages: data.pages,
                                  max_page: data.max_page,
                                  total_reports: data.total_reports};
             $scope.reports = data.reports;
+            $scope.is_searching = false;
+
+        }).error(function() {
+            $scope.is_searching = false;
         })
     };
 
