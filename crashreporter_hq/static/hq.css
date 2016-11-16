@@ -12,7 +12,18 @@
 /* Navigation bar (Left side bar)*/
 .navbar {
     background: #195476;
-    /*width: 5%;*/
+    display: flex;
+    flex-flow: column;
+    flex: 1 0 content;
+}
+
+.sidenavbuttons {
+    height: 100%;
+    flex: 1 0 auto;
+}
+
+.sidenavlogo {
+
 }
 
 .navbar md-toolbar {

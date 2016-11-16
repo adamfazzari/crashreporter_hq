@@ -30,14 +30,14 @@
               {#   Side Navigation Bar   #}
               <md-sidenav md-is-locked-open="$mdMedia('gt-sm')" md-component-id="left" class="navbar">
 
-                <md-toolbar>
+                <md-toolbar class="sidenavlogo">
                     <h3>Crash Reporter HQ</h3>
                 </md-toolbar>
                 <md-toolbar id="logged-in-info">
                   You are logged in as {{ user.name }}
                 </md-toolbar>
 
-                <md-toolbar style="height: 100%">
+                <md-toolbar class="sidenavbuttons">
                     {% set menuitems =[('Home', url_for('view_reports')),
                                        ('Groups', url_for('groups')),
                                        ('Users', url_for('users')),
@@ -55,11 +55,9 @@
                     </md-button>
                 </md-toolbar>
 
-              <div id="copywrite">
-                <md-toolbar style="text-align: center; font-size: inherit">
+                <md-toolbar id="copywrite" style="text-align: center; font-size: inherit">
                   <p>© Calvin Lobo 2015.<br> All rights reserved.</p>
                 </md-toolbar>
-              </div>
 
 
             </md-sidenav>
