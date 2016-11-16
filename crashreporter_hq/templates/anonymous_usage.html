@@ -1,54 +1,53 @@
 {% extends "base.html" %}
 
-    {% block header %}
-        <script src="{{ url_for('static', filename='bower_components/angular-google-chart/ng-google-chart.js') }}"></script>
-        <script src="https://www.google.com/jsapi" type="text/javascript"></script>
-        <script src="{{ url_for('static', filename='plots.js') }}"></script>
-    {% endblock %}
-
-<body>
-
-    {% block content %}
-
-        <div style="display: inline-block; float:left; width:100%; height: 800px; ">
-            <div style="display: inline-block; width:100%; float:left;">
-                <label>User Filter:</label>
-                <select id='show_alias_selector' ng-model="showaliasSelection" style="width:100%">
-                    <option value="0" selected>All</option>
-                    <option value="1" selected>Aliased Only</option>
-                    <option value="2" selected>No Aliases</option>
-                </select>
-            </div>
+{% block header %}
+    <script src="{{ url_for('static', filename='bower_components/angular-google-chart/ng-google-chart.js') }}"></script>
+    <script src="https://www.google.com/jsapi" type="text/javascript"></script>
+    <script src="{{ url_for('static', filename='plots.js') }}"></script>
+{% endblock %}
 
 
-            <div style="display: inline-block; width:50%; height:80%; float:left;">
+{% block content %}
+    <div layout="column" style="background: white; color: black; height: 100%; width: 100%">
+
+        <md-input-container>
+            <label>User Filter:</label>
+            <md-select id='show_alias_selector' ng-model="showaliasSelection" style="width:100%" placeholder="Select Alias Level">
+                <md-option value="0" selected>All</md-option>
+                <md-option value="1" selected>Aliased Only</md-option>
+                <md-option value="2" selected>No Aliases</md-option>
+            </md-select>
+        </md-input-container>
+
+        <div layout="column" style="height: 50%;">
+            <md-input-container>
                 <label>User-Defined Chart:</label>
-                <select id="statisticSelection" ng-model="statisticSelection" style="width:100%">
-                    <option value="" selected>Select a Chart</option>
+                <md-select id="statisticSelection" ng-model="statisticSelection" style="width:100%" placeholder="Select a Chart">
                     {% for id, name in statistics %}
-                        <option value="{{ id }}" selected>{{ name }}</option>
+                        <md-option value="{{ id }}" selected>{{ name }}</md-option>
                     {% endfor %}
-                </select>
+                </md-select>
+            </md-input-container>
 
-                {% raw %}
-                <div statisticchart plotid="{{statisticSelection}}" showaliases="{{showaliasSelection}}" style="height:100%;"> </div>
-                {% endraw %}
-            </div>
+            <div statisticchart plotid="{a statisticSelection a}" showaliases="{a showaliasSelection a}" style="height:100%;"> </div>
 
-            <div style="display: inline-block; width:50%; float:left; height:80%;">
-                <label>State Chart:</label>
-                <select id="stateSelection" ng-model="stateSelection" style="width:100%">
-                    <option value="" selected>Select a Trackable State</option>
-                    {% for s in states %}
-                        <option value="{{ s }}" selected>{{ s }}</option>
-                    {% endfor %}
-                </select>
-                {% raw %}
-                <div statechart state="{{stateSelection}}" showaliases="{{showaliasSelection}}" style="height:100%;"> </div>
-                {% endraw %}
-            </div>
         </div>
-    {% endblock %}
 
-</body>
-</html>
+        <div layout="column" style="height: 50%;">
+            <md-input-container style="display: inline-block; width:50%; float:left; height:80%;">
+                <label>State Chart:</label>
+                <md-select id="stateSelection" ng-model="stateSelection" style="width:100%" placeholder="Select a Trackable State">
+                    {% for s in states %}
+                        <md-option value="{{ s }}" selected>{{ s }}</md-option>
+                    {% endfor %}
+                </md-select>
+            </md-input-container>
+
+            <div statechart state="{a stateSelection a}" showaliases="{a showaliasSelection a}" style="height:100%;"> </div>
+        </div>
+
+
+    </div>
+{% endblock %}
+
+

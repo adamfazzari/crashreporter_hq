@@ -25,7 +25,7 @@
 
     <div ng-cloak layout="column" ng-controller="HQController" style="height:100%;">
 
-          <div flex layout="row">
+      <div flex layout="row" style="height:100%;">
 
               {#   Side Navigation Bar   #}
               <md-sidenav md-is-locked-open="$mdMedia('gt-sm')" md-component-id="left" class="navbar">
@@ -63,15 +63,15 @@
             </md-sidenav>
 
             {# Main Content #}
-            <md-content flex id="content">
-                <div style="margin: 0.5%">
+            <md-content id="content">
+                <div style="margin: 0.5%; height:100vh;">
                     {% block content %}
                     {# Individual pages go here#}
                     {% endblock %}
                 </div>
             </md-content>
 
-          </div>
+      </div>
 
 
     </div>
