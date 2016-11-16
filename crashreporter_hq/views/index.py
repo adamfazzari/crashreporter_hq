@@ -103,7 +103,8 @@ def filter_reports(criteria):
                                     'user': aliases.get(r.uuid.user_identifier, r.uuid.user_identifier),
                                     'error_type': r.error_type,
                                     'error_message': r.error_message,
-                                    'date': r.date.strftime('%d %B %Y -- %I:%M %p')
+                                    'date': r.date.strftime('%B %d %Y%I:%M %p'),
+                                    'time': r.date.strftime('%I:%M %p')
                                     })
     json = flask.jsonify(response)
     return json

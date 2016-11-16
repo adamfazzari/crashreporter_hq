@@ -80,7 +80,7 @@
 
             <table border="1" style="width:100%;" class="reporttable">
                 <tr>
-                    {% for header in ('Report #', 'Count', 'Application Name', 'Version', 'User', 'Error Type', 'Error Message', 'Date/Time', '', '') %}
+                    {% for header in ('#', 'Count', 'Application', 'Version', 'User', 'Error Type', 'Error Message', 'Date', 'Time', '', '') %}
                         <td class="tableheader">{{ header }}</td>
                     {% endfor %}
                 </tr>
@@ -90,15 +90,16 @@
                     <td><a href="/reports/related/{a r.report_number a}">{a r.n_similar a}</a></td>
                     <td>{a r.application_name a}</td>
                     <td>{a r.application_version a}</td>
-                    <td>{a r.user a}</td>
+                    <td style="width: 10%">{a r.user a}</td>
                     <td>{a r.error_type a}</td>
-                    <td>{a r.error_message a}</td>
+                    <td style="width: 30%">{a r.error_message a}</td>
                     <td>{a r.date a}</td>
+                    <td>{a r.time a}</td>
                     <td>
-                        <a href="/reports/{a r.report_number a}" class="md-raised">Open</a>
+                            <md-button href="/reports/{a r.report_number a}" class="md-raised">Open</md-button>
                     </td>
                     <td>
-                        <a href="/reports/{a r.report_number a}/delete" class="md-raised">Delete</a>
+                            <md-button href="/reports/{a r.report_number a}/delete" class="md-raised">Delete</md-button>
                     </td>
                 </tr>
             </table>
