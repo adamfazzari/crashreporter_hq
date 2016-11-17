@@ -19,7 +19,14 @@ app.controller('GroupController', function($scope) {
 });
 
 
-app.controller('HQController', function($scope, $http) {
+app.controller('HQController', function($scope, $http, $mdSidenav) {
+
+    $scope.toggleMenu = function (event) {
+      $mdSidenav('leftNav').toggle()
+    };
+
+    $scope.onSwipeRight  = $scope.toggleMenu;
+
 
 });
 
