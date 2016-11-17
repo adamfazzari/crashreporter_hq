@@ -1,11 +1,9 @@
-
-from flask import request, render_template, flash, redirect, url_for
 import flask.ext.login as flask_login
-from ..forms import CreateAliasForm, PasswordChangeform
-from ..models import User, Alias, UUID
+from flask import request, render_template, flash, redirect, url_for
 
 from .. import app, db
-
+from ..forms import CreateAliasForm, PasswordChangeform
+from ..models import User, Alias, UUID
 
 
 @app.route('/users', methods=['GET'])
@@ -21,11 +19,7 @@ def users():
                 user_list = User.query.all()
                 return render_template('users.html', user_list=user_list, user=flask_login.current_user)
             else:
-                return 'User does not exist.'
-
-        else:
-            return 'Admin access only.'
-
+                return 'Admin access only.'
 
 
 @app.route('/users/profile', methods=['GET'])
