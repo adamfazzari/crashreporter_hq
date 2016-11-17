@@ -1,11 +1,12 @@
+import json
+
+import flask
 from flask import Response
-from sqlalchemy import func
 from sqlalchemy.orm import aliased
 
+from constants import *
 from groups import *
 from ..models import Statistic, State, Timer, Sequence, UUID, StatisticBarPlot
-from constants import *
-import json
 
 TRACKABLES = {'Statistic': Statistic, 'State': State, 'Timer': Timer, 'Sequence': Sequence}
 
@@ -26,11 +27,18 @@ def get_trackable_list():
     data = {'states': [q.name for q in db.session.query(State.name.distinct().label('name'))],
             'statistics': [q.name for q in db.session.query(Statistic.name.distinct().label('name'))]}
 
-    json_response = json.dumps(data)
-    response = Response(json_response, content_type='application/json; charset=utf-8')
-    response.headers.add('content-length', len(json_response))
-    response.status_code = 200
-    return response
+    return flask.jsonify(data)
+
+@app.route('/usage/plots', methods=['GET'])
+def get_plots():
+    plots = db.session.query(StatisticBarPlot.id, StatisticBarPlot.name).filter(StatisticBarPlot.group_id==flask_login.current_user.group.id).all()
+    return flask.jsonify(plots)
+
+
+@app.route('/usage/states', methods=['GET'])
+def get_states():
+    state_trackables = [q.name for q in db.session.query(State.name.distinct().label('name'))]
+    return flask.jsonify({'states': state_trackables})
 
 
 @app.route('/usage/plots/get_data', methods=['GET'])

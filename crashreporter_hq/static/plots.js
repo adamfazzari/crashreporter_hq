@@ -28,6 +28,37 @@ app.controller('ReportPlotsController', function($scope, $interval) {
     $scope.released_only = false;
 });
 
+app.controller('UsagePlotsController', function($scope, $http) {
+    
+    $http.get('/usage/plots').success(function(data) {
+        $scope.statistic_plots = data;
+    }).error(function() {});
+    
+    $http.get('/usage/states').success(function(data) {
+        $scope.state_trackables = data.states;
+    }).error(function() {});
+    
+    $scope.createdPlots = {'statistics': [], 'states': []};
+
+    $scope.addStatisticPlot = function() {
+        $scope.createdPlots.statistics.push({plotid: ''});
+    };
+
+    $scope.deleteStatisticPlot = function(createdPlotID) {
+        $scope.createdPlots.statistics.splice($scope.createdPlots.statistics.indexOf(createdPlotID), 1)
+    }
+    
+    
+    $scope.addStatePlot = function() {
+        $scope.createdPlots.states.push({state: ''});
+    };
+
+    $scope.deleteStatePlot = function(state) {
+        $scope.createdPlots.states.splice($scope.createdPlots.states.indexOf(state), 1)
+    }
+    
+});
+
 app.directive('datechart', function($http) {
         return {
           restrict: 'A',

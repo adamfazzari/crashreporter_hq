@@ -8,7 +8,7 @@
 
 
 {% block content %}
-    <div layout="column" style="background: white; color: black; height: 100%; width: 100%">
+    <div ng-controller="UsagePlotsController" layout="column" style="background: white; color: black; height: 100%; width: 100%">
 
         <md-input-container>
             <label>User Filter:</label>
@@ -19,33 +19,39 @@
             </md-select>
         </md-input-container>
 
-        <div layout="column" style="height: 50%;">
-            <md-input-container>
-                <label>User-Defined Chart:</label>
-                <md-select id="statisticSelection" ng-model="statisticSelection" style="width:100%" placeholder="Select a Chart">
-                    {% for id, name in statistics %}
-                        <md-option value="{{ id }}" selected>{{ name }}</md-option>
-                    {% endfor %}
-                </md-select>
-            </md-input-container>
+        <div layout="row" style="height: 50%;">
+            <md-button ng-click="addStatisticPlot()">Add Plot</md-button>
+            <div ng-repeat="createdplotid in createdPlots.statistics" style="display: inline">
+                <md-input-container layout="row">
+                    <label>User-Defined Chart:</label>
+                    <md-select ng-model="createdplotid.plotid" style="width:100%" placeholder="Select a Chart">
+                            <md-option ng-repeat="(plotid, statplot) in statistic_plots" ng-value="plotid">{a statplot a}</md-option>
+                    </md-select>
+                    <md-button ng-click="deleteStatisticPlot(createdplotid)">X</md-button>
 
-            <div statisticchart plotid="{a statisticSelection a}" showaliases="{a showaliasSelection a}" style="height:100%;"> </div>
+                </md-input-container>
 
+                <div style="width: 400px; height: 300px;" statisticchart plotid="{a createdplotid.plotid a}" showaliases="{a showaliasSelection a}" style="height:100%;">
+                </div>
+            </div>
         </div>
 
-        <div layout="column" style="height: 50%;">
-            <md-input-container style="display: inline-block; width:50%; float:left; height:80%;">
-                <label>State Chart:</label>
-                <md-select id="stateSelection" ng-model="stateSelection" style="width:100%" placeholder="Select a Trackable State">
-                    {% for s in states %}
-                        <md-option value="{{ s }}" selected>{{ s }}</md-option>
-                    {% endfor %}
-                </md-select>
-            </md-input-container>
 
-            <div statechart state="{a stateSelection a}" showaliases="{a showaliasSelection a}" style="height:100%;"> </div>
+        <div layout="row" style="height: 50%;">
+            <md-button ng-click="addStatePlot()">Add State</md-button>
+            <div ng-repeat="createdstate in createdPlots.states" style="display: inline">
+                <md-input-container layout="row">
+                    <label>User-Defined Chart:</label>
+                    <md-select ng-model="createdstate.state" style="width:100%" placeholder="Select a Chart">
+                            <md-option ng-repeat="state in state_trackables" ng-value="state">{a state a}</md-option>
+                    </md-select>
+                    <md-button ng-click="deleteStatePlot(createdstate)">X</md-button>
+                </md-input-container>
+
+                <div style="width: 400px; height: 300px;" statechart state="{a createdstate.state a}" showaliases="{a showaliasSelection a}" style="height:100%;">
+                </div>
+            </div>
         </div>
-
 
     </div>
 {% endblock %}
