@@ -1,121 +1,104 @@
-<!DOCTYPE html>
-<html>
-<head lang="en">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='crashreport.css') }}">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='pagination.css') }}">
-    <script src="{{ url_for('static', filename='sorttable.js') }}"></script>
-    <meta charset="UTF-8">
-    <title>Crash Reporter HQ</title>
-</head>
+{% extends "base.html" %}
 
+{% block content %}
 
-<body>
+    <form ng-controller="SearchController" ng-submit="submitSearch()" method="post" layout="column" style="background: white; color:black;">
 
-    {% extends "base.html" %}
+        {#   Search form starts here     #}
+        <div layout="column" style="padding: 0px 50px">
+            <div layout-gt-sm="column" ng-repeat="c in searchform.filters">
+                <div layout-gt-sm="row">
 
-    {% block content %}
+                    <md-input-container style="width: 15%">
+                        <md-select  ng-model="c[0]" placeholder="Choose a field">
+                            <md-option ng-repeat="s in searchfields"
+                                       ng-value="s.value">
 
-        <form ng-controller="SearchController" ng-submit="submitSearch()" method="post" layout="column" style="background: white; color:black;">
+                                            {a s.field a}
 
-            {#   Search form starts here     #}
-            <div layout="column" style="padding: 0px 50px">
-                <div layout-gt-sm="column" ng-repeat="c in searchform.filters">
-                    <div layout-gt-sm="row">
-
-                        <md-input-container style="width: 15%">
-                            <md-select  ng-model="c[0]" placeholder="Choose a field">
-                                <md-option ng-repeat="s in searchfields"
-                                           ng-value="s.value">
-
-                                                {a s.field a}
-
-                                </md-option>
-                            </md-select>
-                        </md-input-container>
-
-                        <md-input-container style="width: 30%">
-                            <input ng-model="c[1]"
-                                   ng-value="c[1]">
-
-                            </input>
-                        </md-input-container>
-
-                        <md-input-container>
-                            <md-button ng-click="removeFilter(c)"
-                                       ng-hide="searchform.filters.indexOf(c)==0"
-                                       class="md-raised"
-                                       name="remove_filter_button">
-
-                                            Remove Field
-                            </md-button>
-                        </md-input-container>
-
-                    </div>
-                </div>
-                <div layout-gt-sm="row" layout-align="left">
-                    <md-input-container>
-                        <md-button ng-click="addFilter()" class="md-raised" name="add_filter_button">Add Field</md-button>
+                            </md-option>
+                        </md-select>
                     </md-input-container>
 
-                    <section layout="row" layout-sm="column" layout-align="left center" layout-wrap>
-                        <md-button ng-click="submitSearch()" class="md-raised" name="search_button">Search</md-button>
-                        <md-progress-circular id="searchprogress" class="ng-hide" md-mode="indeterminate" ng-hide="!is_searching"></md-progress-circular>
-                    </section>
+                    <md-input-container style="width: 30%">
+                        <input ng-model="c[1]"
+                               ng-value="c[1]">
+
+                        </input>
+                    </md-input-container>
+
+                    <md-input-container>
+                        <md-button ng-click="removeFilter(c)"
+                                   ng-hide="searchform.filters.indexOf(c)==0"
+                                   class="md-raised"
+                                   name="remove_filter_button">
+
+                                        Remove Field
+                        </md-button>
+                    </md-input-container>
+
                 </div>
             </div>
-            {#   Search form ends here     #}
+            <div layout-gt-sm="row" layout-align="left">
+                <md-input-container>
+                    <md-button ng-click="addFilter()" class="md-raised" name="add_filter_button">Add Field</md-button>
+                </md-input-container>
 
-
-            <div layout="column" layout-sm="column" layout-align="center center" style="height: 100px">
-                <div layout-gt-sm="row">
-                    <p> Page {a pagination.page a} of {a pagination.max_page a}</p>
-                </div>
-                <div layout-gt-sm="row">
-                    <md-button style="width: 10px" ng-repeat="p in pagination.pages" ng-click="submitSearch(p)">
-                        {a p a}
-                    </md-button>
-                </div>
+                <section layout="row" layout-sm="column" layout-align="left center" layout-wrap>
+                    <md-button ng-click="submitSearch()" class="md-raised" name="search_button">Search</md-button>
+                    <md-progress-circular id="searchprogress" class="ng-hide" md-mode="indeterminate" ng-hide="!is_searching"></md-progress-circular>
+                </section>
             </div>
+        </div>
+        {#   Search form ends here     #}
 
 
-            <table border="1" style="width:100%;" class="reporttable">
-                <tr>
-                    {% for header in ('#', 'Count', 'Application', 'Version', 'User', 'Error Type', 'Error Message', 'Date', 'Time', '', '') %}
-                        <td class="tableheader">{{ header }}</td>
-                    {% endfor %}
-                </tr>
+        <div layout="column" layout-sm="column" layout-align="center center" style="height: 100px">
+            <div layout-gt-sm="row">
+                <p> Page {a pagination.page a} of {a pagination.max_page a}</p>
+            </div>
+            <div layout-gt-sm="row">
+                <md-button style="width: 10px" ng-repeat="p in pagination.pages" ng-click="submitSearch(p)">
+                    {a p a}
+                </md-button>
+            </div>
+        </div>
 
-                <tr ng-repeat="r in reports">
-                    <td>{a r.report_number a}</td>
-                    <td><a href="/reports/related/{a r.report_number a}">{a r.n_similar a}</a></td>
-                    <td>{a r.application_name a}</td>
-                    <td>{a r.application_version a}</td>
-                    <td style="width: 10%">{a r.user a}</td>
-                    <td>{a r.error_type a}</td>
-                    <td style="width: 30%">{a r.error_message a}</td>
-                    <td>{a r.date a}</td>
-                    <td>{a r.time a}</td>
-                    <td>
-                            <md-button href="/reports/{a r.report_number a}" class="md-raised">Open</md-button>
-                    </td>
-                    <td>
-                            <md-button href="/reports/{a r.report_number a}/delete" class="md-raised">Delete</md-button>
-                    </td>
-                </tr>
-            </table>
 
+        <table border="1" style="width:100%;" class="reporttable sortable">
+            <tr>
+                {% for header in ('#', 'Count', 'Application', 'Version', 'User', 'Error Type', 'Error Message', 'Date', 'Time', '', '') %}
+                    <td class="tableheader">{{ header }}</td>
+                {% endfor %}
+            </tr>
+
+            <tr ng-repeat="r in reports">
+                <td>{a r.report_number a}</td>
+                <td><a href="/reports/related/{a r.report_number a}">{a r.n_similar a}</a></td>
+                <td>{a r.application_name a}</td>
+                <td>{a r.application_version a}</td>
+                <td style="width: 10%">{a r.user a}</td>
+                <td>{a r.error_type a}</td>
+                <td style="width: 30%">{a r.error_message a}</td>
+                <td>{a r.date a}</td>
+                <td>{a r.time a}</td>
+                <td>
+                        <md-button href="/reports/{a r.report_number a}" class="md-raised">Open</md-button>
+                </td>
+                <td>
+                        <md-button href="/reports/{a r.report_number a}/delete" class="md-raised">Delete</md-button>
+                </td>
+            </tr>
+        </table>
+
+    </form>
+
+
+    {% if user.group_admin and show_delete %}
+        <form action={{ url_for('delete_report', delete_similar=True, report_numbers=','.join(report_numbers)) }} method="post" name="login" >
+            <input type='submit' name='search', value="Delete Results">
+            </input>
         </form>
+    {% endif %}
 
-
-        {% if user.group_admin and show_delete %}
-            <form action={{ url_for('delete_report', delete_similar=True, report_numbers=','.join(report_numbers)) }} method="post" name="login" >
-                <input type='submit' name='search', value="Delete Results">
-                </input>
-            </form>
-        {% endif %}
-
-    {% endblock %}
-
-
-</body>
-</html>
+{% endblock %}
