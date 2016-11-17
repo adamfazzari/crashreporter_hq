@@ -7,11 +7,6 @@ app.config(['$interpolateProvider', function($interpolateProvider) {
   $interpolateProvider.endSymbol('a}');
 }]);
 
-app.factory('reportService', function(){
-   return {'reports': []}
-
-});
-
 app.controller('GroupController', function($scope) {
 
     $scope.currentNavItem = 'Group Members';
