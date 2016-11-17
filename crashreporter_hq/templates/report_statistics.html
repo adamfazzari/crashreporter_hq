@@ -9,10 +9,10 @@
     {% block content %}
 
     <h3>Most Frequent Reports</h3>
-    <div ng-cloak="">
+    <div ng-controller="ReportPlotsController" ng-cloak="">
 
       <md-content>
-          <md-tabs md-dynamic-height md-border-bottom>
+          <md-tabs id="TopAppReportsTabs" md-dynamic-height md-border-bottom md-selected="selectedAppTabIndex">
             {% for name, top_reports in top_reports.iteritems() %}
 
                     <md-tab label="{{ name }}">
@@ -49,7 +49,7 @@
       </md-content>
 
 
-      <div ng-controller="ReportPlotsController" style="background: #FFFFFF">
+      <div style="background: #FFFFFF">
           <div style="margin-left: 50px;">
               <label style="color: #000000; margin-left:50px;">Hide Aliased:</label>
               <md-checkbox ng-model="hide_aliased"></md-checkbox>

@@ -3,7 +3,22 @@
 
 var app = angular.module('hq-app');
 
-app.controller('ReportPlotsController', function($scope) {
+app.controller('ReportPlotsController', function($scope, $interval) {
+    $scope.selectedAppTabIndex = 0;
+    var cycle_tab = function() {
+        console.log('Interval has passed!');
+        var tabmanager= document.getElementById("TopAppReportsTabs");
+        var newIdx = $scope.selectedAppTabIndex + 1;
+        if (newIdx >= tabmanager.children[1].children.length) {
+            $scope.selectedAppTabIndex = 0;
+        } else {
+            $scope.selectedAppTabIndex = newIdx;
+        }
+
+    };
+
+    $scope.cycleAppTab = $interval(cycle_tab, 10000, 0);
+
     $scope.hide_aliased = true;
     $scope.released_only = false;
 });
