@@ -15,7 +15,7 @@
           <md-tabs id="TopAppReportsTabs" md-dynamic-height md-border-bottom md-selected="selectedAppTabIndex">
             {% for name, top_reports in top_reports.iteritems() %}
 
-                    <md-tab label="{{ name }}">
+                    <md-tab label="{{ name }}" ng-click="stopTabCycler()">
                         <md-content class="md-padding">
 
                             <h1 class="md-title">{{ name }} - {{ top_reports[0][0].application.version_string }}</h1>

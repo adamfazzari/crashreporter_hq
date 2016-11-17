@@ -5,7 +5,8 @@ var app = angular.module('hq-app');
 
 app.controller('ReportPlotsController', function($scope, $interval) {
     $scope.selectedAppTabIndex = 0;
-    var cycle_tab = function() {
+
+    var cycleTabs = function() {
         console.log('Interval has passed!');
         var tabmanager= document.getElementById("TopAppReportsTabs");
         var newIdx = $scope.selectedAppTabIndex + 1;
@@ -17,7 +18,11 @@ app.controller('ReportPlotsController', function($scope, $interval) {
 
     };
 
-    $scope.cycleAppTab = $interval(cycle_tab, 10000, 0);
+    $scope.stopTabCycler = function () {
+        $interval.cancel($scope.startTabCycler);
+    };
+
+    $scope.startTabCycler = $interval(cycleTabs, 10000, 0);
 
     $scope.hide_aliased = true;
     $scope.released_only = false;
