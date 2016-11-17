@@ -40,6 +40,29 @@
                                     {% endfor %}
                                 </form>
                             </div>
+
+                            <div>
+                                <h3>Search for a group</h3>
+                                <form action="groups" method="post" name="groups">
+                                    {{ sform.hidden_tag() }}
+                                    <ul>
+                                        <li>
+                                            <span>Group Name</span>
+                                        </li>
+                                        <li>
+                                            {{ sform.name(size=80) }}
+                                        </li>
+                                        <li>
+                                            {{ sform.submit }}
+                                        </li>
+                                    </ul>
+
+                                    {% for error in sform.name.errors %}
+                                        <span style="color: red;">[{{ error }}]</span>
+                                    {% endfor %}
+                                </form>
+                            </div>
+
                         {% else %}
                             <div>
                                 <h3> {{ group.name }} </h3>
@@ -120,7 +143,7 @@
                 </md-tab>
 
 
-                <md-tab label="Application Releases">
+                <md-tab label="Application Releases" ng-disabled={{ "false" if group else "true" }}>
                     <md-content>
                         <table border="1" class="sortable", style="width:100%">
                             <tr class="tableheader">
@@ -157,7 +180,7 @@
                 </md-tab>
 
 
-                <md-tab label="Application Users">
+                <md-tab label="Application Users" ng-disabled={{ "false" if group else "true" }}>
                     <md-content>
                         <table border="1" class="sortable", style="width:100%">
                             <tr class="tableheader">
@@ -193,7 +216,7 @@
                 </md-tab>
 
 
-                <md-tab label="Aliases">
+                <md-tab label="Aliases" ng-disabled={{ "false" if group else "true" }}>
                     <md-content>
                         <table border="1" class="sortable", style="width:100%">
                             <tr class="tableheader">
@@ -229,7 +252,7 @@
                 </md-tab>
 
 
-                <md-tab label="Trackables">
+                <md-tab label="Trackables" ng-disabled={{ "false" if group else "true" }}>
                     <md-content>
                         <md-tabs>
                             <md-content>
@@ -260,7 +283,7 @@
                     </md-content>
                 </md-tab>
 
-                <md-tab label="Plots">
+                <md-tab label="Plots" ng-disabled={{ "false" if group else "true" }}>
                     <md-content>
                         <table border="1" class="sortable", style="width:100%">
                             <tr class="tableheader">
@@ -304,28 +327,6 @@
 
         </md-content>
 
-    </div>
-
-    <div>
-        <h3>Search for a group</h3>
-        <form action="groups" method="post" name="groups">
-            {{ sform.hidden_tag() }}
-            <ul>
-                <li>
-                    <span>Group Name</span>
-                </li>
-                <li>
-                    {{ sform.name(size=80) }}
-                </li>
-                <li>
-                    {{ sform.submit }}
-                </li>
-            </ul>
-
-            {% for error in sform.name.errors %}
-                <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
-        </form>
     </div>
 
 {% endblock %}
