@@ -70,74 +70,82 @@
                                     <p> {{ group.description }} </p>
                                 {% endif %}
                                 {%  if not user.group %}
-                                    <form method='POST' action="{{ url_for('request_group_invite', group=group.name) }}">
-                                        <input type="submit" value="Request Invite" >
+                                    <form method="POST" action="{{ url_for('request_group_invite', group=group.name) }}">
+                                        {% if user in group.join_requests %}
+                                            <md-button disabled="true" type='submit'>Request Sent</md-button>
+                                        {% else %}
+                                            <md-button type='submit'>Request Invitation</md-button>
+                                        {% endif %}
                                     </form>
                                 {% endif %}
+                                {% if user.group_id == group.id %}
+                                    <table border="1" class="sortable", style="width:100%">
+                                        <tr>
+
+                                            {% for header in ('User', 'Group Admin', 'Actions') %}
+                                                <td class="tableheader">{{ header }}</td>
+                                            {% endfor %}
+                                        </tr>
+
+                                        {% for u in group.users%}
+                                            <tr>
+                                                <td style="text-align: center; width: 33%"> {{ u.name}}</td>
+                                                <td style="text-align: center; width: 33%">{{ 'Yes' if u.group_admin else 'No' }}</td>
+                                                {% if user.group_admin %}
+                                                    <td style="text-align: center; width: 33%">
+                                                        <div style="display:inline-flex">
+                                                            <form method='POST' action="{{ url_for('manage_member', group=group.name, user_email=u.email, action='remove') }}">
+                                                                <input type="submit" value="Remove" >
+                                                            </form>
+
+                                                            <form method='POST' action="{{ url_for('manage_member', group=group.name, user_email=u.email, action='demote' if u.group_admin else 'promote') }}">
+                                                                <input type="submit" value={{ 'Demote' if u.group_admin else 'Promote' }} >
+                                                            </form>
+                                                        <div>
+                                                    </td>
+                                                {% endif %}
+
+                                            </tr>
+                                        {% endfor %}
+                                    </table>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+
+                        {% if user.group_admin %}
+                            <div>
+                                <h3> Invitations </h3>
+                                {% if group.join_requests %}
                                 <table border="1" class="sortable", style="width:100%">
                                     <tr>
 
-                                        {% for header in ('User', 'Group Admin', 'Actions') %}
+                                        {% for header in ('User', 'Company', 'Action') %}
                                             <td class="tableheader">{{ header }}</td>
                                         {% endfor %}
                                     </tr>
 
-                                    {% for u in group.users%}
+                                    {% for u in group.join_requests %}
                                         <tr>
-                                            <td style="text-align: center; width: 33%"> {{ u.name}}</td>
-                                            <td style="text-align: center; width: 33%">{{ 'Yes' if u.group_admin else 'No' }}</td>
-                                            {% if user.group_admin %}
-                                                <td style="text-align: center; width: 33%">
-                                                    <div style="display:inline-flex">
-                                                        <form method='POST' action="{{ url_for('manage_member', group=group.name, user_email=u.email, action='remove') }}">
-                                                            <input type="submit" value="Remove" >
-                                                        </form>
-
-                                                        <form method='POST' action="{{ url_for('manage_member', group=group.name, user_email=u.email, action='demote' if u.group_admin else 'promote') }}">
-                                                            <input type="submit" value={{ 'Demote' if u.group_admin else 'Promote' }} >
-                                                        </form>
-                                                    <div>
-                                                </td>
-                                            {% endif %}
-
+                                            <td style="text-align: center; width: 33%"> {{ u.name }}</td>
+                                            <td style="text-align: center; width: 33%"> {{ u.company }}</td>
+                                            <td style="text-align: center; width: 33%">
+                                                <div style="display:inline-flex">
+                                                    <form method='POST' action="{{ url_for('group_join_request', group=group.name, user_email=u.email, action='accept') }}">
+                                                        <input type="submit" value="Accept" >
+                                                    </form>
+                                                    <form method='POST' action="{{ url_for('group_join_request', group=group.name, user_email=u.email, action='reject') }}">
+                                                        <input type="submit" value="Reject" >
+                                                    </form>
+                                                </div>
+                                            </td>
                                         </tr>
                                     {% endfor %}
                                 </table>
+                                {% else %}
+                                    <p>There are no pending invitations.</p>
+                                {% endif %}
                             </div>
                         {% endif %}
-
-                        <div>
-                            <h3> Invitations </h3>
-                            {% if group.join_requests %}
-                            <table border="1" class="sortable", style="width:100%">
-                                <tr>
-
-                                    {% for header in ('User', 'Company', 'Action') %}
-                                        <td class="tableheader">{{ header }}</td>
-                                    {% endfor %}
-                                </tr>
-
-                                {% for u in group.join_requests %}
-                                    <tr>
-                                        <td style="text-align: center; width: 33%"> {{ u.name }}</td>
-                                        <td style="text-align: center; width: 33%"> {{ u.company }}</td>
-                                        <td style="text-align: center; width: 33%">
-                                            <div style="display:inline-flex">
-                                                <form method='POST' action="{{ url_for('group_join_request', group=group.name, user_email=u.email, action='accept') }}">
-                                                    <input type="submit" value="Accept" >
-                                                </form>
-                                                <form method='POST' action="{{ url_for('group_join_request', group=group.name, user_email=u.email, action='reject') }}">
-                                                    <input type="submit" value="Reject" >
-                                                </form>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                            </table>
-                            {% else %}
-                                <p>There are no pending invitations.</p>
-                            {% endif %}
-                        </div>
 
                     </md-content>
                 </md-tab>
