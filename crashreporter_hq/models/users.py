@@ -1,12 +1,13 @@
-import uuid
-import flask.ext.login as flask_login
-from .. import login_manager
+from __future__ import absolute_import
 
+import flask.ext.login as flask_login
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
 
+import uuid
+from .group import Group
 from .. import db
-from group import Group
+from .. import login_manager
 
 
 class User(db.Model, flask_login.UserMixin):

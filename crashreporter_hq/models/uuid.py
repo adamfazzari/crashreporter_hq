@@ -1,7 +1,7 @@
-from sqlalchemy import Column, Integer, String, Table, ForeignKey, Boolean
-from .. import db
-
+from sqlalchemy import Column, Integer, String, ForeignKey, Boolean
 from sqlalchemy.orm import relationship
+
+from .. import db
 
 
 class UUID(db.Model):
