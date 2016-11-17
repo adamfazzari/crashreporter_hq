@@ -30,14 +30,20 @@ def get_trackable_list():
     return flask.jsonify(data)
 
 @app.route('/usage/plots', methods=['GET'])
+@flask_login.login_required
 def get_plots():
-    plots = db.session.query(StatisticBarPlot.id, StatisticBarPlot.name).filter(StatisticBarPlot.group_id==flask_login.current_user.group.id).all()
+    plots = db.session.query(StatisticBarPlot.id, StatisticBarPlot.name)\
+                      .filter(StatisticBarPlot.group_id==flask_login.current_user.group.id)\
+                      .all()
     return flask.jsonify(plots)
 
 
 @app.route('/usage/states', methods=['GET'])
+@flask_login.login_required
 def get_states():
-    state_trackables = [q.name for q in db.session.query(State.name.distinct().label('name'))]
+    state_trackables = [q.name for q in db.session.query(State.name.distinct().label('name')) \
+                                                  .filter(State.group_id == flask_login.current_user.group.id)\
+                                                  .all()]
     return flask.jsonify({'states': state_trackables})
 
 
@@ -46,7 +52,8 @@ def get_states():
 def get_plot_data():
     if request.args.get('type') == 'statistic':
         if request.args.get('id'):
-            plot = StatisticBarPlot.query.filter(StatisticBarPlot.id==int(request.args.get('id'))).first()
+            plot = StatisticBarPlot.query.filter(StatisticBarPlot.id==int(request.args.get('id')),
+                                                 StatisticBarPlot.group_id==flask_login.current_user.group.id).first()
             if int(request.args.get('hide_aliases', ANY)) == NONE:
                 _aliases = set(u.uuid for u in plot.group.aliases)
                 uuids = filter(lambda x: x not in _aliases, plot.group.uuids)
@@ -79,7 +86,8 @@ def get_plot_data():
                 alias_filter = True # Do nothing
             data = {'name': request.args.get('name'),
                     'counts': db.session.query(State.state, func.count(State.id)).join(alias)\
-                                        .filter(State.name==request.args.get('name'), alias_filter)\
+                                        .filter(State.name==request.args.get('name'), alias_filter,
+                                                State.group_id==flask_login.current_user.group.id)\
                                         .group_by(State.state).all()
                     }    #
     # else:
