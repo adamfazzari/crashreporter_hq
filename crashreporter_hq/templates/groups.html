@@ -231,27 +231,32 @@
 
                 <md-tab label="Trackables">
                     <md-content>
-                        {% for trackable in ('Statistics', 'States', 'Timers', 'Sequences') %}
-                            {% if trackables[trackable.lower()]|length %}
+                        <md-tabs>
+                            <md-content>
 
-                                <h4>{{ trackable }}</h4>
 
-                                <table border="1" class="sortable", style="width:100%">
-                                    <tr class="tableheader">
-                                        {% for header in ('Name', 'Number of Users Reported', '') %}
-                                            <td class="tableheader">{{ header }}</td>
-                                        {% endfor %}
-                                    </tr>
-                                    {% for s in trackables[trackable.lower()] %}
-                                        <tr>
-                                            <td>{{ s[0].name }}</td>
-                                            <td>{{ s[1]}}</td>
-                                        </tr>
-                                    {% endfor %}
-                                </table>
+                                {% for trackable in ('Statistics', 'States', 'Timers', 'Sequences') %}
+                                    <md-tab label="{{ trackable }} Trackable">
 
-                            {% endif %}
-                        {% endfor %}
+                                        <table border="1" class="sortable", style="width:100%">
+                                            <tr class="tableheader">
+                                                {% for header in ('Name', 'Number of Users Reported', '') %}
+                                                    <td class="tableheader">{{ header }}</td>
+                                                {% endfor %}
+                                            </tr>
+                                            {% for s in trackables[trackable.lower()] %}
+                                                <tr>
+                                                    <td>{{ s[0].name }}</td>
+                                                    <td>{{ s[1]}}</td>
+                                                </tr>
+                                            {% endfor %}
+                                        </table>
+                                    </md-tab>
+                                {% endfor %}
+
+                            </md-content>
+                        </md-tabs>
+
                     </md-content>
                 </md-tab>
 
