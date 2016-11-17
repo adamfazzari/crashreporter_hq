@@ -1,18 +1,16 @@
 import json
+from datetime import datetime
 
 from flask import Response
 from flask.ext.paginate import Pagination
-
-from sqlalchemy import func, asc
-from datetime import datetime
+from pygments import highlight
+from pygments.formatters import HtmlFormatter
+from pygments.lexers import PythonLexer
+from sqlalchemy import asc
 
 from groups import *
+from ..forms import YoutrackSubmitForm
 from ..models import CrashReport, UUID, Traceback, Application
-from ..forms import YoutrackSubmitForm, SearchReportsForm
-
-from pygments import highlight
-from pygments.lexers import PythonLexer
-from pygments.formatters import HtmlFormatter
 
 
 @app.route('/reports/<int:report_number>')
@@ -73,17 +71,20 @@ def view_related_reports(report_id):
 @app.route('/reports/view_stats', methods=['GET', 'POST'])
 @flask_login.login_required
 def view_report_stats():
+    group = flask_login.current_user.group
     latest_applications = db.session.query(func.max(Application.version_0),
                                            func.max(Application.version_1),
                                            func.max(Application.version_2)) \
-                                    .filter(Application.is_release == True) \
+                                    .filter(Application.group_id==group.id,
+                                            Application.is_release == True) \
                                     .group_by(Application.name).all()
 
     top_reports = {}
     for v0, v1, v2 in latest_applications:
         r = db.session.query(CrashReport, func.count(CrashReport.id).label('total'))\
                       .group_by(CrashReport.related_group_id) \
-                      .filter(CrashReport.application.has(version_0=v0, version_1=v1, version_2=v2)) \
+                      .filter(CrashReport.group_id==group.id,
+                              CrashReport.application.has(version_0=v0, version_1=v1, version_2=v2)) \
                       .order_by('total DESC').limit(5)
         if r:
             top_reports[r[0][0].application.name] = r
@@ -93,10 +94,13 @@ def view_report_stats():
 
 
 @app.route('/reports/get_stats', methods=['GET'])
+@flask_login.login_required
 def get_report_stats():
+    group = flask_login.current_user.group
     if request.args.get('type') == 'date':
         # Query for the number of reports for each day
-        q = db.session.query(func.date(CrashReport.date), func.count(func.DATE(CrashReport.date)))
+        q = db.session.query(func.date(CrashReport.date), func.count(func.DATE(CrashReport.date)))\
+                      .filter(CrashReport.group_id==group.id)
         # Only dates that are before today (so we take out units with time-stamps in the future)
         q = q.filter(CrashReport.date <= datetime.now())
         # Group / bin the results by day in ascending order
@@ -115,7 +119,10 @@ def get_report_stats():
 
     elif request.args.get('type') == 'user':
         # https://stackoverflow.com/questions/25500904/counting-relationships-in-sqlalchemy/25525771#25525771
-        q = db.session.query(UUID.user_identifier, func.count(CrashReport.id)).join(UUID.reports).group_by(UUID.user_identifier)
+        q = db.session.query(UUID.user_identifier, func.count(CrashReport.id))\
+                      .filter(CrashReport.group_id==group.id)\
+                      .join(UUID.reports)\
+                      .group_by(UUID.user_identifier)
         if request.args.get('hide_aliased', 'false') == 'true':
             q = q.filter(CrashReport.uuid_id.notin_([a.uuid_id for a in flask_login.current_user.group.aliases]))
         if request.args.get('released_only', 'false') == 'true':
