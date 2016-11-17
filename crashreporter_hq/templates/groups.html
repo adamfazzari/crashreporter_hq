@@ -1,128 +1,95 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='crashreport.css') }}">
-    <title>Crash Reporter HQ</title>
-</head>
-<body id="form-page">
+{% extends "base.html" %}
 
-    {% extends "base.html" %}
+{% macro render_field(field, required=False, field_name=None) %}
+    <span>{{ '* ' if required else '' }}{{ field_name if field_name is not none else field.name.capitalize() }}</span> {{ field(**kwargs)|safe }}
+    {% if field.errors %}
+        <ul>
+        {% for error in field.errors %}
+            <li style="color: red;">{{ error }}</li>
+        {% endfor %}
 
-    {% macro render_field(field, required=False, field_name=None) %}
-        <span>{{ '* ' if required else '' }}{{ field_name if field_name is not none else field.name.capitalize() }}</span> {{ field(**kwargs)|safe }}
-        {% if field.errors %}
-            <ul>
-            {% for error in field.errors %}
-                <li style="color: red;">{{ error }}</li>
-            {% endfor %}
+        </ul>
+    {% endif %}
+{% endmacro %}
 
-            </ul>
-        {% endif %}
-    {% endmacro %}
+{% block content %}
 
-    {% block content %}
+    <div ng-controller="GroupController" ng-cloak>
+        <md-content class="md-padding">
+            <md-nav-bar md-selected-nav-item="currentNavItem">
+                <md-nav-item md-nav-click="goto('group_members')">Group Members</md-nav-item>
+                <md-nav-item md-nav-click="goto('application_releases')">Application Releases</md-nav-item>
+                <md-nav-item md-nav-click="goto('users')">Application Users</md-nav-item>
+                <md-nav-item md-nav-click="goto('aliases')">Aliases</md-nav-item>
+                <md-nav-item md-nav-click="goto('trackables')">Trackables</md-nav-item>
+                <md-nav-item md-nav-click="goto('plots')">Plots</md-nav-item>
+            </md-nav-bar>
 
-        <div>
-            <h3>Search for a group</h3>
-            <form action="groups" method="post" name="groups">
-                {{ sform.hidden_tag() }}
-                <ul>
-                    <li>
-                        <span>Group Name</span>
-                    </li>
-                    <li>
-                        {{ sform.name(size=80) }}
-                    </li>
-                    <li>
-                        {{ sform.submit }}
-                    </li>
-                </ul>
+            <div ng-switch="currentNavItem">
 
-                {% for error in sform.name.errors %}
-                    <span style="color: red;">[{{ error }}]</span>
-                {% endfor %}
-            </form>
-        </div>
+                <div ng-switch-when="Group Members">
 
-        <br>
+                    {%  if group is none %}
+                        <br>
+                        <div >
+                            <h3>Create a group</h3>
+                            <form action="groups" method="post" name="groups">
+                                {{ cform.hidden_tag() }}
+                                <ul>
+                                    <li><span>Group Name</span></li>
+                                    <li>{{ cform.name(size=80) }}</li>
+                                    <li><span>Group Description</span></li>
+                                    <li>{{ cform.description }}</li>
+                                    <li>{{ cform.submit }}</li>
+                                </ul>
 
-        {%  if group is none %}
-            <br>
-            <div >
-                <h3>Create a group</h3>
-                <form action="groups" method="post" name="groups">
-                    {{ cform.hidden_tag() }}
-                    <ul>
-                        <li>
-                            <span>Group Name</span>
-                        </li>
-                        <li>
-                            {{ cform.name(size=80) }}
-                        </li>
-                        <li>
-                            <span>Group Description</span>
-                        </li>
-                        <li>
-                            {{ cform.description }}
-                        </li>
-                        <li>
-                            {{ cform.submit }}
-                        </li>
-                    </ul>
-
-                    {% for error in cform.name.errors %}
-                        <span style="color: red;">[{{ error }}]</span>
-                    {% endfor %}
-                </form>
-            </div>
-        {% else %}
-            <div>
-                <h3> {{ group.name }} </h3>
-                {% if group.description %}
-                    <p> {{ group.description }} </p>
-                {% endif %}
-                {%  if not user.group %}
-                    <form method='POST' action="{{ url_for('request_group_invite', group=group.name) }}">
-                        <input type="submit" value="Request Invite" >
-                    </form>
-                {% endif %}
-                <table border="1" class="sortable", style="width:100%">
-                    <tr>
-
-                        {% for header in ('User', 'Group Admin', 'Actions') %}
-                            <td class="tableheader">{{ header }}</td>
-                        {% endfor %}
-                    </tr>
-
-                    {% for u in group.users%}
-                        <tr>
-                            <td style="text-align: center; width: 33%"> {{ u.name}}</td>
-                            <td style="text-align: center; width: 33%">
-                                {{ 'Yes' if u.group_admin else 'No' }}
-                            </td>
-                            {% if user.group_admin %}
-                                <td style="text-align: center; width: 33%">
-                                    <div style="display:inline-flex">
-                                        <form method='POST' action="{{ url_for('manage_member', group=group.name, user_email=u.email, action='remove') }}">
-                                            <input type="submit" value="Remove" >
-                                        </form>
-
-                                        <form method='POST' action="{{ url_for('manage_member', group=group.name, user_email=u.email, action='demote' if u.group_admin else 'promote') }}">
-                                            <input type="submit" value={{ 'Demote' if u.group_admin else 'Promote' }} >
-                                        </form>
-                                    <div>
-                                </td>
+                                {% for error in cform.name.errors %}
+                                    <span style="color: red;">[{{ error }}]</span>
+                                {% endfor %}
+                            </form>
+                        </div>
+                    {% else %}
+                        <div>
+                            <h3> {{ group.name }} </h3>
+                            {% if group.description %}
+                                <p> {{ group.description }} </p>
                             {% endif %}
+                            {%  if not user.group %}
+                                <form method='POST' action="{{ url_for('request_group_invite', group=group.name) }}">
+                                    <input type="submit" value="Request Invite" >
+                                </form>
+                            {% endif %}
+                            <table border="1" class="sortable", style="width:100%">
+                                <tr>
 
-                        </tr>
-                    {% endfor %}
-                </table>
-            </div>
-            <br>
+                                    {% for header in ('User', 'Group Admin', 'Actions') %}
+                                        <td class="tableheader">{{ header }}</td>
+                                    {% endfor %}
+                                </tr>
 
-            {# The following section is visible only to administrators #}
-            {% if user.group_admin and group.name == user.group.name %}
+                                {% for u in group.users%}
+                                    <tr>
+                                        <td style="text-align: center; width: 33%"> {{ u.name}}</td>
+                                        <td style="text-align: center; width: 33%">{{ 'Yes' if u.group_admin else 'No' }}</td>
+                                        {% if user.group_admin %}
+                                            <td style="text-align: center; width: 33%">
+                                                <div style="display:inline-flex">
+                                                    <form method='POST' action="{{ url_for('manage_member', group=group.name, user_email=u.email, action='remove') }}">
+                                                        <input type="submit" value="Remove" >
+                                                    </form>
+
+                                                    <form method='POST' action="{{ url_for('manage_member', group=group.name, user_email=u.email, action='demote' if u.group_admin else 'promote') }}">
+                                                        <input type="submit" value={{ 'Demote' if u.group_admin else 'Promote' }} >
+                                                    </form>
+                                                <div>
+                                            </td>
+                                        {% endif %}
+
+                                    </tr>
+                                {% endfor %}
+                            </table>
+                        </div>
+                    {% endif %}
 
                     <div>
                         <h3> Invitations </h3>
@@ -157,12 +124,9 @@
                         {% endif %}
                     </div>
 
+                </div>
 
-
-                <br>
-
-                <div>
-                    <h3>Application Versions </h3>
+                <div ng-switch-when="Application Releases">
 
                     <table border="1" class="sortable", style="width:100%">
                         <tr class="tableheader">
@@ -194,14 +158,11 @@
                                 {{ release_form.submit }}
                             </div>
                         </form>
-
                     </table>
-                    <br>
+
                 </div>
 
-
-                <div>
-                    <h3> Users </h3>
+                <div ng-switch-when="Application Users">
                     <table border="1" class="sortable", style="width:100%">
                         <tr class="tableheader">
 
@@ -234,47 +195,41 @@
                     </table>
                 </div>
 
-                <br>
+                <div ng-switch-when="Aliases">
+                    <table border="1" class="sortable", style="width:100%">
+                        <tr class="tableheader">
 
-                <div>
-                    <h3>Aliases</h3>
-                <table border="1" class="sortable", style="width:100%">
-                    <tr class="tableheader">
+                            {% for header in ('Alias', 'UUID', '') %}
+                                <td class="tableheader">{{ header }}</td>
+                            {% endfor %}
 
-                        {% for header in ('Alias', 'UUID', '') %}
-                            <td class="tableheader">{{ header }}</td>
-                        {% endfor %}
-
-                    </tr>
-                    {% for alias in user.group.aliases %}
-                        <tr>
-                            <td>{{ alias.alias }}</td>
-                            <td>{{ alias.user_identifier}}</td>
-                            <td>
-                                <form method='POST' action="{{ url_for('manage_aliases', action='delete', uuid=alias.user_identifier) }}">
-                                    <input type="submit" value="Delete" >
-                                </form>
-                            </td>
                         </tr>
-                    {% endfor %}
-                </table>
-                <br>
-                    <form action="{{ url_for('manage_aliases', action='create') }}" method="post" name="aliases">
-                        {{ alias_form.hidden_tag() }}
-                        <div style="display:flex">
-                            {{ render_field(alias_form.alias) }}
-                            {{ render_field(alias_form.uuid, field_name='UUID') }}
-                            {{ alias_form.submit }}
-                        </div>
-                    </form>
+                        {% for alias in user.group.aliases %}
+                            <tr>
+                                <td>{{ alias.alias }}</td>
+                                <td>{{ alias.user_identifier}}</td>
+                                <td>
+                                    <form method='POST' action="{{ url_for('manage_aliases', action='delete', uuid=alias.user_identifier) }}">
+                                        <input type="submit" value="Delete" >
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                    <br>
+                        <form action="{{ url_for('manage_aliases', action='create') }}" method="post" name="aliases">
+                            {{ alias_form.hidden_tag() }}
+                            <div style="display:flex">
+                                {{ render_field(alias_form.alias) }}
+                                {{ render_field(alias_form.uuid, field_name='UUID') }}
+                                {{ alias_form.submit }}
+                            </div>
+                        </form>
 
-                </div>
+                    </div>
 
-                <br>
+                <div ng-switch-when="Trackables">
 
-
-                <div>
-                    <h3>Trackables</h3>
                     {% for trackable in ('Statistics', 'States', 'Timers', 'Sequences') %}
                         {% if trackables[trackable.lower()]|length %}
 
@@ -302,11 +257,10 @@
 
                         {% endif %}
                     {% endfor %}
+
                 </div>
 
-                <div>
-                    <h3>Plots</h3>
-
+                <div ng-switch-when="Plots">
                     <table border="1" class="sortable", style="width:100%">
                         <tr class="tableheader">
 
@@ -340,14 +294,34 @@
                                 {{ plot_form.submit }}
                             </div>
                         </form>
-
                 </div>
 
-            {% endif %}
+            </div>
 
-        {% endif %}
-    {% endblock %}
+        </md-content>
 
+    </div>
 
-</body>
-</html>
+    <div>
+        <h3>Search for a group</h3>
+        <form action="groups" method="post" name="groups">
+            {{ sform.hidden_tag() }}
+            <ul>
+                <li>
+                    <span>Group Name</span>
+                </li>
+                <li>
+                    {{ sform.name(size=80) }}
+                </li>
+                <li>
+                    {{ sform.submit }}
+                </li>
+            </ul>
+
+            {% for error in sform.name.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </form>
+    </div>
+
+{% endblock %}

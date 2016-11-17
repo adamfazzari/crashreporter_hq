@@ -12,8 +12,10 @@ app.factory('reportService', function(){
 
 });
 
-app.controller('Hq', function($scope, $http) {
+app.controller('GroupController', function($scope) {
 
+    $scope.currentNavItem = 'Group Members';
+    
 });
 
 
