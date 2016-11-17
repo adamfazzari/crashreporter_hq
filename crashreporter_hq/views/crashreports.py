@@ -72,6 +72,8 @@ def view_related_reports(report_id):
 @flask_login.login_required
 def view_report_stats():
     group = flask_login.current_user.group
+    if group is None:
+        return 'You are not in a group.'
     latest_applications = db.session.query(func.max(Application.version_0),
                                            func.max(Application.version_1),
                                            func.max(Application.version_2)) \
