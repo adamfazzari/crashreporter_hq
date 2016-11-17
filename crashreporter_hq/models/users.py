@@ -16,7 +16,7 @@ class User(db.Model, flask_login.UserMixin):
     name = Column(String(30), unique=False, default='')
     company = Column(String(50), unique=False, default='')
     email = Column(String(120), unique=True)
-    password = Column(String(50), unique=True)
+    password = Column(String(50))
     admin = Column(Boolean(False))
     api_key = Column(String(50), unique=True)
     group_id = Column(Integer, ForeignKey('group.id'))
