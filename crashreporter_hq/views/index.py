@@ -142,7 +142,7 @@ def view_reports():
         form.releases_only.data = str(NONE)
     elif released_state == ONLY:
         q = q.filter(Application.is_release == True)
-        form.hide_aliased.data = str(ONLY)
+        form.releases_only.data = str(ONLY)
 
     search_fields = [request.args.get('field%d' % (i+1)) for i in xrange(3)]
     search_values = [request.args.get('value%d' % (i+1)) for i in xrange(3)]
@@ -183,7 +183,7 @@ def view_reports():
                 attr = getattr(CrashReport, field)
                 q = q.filter(attr.contains(str(value)))
 
-    reports = q.order_by(CrashReport.id.asc()).all()
+    reports = q.order_by(CrashReport.date.asc()).all()
     n_total_reports = len(reports)
 
     max_page = int(ceil(n_total_reports / float(PER_PAGE)))
