@@ -50,7 +50,7 @@ app.controller('GroupController', function($scope, $http) {
     $scope.aliases = [];
     $scope.getReleases();
     $scope.getAliases();
-    $scope.AppReleaseForm = {'name': '.test', 'version': 'drrr'};
+    $scope.AppReleaseForm = {'name': '', 'version': ''};
     $scope.currentNavItem = 'Group Members';
     
 });
