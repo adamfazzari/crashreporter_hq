@@ -166,9 +166,7 @@
                                 <td>{a app.name a}</td>
                                 <td>{a app.version a}</td>
                                 <td>
-                                    <form method='POST' ng-submit="removeRelease(id)">
-                                        <input type="submit" value="Remove" >
-                                    </form>
+                                    <md-button class="md-raised" ng-click="removeRelease(id)">Remove</md-button>
                                 </td>
                             </tr>
                         </table>
@@ -239,9 +237,7 @@
                             <td>{a alias.alias a}</td>
                             <td>{a alias.uuid a}</td>
                             <td>
-                                <form method='POST' ng-submit="removeAlias(id)">
-                                    <input type="submit" value="Remove" >
-                                </form>
+                                <md-button class="md-raised" ng-click="removeAlias(id)">Remove</md-button>
                             </td>
                         </tr>
                     </table>
@@ -310,9 +306,7 @@
                                     <span style="padding: 10px;" ng-repeat="s in plot.statistics">{a s a}</span>
                                 </td>
                                 <td>
-                                    <form method='POST' ng-submit="removePlot(id)">
-                                        <input type="submit" value="Remove" >
-                                    </form>
+                                    <md-button class="md-raised"  ng-click="removePlot(id)">Remove</md-button>
                                 </td>
                             </tr>
                         </table>
