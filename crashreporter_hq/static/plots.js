@@ -30,7 +30,7 @@ app.controller('ReportPlotsController', function($scope, $interval) {
 
 app.controller('UsagePlotsController', function($scope, $http) {
     
-    $http.get('/usage/plots').success(function(data) {
+    $http.get('/plots/statistics').success(function(data) {
         $scope.statistic_plots = data;
     }).error(function() {});
     
@@ -188,7 +188,7 @@ app.directive('statisticchart', function($http) {
                         var update = function(value){
                             // Make a request to get the chart data
                             var alias = (attr.showaliases=='') ? "0": attr.showaliases;
-                            $http.get('/usage/plots/get_data?type=statistic&id=' + attr.plotid + '&hide_aliases=' + alias ).then(done, fail);
+                            $http.get('/plots/statistics/data?id=' + attr.plotid + '&hide_aliases=' + alias ).then(done, fail);
                             };
 
                         attr.$observe('plotid', update);
@@ -230,7 +230,9 @@ app.directive('statechart', function($http) {
                     var update = function(value){
                         // Make a request to get the chart data
                         var alias = (attr.showaliases=='') ? "0": attr.showaliases;
-                        $http.get('/usage/plots/get_data?type=state&name=' + attr.state + '&hide_aliases=' + alias).then(done, fail);
+                        if (attr.state != '') {
+                            $http.get('/plots/states/data?name=' + attr.state + '&hide_aliases=' + alias).then(done, fail);
+                            }
                         };
               
                     attr.$observe('state', update);

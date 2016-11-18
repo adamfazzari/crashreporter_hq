@@ -33,14 +33,6 @@ def get_trackable_list():
 
     return flask.jsonify(data)
 
-@app.route('/usage/plots', methods=['GET'])
-@flask_login.login_required
-def get_plots():
-    plots = db.session.query(StatisticBarPlot.id, StatisticBarPlot.name)\
-                      .filter(StatisticBarPlot.group_id==flask_login.current_user.group.id)\
-                      .all()
-    return flask.jsonify(plots)
-
 
 @app.route('/usage/states', methods=['GET'])
 @flask_login.login_required
@@ -49,34 +41,6 @@ def get_states():
                                                   .filter(State.group_id == flask_login.current_user.group.id)\
                                                   .all()]
     return flask.jsonify({'states': state_trackables})
-
-
-@app.route('/usage/plots/get_data', methods=['GET'])
-@flask_login.login_required
-def get_plot_data():
-    if request.args.get('type') == 'state':
-            alias = aliased(State.uuid)
-            if int(request.args.get('hide_aliases', 0)) == NONE:
-                _aliases_id = set(u.uuid.id for u in flask_login.current_user.group.aliases)
-                alias_filter = alias.id.notin_(_aliases_id)
-            elif int(request.args.get('hide_aliases', 0)) == ONLY:
-                _aliases_id = set(u.uuid.id for u in flask_login.current_user.group.aliases)
-                alias_filter = alias.id.in_(_aliases_id)
-            else:
-                alias_filter = True # Do nothing
-            data = {'name': request.args.get('name'),
-                    'counts': db.session.query(State.state, func.count(State.id)).join(alias)\
-                                        .filter(State.name==request.args.get('name'), alias_filter,
-                                                State.group_id==flask_login.current_user.group.id)\
-                                        .group_by(State.state).all()
-                    }    #
-    # else:
-    #     return 'Invalid query.'
-    json_response = json.dumps(data)
-    response = Response(json_response, content_type='application/json; charset=utf-8')
-    response.headers.add('content-length', len(json_response))
-    response.status_code = 200
-    return response
 
 
 @app.route('/usagestats/upload', methods=['POST'])

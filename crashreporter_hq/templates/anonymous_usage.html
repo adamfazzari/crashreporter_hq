@@ -25,7 +25,7 @@
                 <md-input-container layout="row">
                     <label>User-Defined Chart:</label>
                     <md-select ng-model="createdplotid.plotid" style="width:100%" placeholder="Select a Chart">
-                            <md-option ng-repeat="(plotid, statplot) in statistic_plots" ng-value="plotid">{a statplot a}</md-option>
+                            <md-option ng-repeat="(plotid, statplot) in statistic_plots" ng-value="plotid">{a statplot.name a}</md-option>
                     </md-select>
                     <md-button ng-click="deleteStatisticPlot(createdplotid)">X</md-button>
 

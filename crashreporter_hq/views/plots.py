@@ -1,6 +1,7 @@
 import flask
 from groups import *
 from constants import *
+from sqlalchemy.orm import aliased
 
 
 @app.route('/plots/statistics', methods=['GET'])
@@ -10,7 +11,7 @@ def get_statistic_plots():
     if group is None:
         return 'You are not in a group.'
 
-    plots = StatisticBarPlot.query.all()
+    plots = StatisticBarPlot.query.filter(StatisticBarPlot.group_id==flask_login.current_user.group.id).all()
     data = {p.id: {'name': p.name, 'application': p.application_name, 'statistics': p.statistics} for p in plots}
     return flask.jsonify(data)
 
@@ -85,3 +86,24 @@ def remove_statistic_plot():
             flash("Plot '%s' has been deleted" % plot.name)
     return redirect(request.referrer)
 
+
+@app.route('/plots/states/data', methods=['GET'])
+@flask_login.login_required
+def get_state_plot_data():
+    alias = aliased(State.uuid)
+    if int(request.args.get('hide_aliases', 0)) == NONE:
+        _aliases_id = set(u.uuid.id for u in flask_login.current_user.group.aliases)
+        alias_filter = alias.id.notin_(_aliases_id)
+    elif int(request.args.get('hide_aliases', 0)) == ONLY:
+        _aliases_id = set(u.uuid.id for u in flask_login.current_user.group.aliases)
+        alias_filter = alias.id.in_(_aliases_id)
+    else:
+        alias_filter = True # Do nothing
+    data = {'name': request.args.get('name'),
+            'counts': db.session.query(State.state, func.count(State.id)).join(alias)\
+                                .filter(State.name==request.args.get('name'), alias_filter,
+                                        State.group_id==flask_login.current_user.group.id)\
+                                .group_by(State.state).all()
+                    }
+
+    return flask.jsonify(data)
