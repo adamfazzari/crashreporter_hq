@@ -295,38 +295,47 @@
 
             <md-tab label="Plots" ng-disabled={{ "false" if group else "true" }}>
                 <md-content>
-                    <table border="1" class="sortable", style="width:100%">
-                        <tr class="tableheader">
+                    <div layout="column" style="min-height: 400px;">
+                        <table border="1" class="sortable", style="width:100%">
+                            <tr class="tableheader">
 
-                            {% for header in ('Plot Name', 'Fields', '') %}
-                                <td class="tableheader">{{ header }}</td>
-                            {% endfor %}
+                                {% for header in ('Plot Name', 'Fields', '') %}
+                                    <td class="tableheader">{{ header }}</td>
+                                {% endfor %}
 
-                        </tr>
-                        {% for plot in user.group.barplots %}
-                            <tr>
-                                <td>{{ plot.name}}</td>
+                            </tr>
+                            <tr ng-repeat="(id, plot) in statistic_plots">
+                                <td>{a plot.name a}</td>
                                 <td>
-                                    {%  for s in plot.statistics %}
-                                        <div style="display:flex"> {{ s.name }}</div>
-                                    {% endfor %}
+                                    <span style="padding: 10px;" ng-repeat="s in plot.statistics">{a s a}</span>
                                 </td>
                                 <td>
-                                    <form method='POST' action="{{ url_for('manage_plots', action='delete', type='statistic', id=plot.id) }}">
-                                        <input type="submit" value="Delete" >
+                                    <form method='POST' ng-submit="removePlot(id)">
+                                        <input type="submit" value="Remove" >
                                     </form>
                                 </td>
                             </tr>
-                        {% endfor %}
-                    </table>
-                    <br>
-                    <form action="{{ url_for('manage_plots', action='create_bar_plot') }}" method="post">
-                            {{ plot_form.hidden_tag() }}
-                            <div style="display:flex">
-                                {{ render_field(plot_form.name, field_name='Plot Name') }}
-                                {{ render_field(plot_form.fields, field_name='Fields') }}
-                                {{ plot_form.submit }}
-                            </div>
+                        </table>
+                    </div>
+                    <form method='POST' ng-submit="addPlot(PlotForm)">
+                        <md-input-container>
+                            <label>Plot Name</label>
+                            <input ng-model="PlotForm.name"></input>
+                        </md-input-container>
+                        <md-input-container>
+                            <label>Application</label>
+                            <input ng-model="PlotForm.application" placeholder="Optional"></input>
+                        </md-input-container>
+                        <md-input-container>
+                            <label>Version</label>
+                            <input ng-model="PlotForm.version" placeholder="Optional"></input>
+                        </md-input-container>
+                        <md-input-container ng-repeat="stat in PlotForm.statistics">
+                            <label>Statistic</label>
+                            <input ng-model="stat[0]"></input>
+                        </md-input-container>
+                        <md-button ng-click="addStatisticField()">+</md-button>
+                        <md-button type="submit">Add Plot</md-button>
                     </form>
                 </md-content>
             </md-tab>

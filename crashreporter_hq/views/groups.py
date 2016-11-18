@@ -140,33 +140,3 @@ def manage_uuid(uuid_id):
             db.session.commit()
 
     return redirect(request.referrer)
-
-
-@app.route('/plots/manage', methods=['GET', 'POST'])
-@flask_login.login_required
-def manage_plots():
-    if request.method == 'POST':
-        if request.args.get('action') == 'create_bar_plot':
-
-            plot_form = PlotCreationForm()
-            if plot_form.validate_on_submit():
-                fields = plot_form.data['fields'].split(',')
-                stats = Statistic.query.filter(Statistic.name.in_(fields)).all()
-                if stats:
-                    plot = StatisticBarPlot(plot_form.data['name'],
-                                            flask_login.current_user.group, *stats)
-                    db.session.add(plot)
-                    db.session.commit()
-                    flash("New plot '%s' has been created" % plot.name)
-                return redirect(request.referrer)
-
-        elif request.args.get('action') == 'delete':
-
-            if request.args.get('type') == 'statistic':
-                if request.args.get('id'):
-                    plot = StatisticBarPlot.query.filter(StatisticBarPlot.id == int(request.args.get('id'))).first()
-                    if plot:
-                        db.session.delete(plot)
-                        db.session.commit()
-                        flash("Plot '%s' has been deleted" % plot.name)
-                return redirect(request.referrer)

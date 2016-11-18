@@ -7,3 +7,4 @@ from crashreports import *
 from index import *
 from applications import *
 from aliases import *
+from plots import *

@@ -46,12 +46,40 @@ app.controller('GroupController', function($scope, $http) {
         });
     };
 
+
+    $scope.getPlots = function() {
+        $http.get('/plots/statistics').success(function (data) {
+            $scope.statistic_plots = data;
+        });
+    };
+
+    $scope.addPlot = function(plotform) {
+        stats = [].concat.apply([],plotform.statistics);
+        data = {'name': plotform.name, 'statistics': stats};
+        $http.post('/plots/statistics/add', data).success(function() {
+            $scope.getPlots();
+        });
+    };
+
+    $scope.removePlot = function(id) {
+        $http.post('/plots/statistics/remove?id=' + id).success(function() {
+              $scope.getPlots();
+        });
+    };
+    
+    $scope.addStatisticField = function() {
+        $scope.PlotForm.statistics.push(['']);
+    };
+
     $scope.application_releases = [];
     $scope.aliases = [];
+    $scope.statistic_plots = [];
     $scope.getReleases();
     $scope.getAliases();
+    $scope.getPlots();
+    $scope.PlotForm = {'name': '', 'statistics': [['']], 'application': '', 'version': ''};
     $scope.AppReleaseForm = {'name': '', 'version': ''};
-    $scope.currentNavItem = 'Group Members';
+    $scope.currentNavItem = 'Plots';
     
 });
 

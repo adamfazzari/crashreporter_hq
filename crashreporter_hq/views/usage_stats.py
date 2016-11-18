@@ -54,31 +54,7 @@ def get_states():
 @app.route('/usage/plots/get_data', methods=['GET'])
 @flask_login.login_required
 def get_plot_data():
-    if request.args.get('type') == 'statistic':
-        if request.args.get('id'):
-            plot = StatisticBarPlot.query.filter(StatisticBarPlot.id==int(request.args.get('id')),
-                                                 StatisticBarPlot.group_id==flask_login.current_user.group.id).first()
-            if int(request.args.get('hide_aliases', ANY)) == NONE:
-                _aliases = set(u.uuid for u in plot.group.aliases)
-                uuids = filter(lambda x: x not in _aliases, plot.group.uuids)
-            elif int(request.args.get('hide_aliases', ANY)) == ONLY:
-                _aliases = set(u.uuid for u in plot.group.aliases)
-                uuids = filter(lambda x: x in _aliases, plot.group.uuids)
-            else:
-                uuids = plot.group.uuids
-            d = []
-            stats = db.session.query(Statistic.name.distinct()).filter(Statistic.plots.contains(plot)).all()
-            for s in zip(*stats)[0]:
-                d2 = [s]
-                for u in uuids:
-                    count = db.session.query(Statistic.count).filter(Statistic.uuid_id == u.id, Statistic.name == s).first()
-                    d2.append(count[0] if count else 0)
-                d.append(d2)
-            aliases = {a.uuid.id: a.alias for a in plot.group.aliases}
-            data = {'uuids': [aliases.get(u.id, u.user_identifier) for u in uuids],
-                    'counts': d,
-                    'n_users': len(uuids)}
-    elif request.args.get('type') == 'state':
+    if request.args.get('type') == 'state':
             alias = aliased(State.uuid)
             if int(request.args.get('hide_aliases', 0)) == NONE:
                 _aliases_id = set(u.uuid.id for u in flask_login.current_user.group.aliases)
