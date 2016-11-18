@@ -22,17 +22,18 @@ def get_statistic_plot_data():
     if request.args.get('id'):
         plot = StatisticBarPlot.query.filter(StatisticBarPlot.id == int(request.args.get('id')),
                                              StatisticBarPlot.group_id == flask_login.current_user.group.id).first()
+
+        stats = zip(*db.session.query(Statistic.name.distinct()).filter(Statistic.name.in_(plot.statistics)).all())[0]
+
         if int(request.args.get('hide_aliases', ANY)) == NONE:
-            _aliases = set(u.uuid for u in plot.group.aliases)
-            uuids = filter(lambda x: x not in _aliases, plot.group.uuids)
+            uuids = UUID.query.outerjoin(Alias).filter(UUID.group_id == plot.group_id, Alias.id == None).all()
         elif int(request.args.get('hide_aliases', ANY)) == ONLY:
-            _aliases = set(u.uuid for u in plot.group.aliases)
-            uuids = filter(lambda x: x in _aliases, plot.group.uuids)
+            uuids = UUID.query.join(Alias).filter(UUID.group_id == plot.group_id).all()
         else:
             uuids = plot.group.uuids
+
         d = []
-        stats = db.session.query(Statistic.name.distinct()).filter(Statistic.name.in_(plot.statistics)).all()
-        for s in zip(*stats)[0]:
+        for s in stats:
             d2 = [s]
             for u in uuids:
                 count = db.session.query(Statistic.count).filter(Statistic.uuid_id == u.id, Statistic.name == s).first()
