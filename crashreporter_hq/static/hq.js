@@ -71,12 +71,26 @@ app.controller('GroupController', function($scope, $http) {
         $scope.PlotForm.statistics.push(['']);
     };
 
+    $scope.getMembers = function() {
+        $http.get('/groups/members').success(function (data) {
+            $scope.group_members = data;
+        });
+    };
+    
+    $scope.manageMembers = function(user_id, action) {
+        $http.post('/groups/members/'+ user_id + '?action='+ action).success(function() {
+            $scope.getMembers();
+        });
+    };
+    
     $scope.application_releases = [];
     $scope.aliases = [];
     $scope.statistic_plots = [];
+    $scope.group_members = [];
     $scope.getReleases();
     $scope.getAliases();
     $scope.getPlots();
+    $scope.getMembers();
     $scope.PlotForm = {'name': '', 'statistics': [['']], 'application': '', 'version': ''};
     $scope.AppReleaseForm = {'name': '', 'version': ''};
     $scope.currentNavItem = 'Plots';

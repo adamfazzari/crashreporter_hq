@@ -1,5 +1,6 @@
 
 
+import flask
 from flask import request, render_template, flash, redirect, url_for
 from sqlalchemy import func
 import flask.ext.login as flask_login
@@ -82,25 +83,38 @@ def group_join_request():
             return redirect(url_for('groups', group=group))
 
 
-@app.route('/groups/members', methods=['POST'])
+@app.route('/groups/members', methods=['get'])
 @flask_login.login_required
-def manage_member():
-    group = request.args['group']
+def get_group_members():
+    group = flask_login.current_user.group
+    if group is None:
+        return 'You are not in a group.'
+    users = User.query.filter(User.group_id == group.id).all()
+    data = {u.id: {'name': u.name, 'email': u.email, 'group_admin': u.group_admin} for u in users}
+    return flask.jsonify(data)
+
+
+@app.route('/groups/members/<int:user_id>', methods=['POST'])
+@flask_login.login_required
+def manage_member(user_id):
     loggedin_user = flask_login.current_user
-    if loggedin_user.group.name == group and loggedin_user.group_admin:
-        g = Group.query.filter(Group.name == group).first()
-        u = User.query.filter(User.email == request.args['user_email'], User.group_id == g.id).first()
-        if u:
-            if request.args['action'] == 'remove':
-                g.users.remove(u)
-                u.group = None
-                u.group_admin = False
-            elif request.args['action'] == 'promote':
-                u.group_admin = True
-            elif request.args['action'] == 'demote':
-                u.group_admin = False
-            db.session.commit()
-            return redirect(url_for('groups', group=group))
+    if not loggedin_user.group_admin:
+        flask.abort(403)
+
+    group = loggedin_user.group
+
+    u = User.query.filter(User.id == user_id, User.group_id == group.id).first()
+    if u:
+        if request.args['action'] == 'remove':
+            group.users.remove(u)
+            u.group = None
+            u.group_admin = False
+        elif request.args['action'] == 'promote':
+            u.group_admin = True
+        elif request.args['action'] == 'demote':
+            u.group_admin = False
+        db.session.commit()
+        return redirect(url_for('groups', group=group))
 
 
 @app.route('/groups/request/request_invite', methods=['POST'])
