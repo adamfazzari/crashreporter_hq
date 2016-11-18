@@ -25,10 +25,31 @@ app.controller('GroupController', function($scope, $http) {
         $http.post('/applications/releases/add?name=' + name + '&version='+ version).success(function() {
               $scope.getReleases();
         });
+    };    
+    
+    
+    $scope.getAliases = function() {
+        $http.get('/aliases').success(function (data) {
+            $scope.aliases = data;
+        });
+    };
+    
+    $scope.removeAlias = function(id) {
+        $http.post('/aliases/remove?id=' + id).success(function() {
+              $scope.getAliases();
+        });
+    };
+
+    $scope.addAlias = function(uuid, alias) {
+        $http.post('/aliases/add?uuid=' + uuid+ '&alias='+ alias).success(function() {
+              $scope.getAliases();
+        });
     };
 
     $scope.application_releases = [];
+    $scope.aliases = [];
     $scope.getReleases();
+    $scope.getAliases();
     $scope.AppReleaseForm = {'name': '.test', 'version': 'drrr'};
     $scope.currentNavItem = 'Group Members';
     

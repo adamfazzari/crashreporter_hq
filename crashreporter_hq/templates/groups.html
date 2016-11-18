@@ -235,27 +235,28 @@
                             {% endfor %}
 
                         </tr>
-                        {% for alias in user.group.aliases %}
-                            <tr>
-                                <td>{{ alias.alias }}</td>
-                                <td>{{ alias.user_identifier}}</td>
-                                <td>
-                                    <form method='POST' action="{{ url_for('manage_aliases', action='delete', uuid=alias.user_identifier) }}">
-                                        <input type="submit" value="Delete" >
-                                    </form>
-                                </td>
-                            </tr>
-                        {% endfor %}
+                        <tr ng-repeat="(id, alias) in aliases">
+                            <td>{a alias.alias a}</td>
+                            <td>{a alias.uuid a}</td>
+                            <td>
+                                <form method='POST' ng-submit="removeAlias(id)">
+                                    <input type="submit" value="Remove" >
+                                </form>
+                            </td>
+                        </tr>
                     </table>
-                    <br>
-                        <form action="{{ url_for('manage_aliases', action='create') }}" method="post" name="aliases">
-                            {{ alias_form.hidden_tag() }}
-                            <div style="display:flex">
-                                {{ render_field(alias_form.alias) }}
-                                {{ render_field(alias_form.uuid, field_name='UUID') }}
-                                {{ alias_form.submit }}
-                            </div>
-                        </form>
+
+                    <form method='POST' ng-submit="addAlias(AppAliasForm.uuid, AppAliasForm.alias)">
+                        <md-input-container>
+                            <label>UUID</label>
+                            <input ng-model="AppAliasForm.uuid"></input>
+                        </md-input-container>
+                        <md-input-container>
+                            <label>Alias</label>
+                            <input ng-model="AppAliasForm.alias"></input>
+                        </md-input-container>
+                        <md-button type="submit">Add</md-button>
+                    </form>
 
                 </md-content>
             </md-tab>

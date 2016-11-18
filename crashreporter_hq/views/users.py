@@ -44,25 +44,3 @@ def update_password():
         return render_template('user_profile.html', user=flask_login.current_user,
                                alias_form=alias_form, pw_form=password_change_form)
 
-@app.route('/users/profile/alias', methods=['POST'])
-@flask_login.login_required
-def manage_aliases():
-    if request.args.get('action') == 'create':
-        form = CreateAliasForm()
-        if form.validate_on_submit():
-            uuid = UUID.query.filter(UUID.user_identifier==form.data['uuid']).first()
-            if uuid:
-                alias = Alias(flask_login.current_user.group, form.data['alias'], uuid)
-                db.session.add(alias)
-                db.session.commit()
-            return redirect(request.referrer)
-        else:
-            return render_template('user_profile.html', user=flask_login.current_user, form=form)
-    elif request.args.get('action') == 'delete':
-        alias = Alias.query.join(UUID).filter(Alias.group_id==flask_login.current_user.group_id,
-                                              UUID.user_identifier == request.args.get('uuid')).first()
-        if alias:
-            db.session.delete(alias)
-            db.session.commit()
-        return redirect(request.referrer)
-
