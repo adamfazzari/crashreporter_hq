@@ -5,3 +5,4 @@ from groups import *
 from usage_stats import *
 from crashreports import *
 from index import *
+from applications import *

@@ -170,27 +170,3 @@ def manage_plots():
                         db.session.commit()
                         flash("Plot '%s' has been deleted" % plot.name)
                 return redirect(request.referrer)
-
-
-@app.route('/applications', methods=['GET', 'POST'])
-@flask_login.login_required
-def manage_application():
-    if request.method == 'POST':
-        if request.args.get('action') == 'add_release':
-            release_form = AddReleaseForm()
-            if release_form.validate_on_submit():
-                v0, v1, v2 = map(int, release_form.data['version'].split('.'))
-                application = Application.query.filter(Application.name == release_form.data['name'],
-                                                       Application.version_0 == v0,
-                                                       Application.version_1 == v1,
-                                                       Application.version_2 == v2,).first()
-                if application:
-                    application.is_release = True
-                    db.session.commit()
-        elif request.args.get('action') == 'remove_release':
-            application = Application.query.filter(Application.id == request.args.get('id')).first()
-            if application:
-                application.is_release = False
-                db.session.commit()
-
-        return redirect(request.referrer)

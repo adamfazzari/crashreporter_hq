@@ -7,8 +7,29 @@ app.config(['$interpolateProvider', function($interpolateProvider) {
   $interpolateProvider.endSymbol('a}');
 }]);
 
-app.controller('GroupController', function($scope) {
+app.controller('GroupController', function($scope, $http) {
 
+    $scope.getReleases = function() {
+        $http.get('/applications/releases').success(function (data) {
+            $scope.application_releases = data;
+        });
+    };
+    
+    $scope.removeRelease = function(id) {
+        $http.post('/applications/releases/remove?id=' + id).success(function() {
+              $scope.getReleases();
+        });
+    };
+
+    $scope.addRelease = function(name, version) {
+        $http.post('/applications/releases/add?name=' + name + '&version='+ version).success(function() {
+              $scope.getReleases();
+        });
+    };
+
+    $scope.application_releases = [];
+    $scope.getReleases();
+    $scope.AppReleaseForm = {'name': '.test', 'version': 'drrr'};
     $scope.currentNavItem = 'Group Members';
     
 });

@@ -14,145 +14,146 @@
 
 {% block content %}
 
-    <div ng-controller="GroupController" ng-cloak>
-        <md-content style="min-height: 600px;">
-            <md-tabs md-dynamic-height md-border-bottom>
+<div ng-controller="GroupController" ng-cloak>
+    <md-content style="min-height: 600px;">
+        <md-tabs md-dynamic-height md-border-bottom>
 
-                <md-tab label="Group Members">
-                    <md-content>
+            <md-tab label="Group Members">
+                <md-content>
 
-                        {%  if group is none %}
-                            <br>
-                            <div >
-                                <h3>Create a group</h3>
-                                <form action="groups" method="post" name="groups">
-                                    {{ cform.hidden_tag() }}
-                                    <ul>
-                                        <li><span>Group Name</span></li>
-                                        <li>{{ cform.name(size=80) }}</li>
-                                        <li><span>Group Description</span></li>
-                                        <li>{{ cform.description }}</li>
-                                        <li>{{ cform.submit }}</li>
-                                    </ul>
+                    {%  if group is none %}
+                        <br>
+                        <div >
+                            <h3>Create a group</h3>
+                            <form action="groups" method="post" name="groups">
+                                {{ cform.hidden_tag() }}
+                                <ul>
+                                    <li><span>Group Name</span></li>
+                                    <li>{{ cform.name(size=80) }}</li>
+                                    <li><span>Group Description</span></li>
+                                    <li>{{ cform.description }}</li>
+                                    <li>{{ cform.submit }}</li>
+                                </ul>
 
-                                    {% for error in cform.name.errors %}
-                                        <span style="color: red;">[{{ error }}]</span>
-                                    {% endfor %}
+                                {% for error in cform.name.errors %}
+                                    <span style="color: red;">[{{ error }}]</span>
+                                {% endfor %}
+                            </form>
+                        </div>
+
+                        <div>
+                            <h3>Search for a group</h3>
+                            <form action="groups" method="post" name="groups">
+                                {{ sform.hidden_tag() }}
+                                <ul>
+                                    <li>
+                                        <span>Group Name</span>
+                                    </li>
+                                    <li>
+                                        {{ sform.name(size=80) }}
+                                    </li>
+                                    <li>
+                                        {{ sform.submit }}
+                                    </li>
+                                </ul>
+
+                                {% for error in sform.name.errors %}
+                                    <span style="color: red;">[{{ error }}]</span>
+                                {% endfor %}
+                            </form>
+                        </div>
+
+                    {% else %}
+                        <div>
+                            <h3> {{ group.name }} </h3>
+                            {% if group.description %}
+                                <p> {{ group.description }} </p>
+                            {% endif %}
+                            {%  if not user.group %}
+                                <form method="POST" action="{{ url_for('request_group_invite', group=group.name) }}">
+                                    {% if user in group.join_requests %}
+                                        <md-button disabled="true" type='submit'>Request Sent</md-button>
+                                    {% else %}
+                                        <md-button type='submit'>Request Invitation</md-button>
+                                    {% endif %}
                                 </form>
-                            </div>
-
-                            <div>
-                                <h3>Search for a group</h3>
-                                <form action="groups" method="post" name="groups">
-                                    {{ sform.hidden_tag() }}
-                                    <ul>
-                                        <li>
-                                            <span>Group Name</span>
-                                        </li>
-                                        <li>
-                                            {{ sform.name(size=80) }}
-                                        </li>
-                                        <li>
-                                            {{ sform.submit }}
-                                        </li>
-                                    </ul>
-
-                                    {% for error in sform.name.errors %}
-                                        <span style="color: red;">[{{ error }}]</span>
-                                    {% endfor %}
-                                </form>
-                            </div>
-
-                        {% else %}
-                            <div>
-                                <h3> {{ group.name }} </h3>
-                                {% if group.description %}
-                                    <p> {{ group.description }} </p>
-                                {% endif %}
-                                {%  if not user.group %}
-                                    <form method="POST" action="{{ url_for('request_group_invite', group=group.name) }}">
-                                        {% if user in group.join_requests %}
-                                            <md-button disabled="true" type='submit'>Request Sent</md-button>
-                                        {% else %}
-                                            <md-button type='submit'>Request Invitation</md-button>
-                                        {% endif %}
-                                    </form>
-                                {% endif %}
-                                {% if user.group_id == group.id %}
-                                    <table border="1" class="sortable", style="width:100%">
-                                        <tr>
-
-                                            {% for header in ('User', 'Group Admin', 'Actions') %}
-                                                <td class="tableheader">{{ header }}</td>
-                                            {% endfor %}
-                                        </tr>
-
-                                        {% for u in group.users%}
-                                            <tr>
-                                                <td style="text-align: center; width: 33%"> {{ u.name}}</td>
-                                                <td style="text-align: center; width: 33%">{{ 'Yes' if u.group_admin else 'No' }}</td>
-                                                {% if user.group_admin %}
-                                                    <td style="text-align: center; width: 33%">
-                                                        <div style="display:inline-flex">
-                                                            <form method='POST' action="{{ url_for('manage_member', group=group.name, user_email=u.email, action='remove') }}">
-                                                                <input type="submit" value="Remove" >
-                                                            </form>
-
-                                                            <form method='POST' action="{{ url_for('manage_member', group=group.name, user_email=u.email, action='demote' if u.group_admin else 'promote') }}">
-                                                                <input type="submit" value={{ 'Demote' if u.group_admin else 'Promote' }} >
-                                                            </form>
-                                                        <div>
-                                                    </td>
-                                                {% endif %}
-
-                                            </tr>
-                                        {% endfor %}
-                                    </table>
-                                {% endif %}
-                            </div>
-                        {% endif %}
-
-                        {% if user.group_admin %}
-                            <div>
-                                <h3> Invitations </h3>
-                                {% if group.join_requests %}
+                            {% endif %}
+                            {% if user.group_id == group.id %}
                                 <table border="1" class="sortable", style="width:100%">
                                     <tr>
 
-                                        {% for header in ('User', 'Company', 'Action') %}
+                                        {% for header in ('User', 'Group Admin', 'Actions') %}
                                             <td class="tableheader">{{ header }}</td>
                                         {% endfor %}
                                     </tr>
 
-                                    {% for u in group.join_requests %}
+                                    {% for u in group.users%}
                                         <tr>
-                                            <td style="text-align: center; width: 33%"> {{ u.name }}</td>
-                                            <td style="text-align: center; width: 33%"> {{ u.company }}</td>
-                                            <td style="text-align: center; width: 33%">
-                                                <div style="display:inline-flex">
-                                                    <form method='POST' action="{{ url_for('group_join_request', group=group.name, user_email=u.email, action='accept') }}">
-                                                        <input type="submit" value="Accept" >
-                                                    </form>
-                                                    <form method='POST' action="{{ url_for('group_join_request', group=group.name, user_email=u.email, action='reject') }}">
-                                                        <input type="submit" value="Reject" >
-                                                    </form>
-                                                </div>
-                                            </td>
+                                            <td style="text-align: center; width: 33%"> {{ u.name}}</td>
+                                            <td style="text-align: center; width: 33%">{{ 'Yes' if u.group_admin else 'No' }}</td>
+                                            {% if user.group_admin %}
+                                                <td style="text-align: center; width: 33%">
+                                                    <div style="display:inline-flex">
+                                                        <form method='POST' action="{{ url_for('manage_member', group=group.name, user_email=u.email, action='remove') }}">
+                                                            <input type="submit" value="Remove" >
+                                                        </form>
+
+                                                        <form method='POST' action="{{ url_for('manage_member', group=group.name, user_email=u.email, action='demote' if u.group_admin else 'promote') }}">
+                                                            <input type="submit" value={{ 'Demote' if u.group_admin else 'Promote' }} >
+                                                        </form>
+                                                    <div>
+                                                </td>
+                                            {% endif %}
+
                                         </tr>
                                     {% endfor %}
                                 </table>
-                                {% else %}
-                                    <p>There are no pending invitations.</p>
-                                {% endif %}
-                            </div>
-                        {% endif %}
+                            {% endif %}
+                        </div>
+                    {% endif %}
 
-                    </md-content>
-                </md-tab>
+                    {% if user.group_admin %}
+                        <div>
+                            <h3> Invitations </h3>
+                            {% if group.join_requests %}
+                            <table border="1" class="sortable", style="width:100%">
+                                <tr>
+
+                                    {% for header in ('User', 'Company', 'Action') %}
+                                        <td class="tableheader">{{ header }}</td>
+                                    {% endfor %}
+                                </tr>
+
+                                {% for u in group.join_requests %}
+                                    <tr>
+                                        <td style="text-align: center; width: 33%"> {{ u.name }}</td>
+                                        <td style="text-align: center; width: 33%"> {{ u.company }}</td>
+                                        <td style="text-align: center; width: 33%">
+                                            <div style="display:inline-flex">
+                                                <form method='POST' action="{{ url_for('group_join_request', group=group.name, user_email=u.email, action='accept') }}">
+                                                    <input type="submit" value="Accept" >
+                                                </form>
+                                                <form method='POST' action="{{ url_for('group_join_request', group=group.name, user_email=u.email, action='reject') }}">
+                                                    <input type="submit" value="Reject" >
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </table>
+                            {% else %}
+                                <p>There are no pending invitations.</p>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+
+                </md-content>
+            </md-tab>
 
 
-                <md-tab label="Application Releases" ng-disabled={{ "false" if group else "true" }}>
-                    <md-content>
+            <md-tab label="Application Releases" ng-disabled={{ "false" if group else "true" }}>
+                <md-content>
+                    <div layout="column">
                         <table border="1" class="sortable", style="width:100%">
                             <tr class="tableheader">
 
@@ -161,180 +162,180 @@
                                 {% endfor %}
 
                             </tr>
-                            {% for app in group.applications %}
-                                {% if app.is_release %}
-                                    <tr>
-                                        <td>{{ app.name }}</td>
-                                        <td>{{ app.version_string }}</td>
-                                        <td>
-                                            <form method='POST' action="{{ url_for('manage_application', action='remove_release', id=app.id)}}">
-                                                <input type="submit" value="Remove" >
-                                            </form>
-                                        </td>
-                                    </tr>
-                                {% endif %}
-                            {% endfor %}
-
-                            <form action="{{ url_for('manage_application', action='add_release') }}" method="post">
-                                {{ release_form.hidden_tag() }}
-                                <div style="display:flex">
-                                    {{ render_field(release_form.name, field_name='Application Name') }}
-                                    {{ render_field(release_form.version, field_name='Version') }}
-                                    {{ release_form.submit }}
-                                </div>
-                            </form>
-                        </table>
-                    </md-content>
-                </md-tab>
-
-
-                <md-tab label="Application Users" ng-disabled={{ "false" if group else "true" }}>
-                    <md-content>
-                        <table border="1" class="sortable", style="width:100%">
-                            <tr class="tableheader">
-
-                                {% for header in ('UUID', 'Usage Stats', 'Crash Reports', '') %}
-                                    <td class="tableheader">{{ header }}</td>
-                                {% endfor %}
-
+                            <tr ng-repeat="(id, app) in application_releases">
+                                <td>{a app.name a}</td>
+                                <td>{a app.version a}</td>
+                                <td>
+                                    <form method='POST' ng-submit="removeRelease(id)">
+                                        <input type="submit" value="Remove" >
+                                    </form>
+                                </td>
                             </tr>
-
-                            {% for uuid in uuids %}
-                                <tr>
-                                    <td>{{ uuid.user_identifier }}</td>
-                                    <td>
-                                        <form method='POST' action="{{ url_for('manage_uuid', uuid_id=uuid.id, action='toggle_usage_stats') }}">
-                                            <input type="submit" value={{ 'Off' if uuid.usagestats_black_listed else 'On'}} >
-                                        </form>
-                                    </td>
-                                    <td>
-                                        <form method='POST' action="{{ url_for('manage_uuid', uuid_id=uuid.id, action='toggle_crash_reports') }}">
-                                            <input type="submit" value={{ 'Off' if uuid.crashreport_black_listed else 'On'}} >
-                                        </form>
-                                    </td>
-                                    <td>
-                                        <form method='POST' action="{{ url_for('manage_uuid', uuid_id=uuid.id, action='delete') }}">
-                                            <input type="submit" value='Delete' >
-                                        </form>
-                                    </td>
-                                </tr>
-                            {% endfor %}
                         </table>
-                    </md-content>
-                </md-tab>
 
-
-                <md-tab label="Aliases" ng-disabled={{ "false" if group else "true" }}>
-                    <md-content>
-                        <table border="1" class="sortable", style="width:100%">
-                            <tr class="tableheader">
-
-                                {% for header in ('Alias', 'UUID', '') %}
-                                    <td class="tableheader">{{ header }}</td>
-                                {% endfor %}
-
-                            </tr>
-                            {% for alias in user.group.aliases %}
-                                <tr>
-                                    <td>{{ alias.alias }}</td>
-                                    <td>{{ alias.user_identifier}}</td>
-                                    <td>
-                                        <form method='POST' action="{{ url_for('manage_aliases', action='delete', uuid=alias.user_identifier) }}">
-                                            <input type="submit" value="Delete" >
-                                        </form>
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </table>
-                        <br>
-                            <form action="{{ url_for('manage_aliases', action='create') }}" method="post" name="aliases">
-                                {{ alias_form.hidden_tag() }}
-                                <div style="display:flex">
-                                    {{ render_field(alias_form.alias) }}
-                                    {{ render_field(alias_form.uuid, field_name='UUID') }}
-                                    {{ alias_form.submit }}
-                                </div>
-                            </form>
-
-                    </md-content>
-                </md-tab>
-
-
-                <md-tab label="Trackables" ng-disabled={{ "false" if group else "true" }}>
-                    <md-content>
-                        <md-tabs>
-                            <md-content>
-
-
-                                {% for trackable in ('Statistics', 'States', 'Timers', 'Sequences') %}
-                                    <md-tab label="{{ trackable }} Trackable">
-
-                                        <table border="1" class="sortable", style="width:100%">
-                                            <tr class="tableheader">
-                                                {% for header in ('Name', 'Number of Users Reported', '') %}
-                                                    <td class="tableheader">{{ header }}</td>
-                                                {% endfor %}
-                                            </tr>
-                                            {% for s in trackables[trackable.lower()] %}
-                                                <tr>
-                                                    <td>{{ s[0].name }}</td>
-                                                    <td>{{ s[1]}}</td>
-                                                </tr>
-                                            {% endfor %}
-                                        </table>
-                                    </md-tab>
-                                {% endfor %}
-
-                            </md-content>
-                        </md-tabs>
-
-                    </md-content>
-                </md-tab>
-
-                <md-tab label="Plots" ng-disabled={{ "false" if group else "true" }}>
-                    <md-content>
-                        <table border="1" class="sortable", style="width:100%">
-                            <tr class="tableheader">
-
-                                {% for header in ('Plot Name', 'Fields', '') %}
-                                    <td class="tableheader">{{ header }}</td>
-                                {% endfor %}
-
-                            </tr>
-                            {% for plot in user.group.barplots %}
-                                <tr>
-                                    <td>{{ plot.name}}</td>
-                                    <td>
-                                        {%  for s in plot.statistics %}
-                                            <div style="display:flex"> {{ s.name }}</div>
-                                        {% endfor %}
-                                    </td>
-                                    <td>
-                                        <form method='POST' action="{{ url_for('manage_plots', action='delete', type='statistic', id=plot.id) }}">
-                                            <input type="submit" value="Delete" >
-                                        </form>
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </table>
-                        <br>
-                        <form action="{{ url_for('manage_plots', action='create_bar_plot') }}" method="post">
-                                {{ plot_form.hidden_tag() }}
-                                <div style="display:flex">
-                                    {{ render_field(plot_form.name, field_name='Plot Name') }}
-                                    {{ render_field(plot_form.fields, field_name='Fields') }}
-                                    {{ plot_form.submit }}
-                                </div>
+                        <form method='POST' ng-submit="addRelease(AppReleaseForm.name, AppReleaseForm.version)">
+                            <md-input-container>
+                                <label>Application Name</label>
+                                <input ng-model="AppReleaseForm.name"></input>
+                            </md-input-container>
+                            <md-input-container>
+                                <label>Version</label>
+                                <input ng-model="AppReleaseForm.version"></input>
+                            </md-input-container>
+                            <md-button type="submit">Add</md-button>
                         </form>
-                    </md-content>
-                </md-tab>
+                    </div>
+                </md-content>
+            </md-tab>
 
 
-            </md-tabs>
+            <md-tab label="Application Users" ng-disabled={{ "false" if group else "true" }}>
+                <md-content>
+                    <table border="1" class="sortable", style="width:100%">
+                        <tr class="tableheader">
+
+                            {% for header in ('UUID', 'Usage Stats', 'Crash Reports', '') %}
+                                <td class="tableheader">{{ header }}</td>
+                            {% endfor %}
+
+                        </tr>
+
+                        {% for uuid in uuids %}
+                            <tr>
+                                <td>{{ uuid.user_identifier }}</td>
+                                <td>
+                                    <form method='POST' action="{{ url_for('manage_uuid', uuid_id=uuid.id, action='toggle_usage_stats') }}">
+                                        <input type="submit" value={{ 'Off' if uuid.usagestats_black_listed else 'On'}} >
+                                    </form>
+                                </td>
+                                <td>
+                                    <form method='POST' action="{{ url_for('manage_uuid', uuid_id=uuid.id, action='toggle_crash_reports') }}">
+                                        <input type="submit" value={{ 'Off' if uuid.crashreport_black_listed else 'On'}} >
+                                    </form>
+                                </td>
+                                <td>
+                                    <form method='POST' action="{{ url_for('manage_uuid', uuid_id=uuid.id, action='delete') }}">
+                                        <input type="submit" value='Delete' >
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </md-content>
+            </md-tab>
 
 
-        </md-content>
+            <md-tab label="Aliases" ng-disabled={{ "false" if group else "true" }}>
+                <md-content>
+                    <table border="1" class="sortable", style="width:100%">
+                        <tr class="tableheader">
 
-    </div>
+                            {% for header in ('Alias', 'UUID', '') %}
+                                <td class="tableheader">{{ header }}</td>
+                            {% endfor %}
+
+                        </tr>
+                        {% for alias in user.group.aliases %}
+                            <tr>
+                                <td>{{ alias.alias }}</td>
+                                <td>{{ alias.user_identifier}}</td>
+                                <td>
+                                    <form method='POST' action="{{ url_for('manage_aliases', action='delete', uuid=alias.user_identifier) }}">
+                                        <input type="submit" value="Delete" >
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                    <br>
+                        <form action="{{ url_for('manage_aliases', action='create') }}" method="post" name="aliases">
+                            {{ alias_form.hidden_tag() }}
+                            <div style="display:flex">
+                                {{ render_field(alias_form.alias) }}
+                                {{ render_field(alias_form.uuid, field_name='UUID') }}
+                                {{ alias_form.submit }}
+                            </div>
+                        </form>
+
+                </md-content>
+            </md-tab>
+
+
+            <md-tab label="Trackables" ng-disabled={{ "false" if group else "true" }}>
+                <md-content>
+                    <md-tabs>
+                        <md-content>
+
+
+                            {% for trackable in ('Statistics', 'States', 'Timers', 'Sequences') %}
+                                <md-tab label="{{ trackable }} Trackable">
+
+                                    <table border="1" class="sortable", style="width:100%">
+                                        <tr class="tableheader">
+                                            {% for header in ('Name', 'Number of Users Reported', '') %}
+                                                <td class="tableheader">{{ header }}</td>
+                                            {% endfor %}
+                                        </tr>
+                                        {% for s in trackables[trackable.lower()] %}
+                                            <tr>
+                                                <td>{{ s[0].name }}</td>
+                                                <td>{{ s[1]}}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </table>
+                                </md-tab>
+                            {% endfor %}
+
+                        </md-content>
+                    </md-tabs>
+
+                </md-content>
+            </md-tab>
+
+            <md-tab label="Plots" ng-disabled={{ "false" if group else "true" }}>
+                <md-content>
+                    <table border="1" class="sortable", style="width:100%">
+                        <tr class="tableheader">
+
+                            {% for header in ('Plot Name', 'Fields', '') %}
+                                <td class="tableheader">{{ header }}</td>
+                            {% endfor %}
+
+                        </tr>
+                        {% for plot in user.group.barplots %}
+                            <tr>
+                                <td>{{ plot.name}}</td>
+                                <td>
+                                    {%  for s in plot.statistics %}
+                                        <div style="display:flex"> {{ s.name }}</div>
+                                    {% endfor %}
+                                </td>
+                                <td>
+                                    <form method='POST' action="{{ url_for('manage_plots', action='delete', type='statistic', id=plot.id) }}">
+                                        <input type="submit" value="Delete" >
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                    <br>
+                    <form action="{{ url_for('manage_plots', action='create_bar_plot') }}" method="post">
+                            {{ plot_form.hidden_tag() }}
+                            <div style="display:flex">
+                                {{ render_field(plot_form.name, field_name='Plot Name') }}
+                                {{ render_field(plot_form.fields, field_name='Fields') }}
+                                {{ plot_form.submit }}
+                            </div>
+                    </form>
+                </md-content>
+            </md-tab>
+
+
+        </md-tabs>
+
+
+    </md-content>
+
+</div>
 
 {% endblock %}
