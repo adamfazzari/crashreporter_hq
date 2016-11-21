@@ -139,7 +139,7 @@
             </md-tab>
 
 
-            <md-tab label="Application Releases" ng-disabled={{ "false" if group else "true" }}>
+            <md-tab label="Application Releases" ng-disabled={{ "false" if user.group else "true" }}>
                 <md-content>
                     <div layout="column">
                         <table border="1" class="sortable", style="width:100%">
@@ -175,7 +175,7 @@
             </md-tab>
 
 
-            <md-tab label="Application Users" ng-disabled={{ "false" if group else "true" }}>
+            <md-tab label="Application Users" ng-disabled={{ "false" if user.group else "true" }}>
                 <md-content>
                     <table border="1" class="sortable", style="width:100%">
                         <tr class="tableheader">
@@ -211,7 +211,7 @@
             </md-tab>
 
 
-            <md-tab label="Aliases" ng-disabled={{ "false" if group else "true" }}>
+            <md-tab label="Aliases" ng-disabled={{ "false" if user.group else "true" }}>
                 <md-content>
                     <table border="1" class="sortable", style="width:100%">
                         <tr class="tableheader">
@@ -246,7 +246,7 @@
             </md-tab>
 
 
-            <md-tab label="Trackables" ng-disabled={{ "false" if group else "true" }}>
+            <md-tab label="Trackables" ng-disabled={{ "false" if user.group else "true" }}>
                 <md-content>
                     <md-tabs>
                         <md-content>
@@ -277,7 +277,7 @@
                 </md-content>
             </md-tab>
 
-            <md-tab label="Plots" ng-disabled={{ "false" if group else "true" }}>
+            <md-tab label="Plots" ng-disabled={{ "false" if user.group else "true" }}>
                 <md-content>
                     <div layout="column" style="min-height: 400px;">
                         <table border="1" class="sortable", style="width:100%">
