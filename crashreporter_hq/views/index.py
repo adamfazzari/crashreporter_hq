@@ -83,10 +83,10 @@ def filter_reports(criteria):
 
     page = criteria.get('page', 1)
     n_per_page = criteria.get('reports_per_page')
-    q = q.order_by(CrashReport.id.asc())
+    q = q.order_by(CrashReport.date.desc())
     n_reports = q.count()
     max_page = int(ceil(float(n_reports) / n_per_page))
-    reports = q[n_per_page * (page-1):n_per_page * page]
+    reports = q[n_per_page * (page-1):n_per_page * page: -1]
     response = {'reports': [],
                 'page': page,
                 'pages': range(1, max_page+1),
