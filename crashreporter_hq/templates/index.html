@@ -74,7 +74,7 @@
 
             <tr ng-repeat="r in reports">
                 <td>{a r.report_number a}</td>
-                <td><a href="/reports/related/{a r.report_number a}">{a r.n_similar a}</a></td>
+                <td><a href="/reports/related/{a r.report_number a}">{a r.n_similar+1 a}</a></td>
                 <td>{a r.application_name a}</td>
                 <td>{a r.application_version a}</td>
                 <td style="width: 10%">{a r.user a}</td>
