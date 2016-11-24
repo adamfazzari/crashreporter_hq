@@ -5,7 +5,6 @@ from datetime import datetime
 from math import ceil
 from sqlalchemy import or_, func
 
-from ..tools import get_similar_reports
 from ..models import CrashReport, Application
 
 from users import *
@@ -20,7 +19,12 @@ def filter_reports(criteria):
     user = flask_login.current_user
     group = user.group
 
-    q = get_similar_reports(return_query=True)
+    if criteria.get('related_to_id', None) is None:
+        q = CrashReport.query.group_by('related_group_id')
+    else:
+        related_group_id = db.session.query(CrashReport.related_group_id).filter(CrashReport.id == int(criteria['related_to_id'])).first()
+        q = CrashReport.query.filter(CrashReport.related_group_id == related_group_id[0])
+
     q = q.join(Application).filter(CrashReport.group == group)
 
     # Filter aliased state

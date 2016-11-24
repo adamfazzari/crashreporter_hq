@@ -128,7 +128,8 @@ app.controller('SearchController', function($scope, $http){
 
 
     $scope.searchform = {filters: [['', '']],
-                         page: 1, reports_per_page : 25
+                         page: 1, reports_per_page : 25,
+                         related_group_id: null,
                         };
     
     $scope.addFilter = function() {
@@ -139,7 +140,6 @@ app.controller('SearchController', function($scope, $http){
     $scope.removeFilter = function(criteria) {
         $scope.searchform.filters.splice($scope.searchform.filters.indexOf(criteria), 1);
     };
-
 
     $scope.deleteReport = function(report_number) {
       $http.post('/reports/' + report_number + '/delete').success(function () {
@@ -189,7 +189,18 @@ app.controller('SearchController', function($scope, $http){
         })
     };
 
+    $scope.setRelatedGroup = function(related_to_id) {
+        $scope.searchform.related_to_id = related_to_id;
+        $scope.submitSearch();
+    };
+
+    $scope.removeRelatedGroup = function() {
+        $scope.searchform.related_to_id = null;
+        $scope.submitSearch();
+    };
+
     $scope.submitSearch();
 
 });
+
 

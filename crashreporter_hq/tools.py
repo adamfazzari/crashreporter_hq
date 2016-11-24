@@ -46,15 +46,6 @@ def save_report(payload):
     else:
         return None, 'Invalid or missing API Key.'
 
-
-def get_similar_reports(return_query=False):
-    q = CrashReport.query.group_by('related_group_id')
-    if return_query:
-        return q
-    else:
-        return q.all()
-
-
 def get_all_reports():
     return CrashReport.query.all()
 

@@ -45,7 +45,11 @@
                 </md-input-container>
 
                 <section layout="row" layout-sm="column" layout-align="left center" layout-wrap>
-                    <md-button ng-click="submitSearch()" class="md-raised" name="search_button">Search</md-button>
+                    <md-button ng-click="submitSearch()" class="md-raised" name="search_button">
+                        Search</md-button>
+                    <md-button class="md-raised" ng-show="searchform.related_to_id" ng-click="removeRelatedGroup()">
+                        Similar to {a searchform.related_to_id a} X </md-button>
+
                     <md-progress-circular id="searchprogress" class="ng-hide" md-mode="indeterminate" ng-hide="!is_searching"></md-progress-circular>
                 </section>
             </div>
@@ -67,14 +71,22 @@
 
         <table border="1" style="width:100%;" class="reporttable sortable">
             <tr>
-                {% for header in ('#', 'Count', 'Application', 'Version', 'User', 'Error Type', 'Error Message', 'Date', 'Time', '', '') %}
-                    <td class="tableheader">{{ header }}</td>
-                {% endfor %}
+                    <td class="tableheader">#</td>
+                    <td class="tableheader" ng-show="!searchform.related_to_id">Count</td>
+                    <td class="tableheader">Application</td>
+                    <td class="tableheader">Version</td>
+                    <td class="tableheader">User</td>
+                    <td class="tableheader">Error Type</td>
+                    <td class="tableheader">Error Message</td>
+                    <td class="tableheader">Date</td>
+                    <td class="tableheader">Time</td>
+                    <td class="tableheader"></td>
+                    <td class="tableheader"></td>
             </tr>
 
-            <tr ng-repeat="r in reports">
+            <tr ng-repeat="r in reports" ng-show="!is_searching">
                 <td>{a r.report_number a}</td>
-                <td><a href="/reports/related/{a r.report_number a}">{a r.related_report_numbers.length a}</a></td>
+                <td ng-show="!searchform.related_to_id"><md-button ng-click="setRelatedGroup(r.report_number)">{a r.related_report_numbers.length a}</md-button></td>
                 <td>{a r.application_name a}</td>
                 <td>{a r.application_version a}</td>
                 <td style="width: 10%">{a r.user a}</td>
