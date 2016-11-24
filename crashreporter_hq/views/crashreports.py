@@ -71,6 +71,34 @@ def view_related_reports(report_id):
     return html
 
 
+@app.route('/reports/<int:report_number>/info', methods=['GET'])
+@flask_login.login_required
+def get_report_info(report_number):
+    user = flask_login.current_user
+    group = user.group
+    aliases = {a.user_identifier: a.alias for a in group.aliases}
+    report = CrashReport.query.filter(CrashReport.id == report_number).first()
+    if report:
+        return flask.jsonify(_report_to_json(report, aliases=aliases))
+
+
+def _report_to_json(report, aliases=None):
+    if aliases is None:
+        user = report.uuid.user_identifier
+    else:
+        user = aliases.get(report.uuid.user_identifier, report.uuid.user_identifier)
+    return {'report_number': report.id,
+             'related_report_numbers': [report.id for report in report.related_reports],
+             'application_name': report.application.name,
+             'application_version': report.application.version_string,
+             'is_release': report.application.is_release,
+             'user': user,
+             'error_type': report.error_type,
+             'error_message': report.error_message,
+             'date': report.date.strftime('%B %d %Y%I:%M %p'),
+             'time': report.date.strftime('%I:%M %p')
+             }
+
 @app.route('/reports/delete', methods=['POST'])
 @flask_login.login_required
 def delete_many_reports():
@@ -85,7 +113,7 @@ def delete_many_reports():
     return redirect(url_for('view_reports'))
 
 
-@app.route('/reports/<int:report_id>/delete')
+@app.route('/reports/<int:report_id>/delete', methods=['POST'])
 @flask_login.login_required
 def delete_single_report(report_id):
     delete_similar = False

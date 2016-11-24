@@ -7,3 +7,4 @@ from index import *
 from applications import *
 from aliases import *
 from plots import *
+from ..extensions.views import *

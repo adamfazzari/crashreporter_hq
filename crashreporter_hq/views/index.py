@@ -1,16 +1,15 @@
 import flask
 from flask import Response
-from flask.ext.paginate import Pagination
+
 from datetime import datetime
 from math import ceil
 from sqlalchemy import or_, func
 
 from ..tools import get_similar_reports
-from users import *
-
-from ..forms import SearchReportsForm
 from ..models import CrashReport, Application
-from ..extensions.views import *
+
+from users import *
+from crashreports import _report_to_json
 from constants import *
 
 import httplib
@@ -90,17 +89,7 @@ def filter_reports(criteria):
     aliases = {a.user_identifier: a.alias for a in group.aliases}
 
     for r in reports:
-        response['reports'].append({'report_number': r.id,
-                                    'n_similar': len(r.related_reports),
-                                    'application_name': r.application.name,
-                                    'application_version': r.application.version_string,
-                                    'is_release': r.application.is_release,
-                                    'user': aliases.get(r.uuid.user_identifier, r.uuid.user_identifier),
-                                    'error_type': r.error_type,
-                                    'error_message': r.error_message,
-                                    'date': r.date.strftime('%B %d %Y%I:%M %p'),
-                                    'time': r.date.strftime('%I:%M %p')
-                                    })
+        response['reports'].append(_report_to_json(r, aliases=aliases))
     json = flask.jsonify(response)
     return json
 

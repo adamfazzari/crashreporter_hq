@@ -7,6 +7,7 @@ app.config(['$interpolateProvider', function($interpolateProvider) {
   $interpolateProvider.endSymbol('a}');
 }]);
 
+
 app.controller('GroupController', function($scope, $http) {
 
     $scope.getReleases = function() {
@@ -97,7 +98,6 @@ app.controller('GroupController', function($scope, $http) {
     
 });
 
-
 app.controller('HQController', function($scope, $http, $mdSidenav) {
 
     $scope.toggleMenu = function (event) {
@@ -140,6 +140,31 @@ app.controller('SearchController', function($scope, $http){
         $scope.searchform.filters.splice($scope.searchform.filters.indexOf(criteria), 1);
     };
 
+
+    $scope.deleteReport = function(report_number) {
+      $http.post('/reports/' + report_number + '/delete').success(function () {
+          var r = null;
+          for (var i=0; i < $scope.reports.length; i++) {
+              r = $scope.reports[i];
+              if (r.report_number == report_number) {
+                  if (r.related_report_numbers.length == 0) {
+                      $scope.reports.splice(i, 1);
+                      // $scope.apply();
+                      break;
+                  } else {
+                      var next_related_report_id = r.related_report_numbers[r.related_report_numbers.length-1];
+                      $http.get('/reports/' + next_related_report_id + '/info').success(function (report){
+                          $scope.reports[i] = report;
+                      });
+                      break;
+                  }
+                  
+              }
+          }
+          $scope.pagination.total_reports -=1;
+
+      })
+    };
 
     $scope.submitSearch = function(page) {
         $scope.is_searching = true;
