@@ -14,6 +14,7 @@ from ..models import CrashReport, UUID, Traceback, Application
 
 
 @app.route('/reports/<int:report_number>')
+@flask_login.login_required
 def view_report(report_number):
     cr = CrashReport.query.filter(CrashReport.id == report_number).first()
     tracebacks = Traceback.query.filter(Traceback.crashreport_id == report_number).all()
@@ -40,6 +41,7 @@ def view_report(report_number):
 
 
 @app.route('/reports/related/<int:report_id>')
+@flask_login.login_required
 def view_related_reports(report_id):
     PER_PAGE = 25
     report = CrashReport.query.filter(CrashReport.id == report_id).first()
