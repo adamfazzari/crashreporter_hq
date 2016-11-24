@@ -88,7 +88,7 @@ def _report_to_json(report, aliases=None):
     else:
         user = aliases.get(report.uuid.user_identifier, report.uuid.user_identifier)
     return {'report_number': report.id,
-             'related_report_numbers': [report.id for report in report.related_reports],
+             'related_report_numbers': [r.id for r in report.related_reports],
              'application_name': report.application.name,
              'application_version': report.application.version_string,
              'is_release': report.application.is_release,
