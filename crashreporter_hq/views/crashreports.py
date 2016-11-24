@@ -96,6 +96,26 @@ def delete_single_report(report_id):
         return 'Failed. Crash report #%d does not exist.' % report_id
 
 
+@app.route('/reports/upload', methods=['POST'])
+def upload_single_report():
+    if request.method == 'POST':
+        payload = json.loads(request.data)
+        cr, response = save_report(payload)
+        return response
+    else:
+        return 'Upload failed'
+
+
+@app.route('/reports/upload_many', methods=['POST'])
+def upload_many_reports():
+    if request.method == 'POST':
+        payload = json.loads(request.data)
+        for package in payload:
+            cr, response = save_report(package)
+        return response
+    else:
+        return 'Upload failed'
+
 
 @app.route('/reports/view_stats', methods=['GET', 'POST'])
 @flask_login.login_required
