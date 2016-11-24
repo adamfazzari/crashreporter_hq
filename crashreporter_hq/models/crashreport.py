@@ -73,18 +73,20 @@ class CrashReport(db.Model):
             for r in similar_reports:
                 r.related_reports.append(self)
         else:
-            signature = tuple([(tb.module, tb.error_line_number) for tb in self.traceback])
-            related_id = hash(signature)
-            self.related_group_id = related_id
+            self.related_group_id = CrashReport.get_related_hash(self)
 
         self.commit()
 
     def __getitem__(self, item):
         return getattr(self, CrashReport.__mappings__[item], '')
 
+    @staticmethod
+    def get_related_hash(report):
+        signature = tuple([(tb.module, tb.error_line) for tb in report.traceback])
+        return hash(signature)
+
     def get_similar_reports(self):
-        signature = tuple([(tb.module, tb.error_line_number) for tb in self.traceback])
-        related_id = hash(signature)
+        related_id = CrashReport.get_related_hash(self)
         return CrashReport.query.filter(CrashReport.related_group_id == related_id).all()
 
     def __repr__(self):
