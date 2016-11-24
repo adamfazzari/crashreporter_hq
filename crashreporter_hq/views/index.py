@@ -28,14 +28,14 @@ def filter_reports(criteria):
     q = q.join(Application).filter(CrashReport.group == group)
 
     # Filter aliased state
-    aliased_state = int(request.args.get('hide_aliased', ANY))
+    aliased_state = criteria.get('alias_filter', ANY)
     if aliased_state == NONE:
         q = q.filter(CrashReport.uuid_id.notin_([a.uuid_id for a in group.aliases]))
     elif aliased_state == ONLY:
         q = q.filter(CrashReport.uuid_id.in_([a.uuid_id for a in group.aliases]))
 
     # Filter released state
-    released_state = int(request.args.get('releases_only', ANY))
+    released_state = criteria.get('release_filter', ANY)
     if released_state == NONE:
         q = q.filter(Application.is_release == False)
     elif released_state == ONLY:

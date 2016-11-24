@@ -112,6 +112,16 @@ app.controller('HQController', function($scope, $http, $mdSidenav) {
 app.controller('SearchController', function($scope, $http){
     $scope.reports = [];
     $scope.is_searching = false;
+    $scope.alias_filter_options = [
+                                  {field: 'No Filter', value: 'any'},
+                                  {field: 'Only Aliases', value: 'only'},
+                                  {field: 'No Aliases', value: 'none'},
+                                  ];
+    $scope.release_filter_options = [
+                                  {field: 'No Filter', value: 'any'},
+                                  {field: 'Releases Only', value: 'only'},
+                                  {field: 'Development Only', value: 'none'},
+                                  ];
     $scope.searchfields = [
                           {field: 'User', value: 'user_identifier'},
                           {field: 'Application Name', value: 'application_name'},
@@ -130,6 +140,8 @@ app.controller('SearchController', function($scope, $http){
     $scope.searchform = {filters: [['', '']],
                          page: 1, reports_per_page : 25,
                          related_group_id: null,
+                         alias_filter: 'any',
+                         release_filter: 'any',
                         };
     
     $scope.addFilter = function() {

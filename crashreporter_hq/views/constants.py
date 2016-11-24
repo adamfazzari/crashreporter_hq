@@ -1,3 +1,3 @@
-ANY = 0
-ONLY = 1
-NONE = 2
+ANY = 'any'
+ONLY = 'only'
+NONE = 'none'
