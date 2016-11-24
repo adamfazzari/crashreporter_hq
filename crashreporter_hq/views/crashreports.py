@@ -11,6 +11,7 @@ from sqlalchemy import asc
 from groups import *
 from ..forms import YoutrackSubmitForm
 from ..models import CrashReport, UUID, Traceback, Application
+from ..tools import save_report, delete_report as _delete_report
 
 
 @app.route('/reports/<int:report_number>')
@@ -68,6 +69,32 @@ def view_related_reports(report_id):
                            show_delete=True,
                            back_link=request.referrer)
     return html
+
+
+@app.route('/reports/delete', methods=['POST'])
+@flask_login.login_required
+def delete_many_reports():
+    report_numbers = map(int, request.args.get('report_numbers').split(','))
+    delete_similar = request.args.get('delete_similar') == 'True'
+    success = _delete_report(delete_similar, *report_numbers)
+    if success:
+        response = 'Success. Crash report #%s deleted' % request.args.get('report_numbers')
+    else:
+        response = 'Failed. Crash report #%s does not exist.' % request.args.get('report_numbers')
+    flash(response)
+    return redirect(url_for('view_reports'))
+
+
+@app.route('/reports/<int:report_id>/delete')
+@flask_login.login_required
+def delete_single_report(report_id):
+    delete_similar = False
+    success = _delete_report(delete_similar, report_id)
+    if success:
+        return 'Success. Crash report #%d deleted' % report_id
+    else:
+        return 'Failed. Crash report #%d does not exist.' % report_id
+
 
 
 @app.route('/reports/view_stats', methods=['GET', 'POST'])

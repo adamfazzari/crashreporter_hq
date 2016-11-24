@@ -69,7 +69,7 @@
                             </td>
                             {% if user.group_admin %}
                                 <td>
-                                    <form method='POST' action="{{ url_for('delete_report', report_numbers=r['Report Number']) }}">
+                                    <form method='POST' action="{{ url_for('delete_many_reports', report_numbers=r['Report Number']) }}">
                                         <input type="submit" value="Delete" >
                                     </form>
                                 </td>
@@ -84,7 +84,7 @@
         </div>
 
         {% if user.group_admin and show_delete %}
-            <form action={{ url_for('delete_report', delete_similar=True, report_numbers=','.join(report_numbers)) }} method="post" name="login" >
+            <form action={{ url_for('delete_many_reports', delete_similar=True, report_numbers=','.join(report_numbers)) }} method="post" name="login" >
                 <input type='submit' name='search', value="Delete Results">
                 </input>
             </form>
