@@ -140,11 +140,23 @@ app.controller('SearchController', function($scope, $http){
 
     $scope.searchform = {filters: [['', '']],
                          page: 1, reports_per_page : 25,
-                         related_group_id: null,
+                         related_to_id: null,
                          alias_filter: 'any',
                          release_filter: 'any',
                         };
-    
+
+    $scope.init = function(searchparams) {
+        if (searchparams == undefined) {
+            $scope.submitSearch();
+        } else {
+            for (key in searchparams) {
+                $scope.searchform[key] = searchparams[key];
+            }
+            $scope.submitSearch();
+        }
+        console.log(searchparams);
+    };
+
     $scope.addFilter = function() {
         $scope.searchform.filters.push(['', '']);
     };
@@ -212,8 +224,6 @@ app.controller('SearchController', function($scope, $http){
         $scope.searchform.related_to_id = null;
         $scope.submitSearch();
     };
-
-    $scope.submitSearch();
 
 });
 

@@ -44,31 +44,8 @@ def view_report(report_number):
 @app.route('/reports/related/<int:report_id>')
 @flask_login.login_required
 def view_related_reports(report_id):
-    PER_PAGE = 25
-    report = CrashReport.query.filter(CrashReport.id == report_id).first()
-    reports = CrashReport.query.filter(CrashReport.related_group_id == report.related_group_id).order_by('date').all()
-    n_total_reports = len(reports)
-    try:
-        page = max(1, int(request.args.get('page', 1)))
-    except ValueError:
-        page = 1
-    reports_on_page = reports[(page-1) * PER_PAGE: page * PER_PAGE]
-    pagination = Pagination(page=page, per_page=PER_PAGE, total=n_total_reports, search=False, record_name='reports')
-    aliases = {a.user_identifier: a.alias for a in flask_login.current_user.group.aliases}
-    report_numbers = [str(r['Report Number']) for r in reports]
-
-    html = render_template('related_reports.html',
-                           reports=reports_on_page,
-                           user=flask_login.current_user,
-                           user_set=set(r['User'] for r in reports),
-                           most_recent=reports[-1],
-                           pagination=pagination,
-                           n_total_reports=n_total_reports,
-                           report_numbers=report_numbers,
-                           aliases=aliases,
-                           show_delete=True,
-                           back_link=request.referrer)
-    return html
+    return render_template('index.html', user=flask_login.current_user,
+                    search_init="{related_to_id: %d}" % report_id)
 
 
 @app.route('/reports/<int:report_number>/info', methods=['GET'])

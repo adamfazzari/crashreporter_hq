@@ -2,7 +2,7 @@
 
 {% block content %}
 
-    <form ng-controller="SearchController" ng-submit="submitSearch()" method="post" layout="column" style="background: white; color:black;">
+    <form ng-controller="SearchController" ng-init="init({{ search_init }})" ng-submit="submitSearch()" method="post" layout="column" style="background: white; color:black;">
         <div layout="row" flex style="padding: 0px 50px;" layout-align="space-between stretch">
             {#   Search form starts here     #}
             <div layout="column" style="padding: 0px 50px; width: 50%;" layout-align="start start">
