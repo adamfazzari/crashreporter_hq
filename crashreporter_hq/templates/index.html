@@ -38,7 +38,7 @@
                 </div>
                 <div layout-gt-sm="row" layout-align="left" style="width: 100%;">
 
-                    <section layout="row" layout-sm="column" layout-align="start center" style="width:100%">
+                    <section layout="row" layout-sm="column" layout-align="start center" style="width:25%">
                         <md-button ng-click="submitSearch()" class="md-raised" name="search_button">
                             Search
                         </md-button>
@@ -48,9 +48,13 @@
                         </md-button>
                     </section>
 
-                    <section layout="row" layout-sm="column" layout-align="end center" style="width:25%">
-                        <md-button class="md-raised" ng-show="searchform.related_to_id" ng-click="removeRelatedGroup()">
-                            Similar to {a searchform.related_to_id a} X
+                    <section layout="row" layout-sm="column" layout-align="end center" style="width:75%">
+
+                        <md-button class="md-warn" ng-show="searchform.related_to_id" ng-click="removeRelatedGroup()">
+                            <md-tooltip md-direction="top">
+                                Remove
+                            </md-tooltip>
+                            Related to #{a searchform.related_to_id a}
                         </md-button>
 
                         <md-input-container>
