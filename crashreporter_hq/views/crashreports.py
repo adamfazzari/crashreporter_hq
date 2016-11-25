@@ -95,7 +95,7 @@ def report_to_json(report, aliases=None):
              'user': user,
              'error_type': report.error_type,
              'error_message': report.error_message,
-             'date': report.date.strftime('%B %d %Y%I:%M %p'),
+             'date': report.date.strftime('%B %d %Y'),
              'time': report.date.strftime('%I:%M %p')
              }
 
