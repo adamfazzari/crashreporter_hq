@@ -70,13 +70,13 @@ table {
 }
 
 .reporttable tr {
-    height: 40px;
+    height: 30px;
     font-size: 16px;
 }
 
 .reporttable tr:hover {
-    /*font-size: 20px;*/
     background-color: darkgray;
+    transition: all 0.20s ease-in-out;
 }
 
 .reporttable a {
@@ -84,14 +84,13 @@ table {
     text-decoration: none;
 }
 
-
-
 .tableheader {
     background-color:#FFFFC7;
     font-weight: bold;
     color: #FFFFFF;
     background-image:url(images/bg_navigation.gif);
     text-align: center;
+    transition: none;
 }
 
 .tableheader:hover{

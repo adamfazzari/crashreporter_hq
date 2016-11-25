@@ -148,7 +148,6 @@
             </md-button>
         </div>
 
-
         <table border="1" style="width:100%;" class="reporttable sortable">
             <tr>
                     <td class="tableheader">#</td>
@@ -166,7 +165,11 @@
 
             <tr ng-repeat="r in reports" ng-show="!is_searching">
                 <td>{a r.report_number a}</td>
-                <td ng-show="!searchform.related_to_id"><md-button ng-click="setRelatedGroup(r.report_number)">{a r.related_report_numbers.length a}</md-button></td>
+                <td ng-show="!searchform.related_to_id">
+                    <md-button ng-click="setRelatedGroup(r.report_number)" style="min-width:1px; padding: 0px">
+                        {a r.related_report_numbers.length a}
+                    </md-button>
+                </td>
                 <td>{a r.application_name a}</td>
                 <td>{a r.application_version a}</td>
                 <td style="width: 10%">{a r.user a}</td>
