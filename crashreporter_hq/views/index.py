@@ -90,7 +90,6 @@ def filter_reports(criteria):
     reports = q[n_per_page * (page-1):n_per_page * page: -1]
     response = {'reports': [],
                 'page': page,
-                'pages': range(1, max_page+1),
                 'max_page': max_page,
                 'n_users_affected': n_users_affected,
                 'total_reports': n_reports}

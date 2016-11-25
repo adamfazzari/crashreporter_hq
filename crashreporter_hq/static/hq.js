@@ -207,8 +207,16 @@ app.controller('SearchController', function($scope, $http){
         }
 
         $http.post('/search', JSON.stringify($scope.searchform)).success(function(data){
+            // Determine which pages to show in the pagination links
+            pages = [];
+            pagination_pages_to_show = 3;
+            var leftpagestart = Math.max(data.page - pagination_pages_to_show, 1);
+            var rightpageend= Math.min(leftpagestart+2*pagination_pages_to_show, data.max_page);
+            for (var i=leftpagestart; i <= rightpageend; i++) {
+                pages.push(i);
+            }
             $scope.pagination = {page: data.page,
-                                 pages: data.pages,
+                                 pages: pages,
                                  max_page: data.max_page,
                                  total_reports: data.total_reports};
             $scope.reports = data.reports;
