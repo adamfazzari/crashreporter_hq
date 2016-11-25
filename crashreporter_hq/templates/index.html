@@ -54,6 +54,15 @@
                         </md-button>
 
                         <md-input-container>
+                            <label>Results per Page</label>
+                            <md-select  ng-model="searchform.reports_per_page">
+                                <md-option ng-repeat="s in reports_per_page_options" ng-value="s.value">
+                                    {a s.value a}
+                                </md-option>
+                            </md-select>
+                        </md-input-container>
+
+                        <md-input-container>
                             <label>Alias</label>
                             <md-select  ng-model="searchform.alias_filter">
                                 <md-option ng-repeat="s in alias_filter_options" ng-value="s.value">

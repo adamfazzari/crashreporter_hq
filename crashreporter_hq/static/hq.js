@@ -113,6 +113,10 @@ app.controller('SearchController', function($scope, $http){
     $scope.reports = [];
     $scope.n_affected_users = null;
     $scope.is_searching = false;
+    $scope.reports_per_page_options = [{value:10},
+                                       {value: 25},
+                                       {value: 50},
+                                       {value: 100}];
     $scope.alias_filter_options = [
                                   {field: 'No Filter', value: 'any'},
                                   {field: 'Only Aliases', value: 'only'},
@@ -139,7 +143,8 @@ app.controller('SearchController', function($scope, $http){
 
 
     $scope.searchform = {filters: [['', '']],
-                         page: 1, reports_per_page : 25,
+                         page: 1, 
+                         reports_per_page : 25,
                          related_to_id: null,
                          alias_filter: 'any',
                          release_filter: 'any',
