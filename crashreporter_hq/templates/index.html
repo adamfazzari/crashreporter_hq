@@ -3,13 +3,13 @@
 {% block content %}
 
     <form ng-controller="SearchController" ng-init="init({{ search_init }})" ng-submit="submitSearch()" method="post" layout="column" style="background: white; color:black;">
-        <div layout="row" flex style="padding: 0px 50px;" layout-align="space-between stretch">
+        <div layout="row" flex style="padding: 0px 0px;" layout-align="space-between stretch">
             {#   Search form starts here     #}
-            <div layout="column" style="padding: 0px 50px; width: 50%;" layout-align="start start">
+            <div layout="column" style="padding: 20px 25px; width: 50%;" layout-align="start start">
                 <div layout-gt-sm="column" style="width: 100%;" ng-repeat="c in searchform.filters">
                     <div layout-gt-sm="row" style="width: 100%;">
 
-                        <md-input-container style="width: 15%">
+                        <md-input-container style="width: 25%">
                             <md-select  ng-model="c[0]" placeholder="Choose a field">
                                 <md-option ng-repeat="s in searchfields" ng-value="s.value">
                                     {a s.field a}
@@ -17,7 +17,7 @@
                             </md-select>
                         </md-input-container>
 
-                        <md-input-container style="width: 85%">
+                        <md-input-container style="width: 75%">
                             <input ng-model="c[1]"
                                    ng-value="c[1]">
 
