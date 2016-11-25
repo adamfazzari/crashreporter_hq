@@ -92,9 +92,11 @@
             {# Search Result info starts here #}
             <div layout="column" style="width: 50%;" layout-align="stretch">
                 <md-content style="width: 100%;">
-                    <md-content style="text-align: center">
+                    <md-content style="text-align: center; padding: 15px">
+                        <strong>
                         {a pagination.total_reports a} Reports found <br>
                         Page {a pagination.page a} of {a pagination.max_page a}
+                        </strong>
                     </md-content>
 
                     {#    Progress bar to show while searching / loading page   #}
@@ -106,15 +108,15 @@
                     <div layout="row" style="width: 100%;" layout-align="space-around stretch" ng-if="!is_searching">
                         <md-content>
                             <h3>Users Affected</h3>
-                            <h1>{a n_affected_users a}</h1>
+                            <h1 style="text-align: center">{a n_affected_users a}</h1>
                         </md-content>
                         <md-content>
                             <h3>Unique Crashes</h3>
-                            <h1>{a pagination.total_reports a}</h1>
+                            <h1 style="text-align: center">{a pagination.total_reports a}</h1>
                         </md-content>
                         <md-content>
                             <h3>Most Recent Report</h3>
-                            <h3>{a reports[reports.length-1].date a}<hr>
+                            <h3 style="text-align: center">{a reports[reports.length-1].date a}<hr>
                                 {a reports[reports.length-1].time a}
                             </h3>
                         </md-content>
