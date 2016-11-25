@@ -111,6 +111,7 @@ app.controller('HQController', function($scope, $http, $mdSidenav) {
 
 app.controller('SearchController', function($scope, $http){
     $scope.reports = [];
+    $scope.n_affected_users = null;
     $scope.is_searching = false;
     $scope.alias_filter_options = [
                                   {field: 'No Filter', value: 'any'},
@@ -194,6 +195,7 @@ app.controller('SearchController', function($scope, $http){
                                  max_page: data.max_page,
                                  total_reports: data.total_reports};
             $scope.reports = data.reports;
+            $scope.n_affected_users = data.n_users_affected;
             $scope.is_searching = false;
 
         }).error(function() {

@@ -8,7 +8,7 @@ from sqlalchemy import or_, func
 from ..models import CrashReport, Application
 
 from users import *
-from crashreports import _report_to_json
+from crashreports import report_to_json
 from constants import *
 
 import httplib
@@ -19,12 +19,8 @@ def filter_reports(criteria):
     user = flask_login.current_user
     group = user.group
 
-    if criteria.get('related_to_id', None) is None:
-        q = CrashReport.query.group_by('related_group_id')
-    else:
-        related_group_id = db.session.query(CrashReport.related_group_id).filter(CrashReport.id == int(criteria['related_to_id'])).first()
-        q = CrashReport.query.filter(CrashReport.related_group_id == related_group_id[0])
-
+    related_to_id = criteria.get('related_to_id', None)
+    q = CrashReport.query
     q = q.join(Application).filter(CrashReport.group == group)
 
     # Filter aliased state
@@ -81,6 +77,13 @@ def filter_reports(criteria):
 
     page = criteria.get('page', 1)
     n_per_page = criteria.get('reports_per_page')
+    if related_to_id is None:
+        n_users_affected = q.group_by(CrashReport.uuid_id).count()
+        q = q.group_by('related_group_id')
+    else:
+        related_group_id = db.session.query(CrashReport.related_group_id).filter(CrashReport.id == int(related_to_id)).first()
+        q = q.filter(CrashReport.related_group_id == related_group_id[0])
+        n_users_affected = q.group_by(CrashReport.uuid_id).count()
     q = q.order_by(CrashReport.date.desc())
     n_reports = q.count()
     max_page = int(ceil(float(n_reports) / n_per_page))
@@ -89,11 +92,12 @@ def filter_reports(criteria):
                 'page': page,
                 'pages': range(1, max_page+1),
                 'max_page': max_page,
+                'n_users_affected': n_users_affected,
                 'total_reports': n_reports}
     aliases = {a.user_identifier: a.alias for a in group.aliases}
 
     for r in reports:
-        response['reports'].append(_report_to_json(r, aliases=aliases))
+        response['reports'].append(report_to_json(r, aliases=aliases))
     json = flask.jsonify(response)
     return json
 

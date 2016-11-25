@@ -79,10 +79,10 @@ def get_report_info(report_number):
     aliases = {a.user_identifier: a.alias for a in group.aliases}
     report = CrashReport.query.filter(CrashReport.id == report_number).first()
     if report:
-        return flask.jsonify(_report_to_json(report, aliases=aliases))
+        return flask.jsonify(report_to_json(report, aliases=aliases))
 
 
-def _report_to_json(report, aliases=None):
+def report_to_json(report, aliases=None):
     if aliases is None:
         user = report.uuid.user_identifier
     else:
