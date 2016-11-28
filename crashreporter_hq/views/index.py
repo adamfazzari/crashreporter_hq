@@ -37,8 +37,14 @@ def filter_reports(criteria):
     elif released_state == ONLY:
         q = q.filter(Application.is_release == True)
 
-    search_fields, search_values = zip(*criteria.get('filters', [('', '')]))
+    if criteria.get('before_date'):
+        date = datetime.strptime(criteria['before_date'], '%d/%m/%Y')
+        q = q.filter(CrashReport.date <= date)
+    if criteria.get('after_date'):
+        date = datetime.strptime(criteria['after_date'], '%d/%m/%Y')
+        q = q.filter(CrashReport.date >= date)
 
+    search_fields, search_values = zip(*criteria.get('filters', [('', '')]))
     if any(search_values):
         for ii, (field, value) in enumerate(zip(search_fields, search_values)):
             if not value:
@@ -54,12 +60,6 @@ def filter_reports(criteria):
             elif field == 'date':
                 date = datetime.strptime(value, '%d %B %Y').strftime('%Y-%m-%d')
                 q = q.filter(func.date(CrashReport.date) == date)
-            elif field == 'before_date':
-                date = datetime.strptime(value, '%d %B %Y')
-                q = q.filter(CrashReport.date <= date)
-            elif field == 'after_date':
-                date = datetime.strptime(value, '%d %B %Y')
-                q = q.filter(CrashReport.date >= date)
             elif field == 'application_name':
                 q = q.filter(Application.name.contains(value))
             elif field in ('application_version', 'after_version', 'before_version'):

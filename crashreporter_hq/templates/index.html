@@ -5,7 +5,7 @@
     <form ng-controller="SearchController" ng-init="init({{ search_init }})" ng-submit="submitSearch()" method="post" layout="column" style="background: white; color:black;">
         <div layout="row" flex style="padding: 0px 0px;" layout-align="space-between stretch">
             {#   Search form starts here     #}
-            <div layout="column" style="padding: 20px 25px; width: 50%;" layout-align="start start">
+            <div layout="column" style="padding: 0px 20px; width: 60%;" layout-align="start start">
                 <div layout-gt-sm="column" style="width: 100%;" ng-repeat="c in searchform.filters">
                     <div layout-gt-sm="row" style="width: 100%;">
 
@@ -28,37 +28,54 @@
                             <md-button ng-click="removeFilter(c)"
                                        ng-hide="searchform.filters.indexOf(c)==0"
                                        class="md-raised"
-                                       name="remove_filter_button">
+                                       name="remove_filter_button"
+                                       style="width: 130px">
 
                                             Remove Field
                             </md-button>
                         </md-input-container>
 
+                        <md-input-container>
+                            <md-button ng-click="addFilter()"
+                                       class="md-raised"
+                                       ng-hide="searchform.filters.indexOf(c)!=0"
+                                       name="add_filter_button"
+                                       style="width: 130px">
+                                Add Field
+                            </md-button>
+                        </md-input-container>
+
                     </div>
                 </div>
-                <div layout-gt-sm="row" layout-align="left" style="width: 100%;">
+                <div layout-gt-sm="row" layout-align="left start" style="width: 100%;">
 
-                    <section layout="row" layout-sm="column" layout-align="start center" style="width:25%">
+                    <section layout="row" layout-sm="column" layout-align="start center" style="width:10%">
                         <md-button ng-click="submitSearch()" class="md-raised" name="search_button">
                             Search
                         </md-button>
-
-                        <md-button ng-click="addFilter()" class="md-raised" name="add_filter_button">
-                            Add Field
-                        </md-button>
                     </section>
 
-                    <section layout="row" layout-sm="column" layout-align="end center" style="width:75%">
+                    <section layout="row" layout-sm="column" layout-align="end start" style="width:90%;">
 
-                        <md-button class="md-warn" ng-show="searchform.related_to_id" ng-click="removeRelatedGroup()">
+                        <md-button class="md-warn" style="line-height: 125%" ng-show="searchform.related_to_id" ng-click="removeRelatedGroup()">
                             <md-tooltip md-direction="top">
                                 Remove
                             </md-tooltip>
-                            Related to #{a searchform.related_to_id a}
+                            Related to <br>#{a searchform.related_to_id a}
                         </md-button>
 
                         <md-input-container>
-                            <label>Results per Page</label>
+                            <label>After</label>
+                            <md-datepicker md-placeholder="Enter date" ng-model="searchform.after_date"></md-datepicker>
+                        </md-input-container>
+
+                        <md-input-container>
+                            <label>Before</label>
+                            <md-datepicker md-placeholder="Enter date" ng-model="searchform.before_date"></md-datepicker>
+                        </md-input-container>
+
+                        <md-input-container>
+                            <label>Per Page</label>
                             <md-select  ng-model="searchform.reports_per_page">
                                 <md-option ng-repeat="s in reports_per_page_options" ng-value="s.value">
                                     {a s.value a}
@@ -92,7 +109,7 @@
             {# Search Result info starts here #}
             <div layout="column" style="width: 50%;" layout-align="stretch">
                 <md-content style="width: 100%;">
-                    <md-content style="text-align: center; padding: 15px">
+                    <md-content style="text-align: center; padding: 0px">
                         <strong>
                         {a pagination.total_reports a} Reports found <br>
                         Page {a pagination.page a} of {a pagination.max_page a}

@@ -68,7 +68,7 @@
                             {% if tb['Local Variables'] %}
                                 <h4>Local Variables:</h4>
                                     <div class="contentitem">
-                                        <table border="1" class="variabletable">
+                                        <table border="1" class="reporttable variabletable">
                                             <tr class="tableheader">
                                                 <td>Variable</td>
                                                 <td>Value</td>
@@ -87,7 +87,7 @@
                             {% if tb['Object Variables'] %}
                                 <h4>Object Inspection:</h4>
                                     <div class="contentitem">
-                                        <table border="1" class="variabletable">
+                                        <table border="1" class="reporttable variabletable">
                                             <tr class="tableheader">
                                                 <td>Variable</td>
                                                 <td>Value</td>
@@ -107,7 +107,7 @@
                                 {% for header, additional_info in tb['Custom Inspection'].iteritems() %}
                                     <h4>{{ header }}</h4>
                                     <div class="contentitem">
-                                        <table border="1" class="variabletable">
+                                        <table border="1" class="reporttable variabletable">
                                             <tr class="tableheader">
                                                 <td>Variable</td>
                                                 <td>Value</td>

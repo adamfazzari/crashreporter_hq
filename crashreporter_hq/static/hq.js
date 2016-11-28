@@ -144,6 +144,8 @@ app.controller('SearchController', function($scope, $http){
 
     $scope.searchform = {filters: [['', '']],
                          page: 1, 
+                         before_date: null,
+                         after_date: null,
                          reports_per_page : 25,
                          related_to_id: null,
                          alias_filter: 'any',
@@ -204,6 +206,19 @@ app.controller('SearchController', function($scope, $http){
             $scope.searchform.page = 1;
         } else {
             $scope.searchform.page = page;
+        }
+
+        // Format the min and max date criteria into Day#/Month#/Year# string format
+        var minDate = $scope.searchform.before_date;
+        if (minDate != null && (minDate instanceof Date) ) {
+            sdate = minDate.getDate().toString() + '/' + (minDate.getMonth() + 1).toString() + '/' + minDate.getFullYear().toString();
+            $scope.searchform.before_date = sdate;
+        }
+
+        var maxDate = $scope.searchform.after_date;
+        if (maxDate != null && (maxDate instanceof Date)) {
+            sdate = maxDate.getDate().toString() + '/' + (maxDate.getMonth() + 1).toString() + '/' + maxDate.getFullYear().toString();
+            $scope.searchform.after_date = sdate;
         }
 
         $http.post('/search', JSON.stringify($scope.searchform)).success(function(data){
