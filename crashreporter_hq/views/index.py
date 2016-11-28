@@ -90,7 +90,7 @@ def filter_reports(criteria):
     reports = q[n_per_page * (page-1):n_per_page * page: -1]
     response = {'reports': [],
                 'page': page,
-                'max_page': max_page,
+                'max_page': max_page or 1,
                 'n_users_affected': n_users_affected,
                 'total_reports': n_reports}
     aliases = {a.user_identifier: a.alias for a in group.aliases}
