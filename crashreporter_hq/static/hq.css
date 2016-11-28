@@ -55,7 +55,7 @@
 
 
 /* Tables */
-table {
+.reporttable {
     background-color:#FFFFFF;
     border-collapse: collapse;
     border-color: #000000;
