@@ -10,7 +10,7 @@
                     <div layout-gt-sm="column" style="width: 100%;" ng-repeat="c in searchform.filters">
                         <div layout="row" layout-gt-sm="row" layout-align="space-between start" style="width: 100%; height:60px;">
 
-                            <md-input-container style="width: 25%">
+                            <md-input-container flex="20">
                                 <md-select  ng-model="c[0]" placeholder="Choose a field">
                                     <md-option ng-repeat="s in searchfields" ng-value="s.value">
                                         {a s.field a}
@@ -18,32 +18,27 @@
                                 </md-select>
                             </md-input-container>
 
-                            <md-input-container style="width: 75%">
-                                <input ng-model="c[1]"
-                                       ng-value="c[1]">
+                            <md-input-container flex="75">
+                                <input ng-model="c[1]" ng-value="c[1]">
 
                                 </input>
                             </md-input-container>
 
-                            <md-input-container>
-                                <md-button ng-click="removeFilter(c)"
-                                           ng-hide="searchform.filters.indexOf(c)==0"
-                                           class="md-raised"
-                                           name="remove_filter_button"
-                                           style="width: 130px">
+                            <md-input-container style="width: 50px;">
+                                <md-tooltip md-direction="right" ng-if="searchform.filters.indexOf(c)!=0">
+                                    Delete search criteria
+                                </md-tooltip>
+                                <md-icon ng-if="searchform.filters.indexOf(c)!=0"
+                                         ng-click="removeFilter(c)"
+                                         md-svg-src="/static/images/ic_remove_black_24px.svg"></md-icon>
 
-                                                Remove Field
-                                </md-button>
-                            </md-input-container>
+                                <md-tooltip md-direction="right" ng-if="searchform.filters.indexOf(c)==0">
+                                    Add more search criteria
+                                </md-tooltip>
 
-                            <md-input-container>
-                                <md-button ng-click="addFilter()"
-                                           class="md-raised"
-                                           ng-hide="searchform.filters.indexOf(c)!=0"
-                                           name="add_filter_button"
-                                           style="width: 130px">
-                                    Add Field
-                                </md-button>
+                                <md-icon  ng-if="searchform.filters.indexOf(c)==0"
+                                          ng-click="addFilter()"
+                                          md-svg-src="/static/images/ic_add_black_24px.svg"></md-icon>
                             </md-input-container>
 
                         </div>
