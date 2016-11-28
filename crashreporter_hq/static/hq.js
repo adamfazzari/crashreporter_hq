@@ -136,9 +136,6 @@ app.controller('SearchController', function($scope, $http){
                           {field: 'Report Number', value: 'id'},
                           {field: 'Error Message', value: 'error_message'},
                           {field: 'Error Type', value: 'error_type'},
-                          {field: 'Date', value: 'date'},
-                          {field: 'After Date', value: 'after_date'},
-                          {field: 'Before Date', value: 'before_date'}
     ];
 
 
