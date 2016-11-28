@@ -109,7 +109,7 @@
             {# Search Result info starts here #}
             <div layout="column" style="width: 50%;" layout-align="stretch">
                 <md-content style="width: 100%;">
-                    <md-content style="text-align: center; padding: 0px">
+                    <md-content style="text-align: center; padding: 0px" ng-if="!is_searching">
                         <strong>
                         {a pagination.total_reports a} Reports found <br>
                         Page {a pagination.page a} of {a pagination.max_page a}
@@ -118,7 +118,10 @@
 
                     {#    Progress bar to show while searching / loading page   #}
                     <md-content style="width: 100%; min-width: 100px; min-height: 100px;" ng-if="is_searching">
-                        <md-progress-circular style="margin: 50px auto" id="searchprogress" class="ng-hide" md-mode="indeterminate" ng-hide="false"></md-progress-circular>
+                        <div layout="column" layout-align="space-between center">
+                            <md-progress-circular style="margin: 50px auto" id="searchprogress" class="ng-hide" md-mode="indeterminate" ng-hide="false"></md-progress-circular>
+                            <h3>Loading...</h3>
+                        </div>
                     </md-content>
 
                     {#    Summary info or reports found  #}
@@ -144,7 +147,7 @@
         </div>
         {# Search Result info ends here #}
 
-        <div layout-gt-sm="row" layout-align="center end">
+        <div layout-gt-sm="row" layout-align="center end" ng-if="reports.length>0">
             <md-button style="width: 10px" ng-click="submitSearch(1)" ng-disabled="p==pagination.page">
                 <<
             </md-button>
@@ -204,7 +207,7 @@
         </table>
 
 
-        <div layout-gt-sm="row" layout-align="center end">
+        <div layout-gt-sm="row" layout-align="center end" ng-if="reports.length>0">
             <md-button style="width: 10px" ng-click="submitSearch(1)" ng-disabled="p==pagination.page">
                 <<
             </md-button>
