@@ -186,6 +186,28 @@
             </tr>
         </table>
 
+
+        <div layout-gt-sm="row" layout-align="center end">
+            <md-button style="width: 10px" ng-click="submitSearch(1)" ng-disabled="p==pagination.page">
+                <<
+            </md-button>
+            <md-button style="width: 10px" ng-if="pagination.pages[0] != 1">
+                ...
+            </md-button>
+            <md-button style="width: 10px"
+                       ng-repeat="p in pagination.pages"
+                       ng-click="submitSearch(p)"
+                       ng-disabled="p==pagination.page">
+                {a p a}
+            </md-button>
+            <md-button style="width: 10px" ng-if="pagination.pages[pagination.pages.length-1] != pagination.max_page">
+                ...
+            </md-button>
+            <md-button style="width: 10px" ng-click="submitSearch(pagination.max_page)" ng-disabled="p==pagination.page">
+                >>
+            </md-button>
+        </div>
+
     </form>
 
 
