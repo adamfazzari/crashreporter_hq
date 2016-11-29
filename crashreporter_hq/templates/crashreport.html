@@ -45,11 +45,7 @@
                 </div>
 
             </div>
-            {% if user is none %}
-                <p>A crash was detected on {{report['Date']}} at {{report['Time']}}.</p>
-            {% else %}
-                <p>A crash was detected on {{report['Date']}} at {{report['Time']}} from user {{ report['User'] }}.</p>
-            {% endif %}
+            <p>A crash was detected on {{report['Date'].strftime('%d %B %Y')}} at {{report['Date'].strftime('%H:%M %p')}} from user {{ alias or report['User'].user_identifier }}.</p>
             {% if report.related_reports|length == 1 %}
                 <p>There is <a href="{{ url_for('view_related_reports', report_id=report.id) }}">{{ report.related_reports|length }}</a> other related report found.</p>
             {% elif report.related_reports|length > 1 %}
@@ -63,8 +59,6 @@
 
             <h4>Traceback (most recent call last):</h4>
 
-    {#            <md-button class="md-raised" href="{{ search_links['StackOverflow'] }}">StackOverflow</md-button>#}
-    {#            <md-button class="md-raised" href="{{ search_links['Google'] }}">#}
             {% for tb in report['Traceback'] %}
 
                 <div class="container">
