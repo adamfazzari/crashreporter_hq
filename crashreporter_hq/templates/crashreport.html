@@ -13,19 +13,38 @@
     {% extends "base.html" %}
 
     {% block content %}
-        <div style="width: 80%;">
-            <h3>
-                {% if report.application.name != None %}
-                    {% if report.application.version_string != None %}
-                        {{report.application.name}} (v{{report.application.version_string}})
-                    {% else %}
-                        {{report.application.name}}
-                    {% endif %}
+        <md-content style="padding: 10px; width: 80%;">
 
-                {% else %}
-                    Crash Report
-                {% endif %}
-            </h3>
+            <div layout="row" layout-align="space-between stretch">
+
+                <h3>
+                    {% if report.application.name != None %}
+                        {% if report.application.version_string != None %}
+                            {{report.application.name}} (v{{report.application.version_string}})
+                        {% else %}
+                            {{report.application.name}}
+                        {% endif %}
+
+                    {% else %}
+                        Crash Report
+                    {% endif %}
+                </h3>
+
+                <div layout="row" layout-align="end stretch">
+                    <md-content>
+                        <md-button href="{{ search_links['Google'] }}">
+                            <md-tooltip>Search on Google</md-tooltip>
+                            <md-icon style="height: 45px; width: 45px;" md-svg-src="/static/images/google_icon.svg"></md-icon>
+                        </md-button>
+
+                        <md-button href="{{ search_links['StackOverflow'] }}">
+                            <md-tooltip>Search on StackOverflow</md-tooltip>
+                            <md-icon style="height: 45px; width: 45px;" md-svg-src="/static/images/stackoverflow_icon.svg"></md-icon>
+                        </md-button>
+                    </md-content>
+                </div>
+
+            </div>
             {% if user is none %}
                 <p>A crash was detected on {{report['Date']}} at {{report['Time']}}.</p>
             {% else %}
@@ -38,10 +57,14 @@
             {% endif %}
 
 
-        </div>
+        </md-content>
 
         <div style="width: 80%;">
+
             <h4>Traceback (most recent call last):</h4>
+
+    {#            <md-button class="md-raised" href="{{ search_links['StackOverflow'] }}">StackOverflow</md-button>#}
+    {#            <md-button class="md-raised" href="{{ search_links['Google'] }}">#}
             {% for tb in report['Traceback'] %}
 
                 <div class="container">

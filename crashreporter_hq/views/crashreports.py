@@ -12,6 +12,7 @@ from groups import *
 from ..forms import YoutrackSubmitForm
 from ..models import CrashReport, UUID, Traceback, Application
 from ..tools import save_report, delete_report as _delete_report
+from ..extensions import search
 
 
 @app.route('/reports/<int:report_number>')
@@ -37,6 +38,8 @@ def view_report(report_number):
                            inspection_level=10000,
                            user=flask_login.current_user,
                            form=form,
+                           search_links={'Google': search.get_search_link('google', cr.error_message),
+                                         'StackOverflow': search.get_search_link('stackoverflow', cr.error_message)},
                            back_link=url_for('view_reports'))
     return html
 
