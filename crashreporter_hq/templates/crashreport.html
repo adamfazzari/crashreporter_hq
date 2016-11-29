@@ -32,6 +32,12 @@
 
                 <div layout="row" layout-align="end stretch">
                     <md-content>
+                        {% if report.related_reports|length - 1 > 0 %}
+                            <md-button href="{{ url_for('view_related_reports', report_id=report.id) }}" class="md-warn">
+                                <md-tooltip>See other reports with similar traceback</md-tooltip>
+                                {{ report.related_reports|length - 1 }} Related Reports
+                            </md-button>
+                        {% endif %}
                         <md-button href="{{ search_links['Google'] }}">
                             <md-tooltip>Search on Google</md-tooltip>
                             <md-icon style="height: 45px; width: 45px;" md-svg-src="/static/images/google_icon.svg"></md-icon>
@@ -46,13 +52,6 @@
 
             </div>
             <p>A crash was detected on {{report['Date'].strftime('%d %B %Y')}} at {{report['Date'].strftime('%H:%M %p')}} from user {{ alias or report['User'].user_identifier }}.</p>
-            {% if report.related_reports|length == 1 %}
-                <p>There is <a href="{{ url_for('view_related_reports', report_id=report.id) }}">{{ report.related_reports|length }}</a> other related report found.</p>
-            {% elif report.related_reports|length > 1 %}
-                <p>There are <a href="{{ url_for('view_related_reports', report_id=report.id) }}">{{ report.related_reports|length }}</a> other related reports found.</p>
-            {% endif %}
-
-
         </md-content>
 
         <div style="width: 80%;">
