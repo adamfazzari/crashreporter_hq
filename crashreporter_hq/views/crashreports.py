@@ -30,7 +30,7 @@ def view_report(report_number):
                                       hl_lines=highlighted_line)
         highlighted_source.append(highlight(tb['Source Code'], pylexer, htmlformatter))
 
-    form = YoutrackSubmitForm()
+    # form = YoutrackSubmitForm()
     alias = Alias.query.filter(Alias.uuid_id==cr.uuid_id).first()
     html = render_template('crashreport.html',
                            report=cr,
@@ -38,7 +38,7 @@ def view_report(report_number):
                            inspection_level=10000,
                            user=flask_login.current_user,
                            alias=alias,
-                           form=form,
+                           # form=form,
                            search_links={'Google': search.get_search_link('google', cr.error_message),
                                          'StackOverflow': search.get_search_link('stackoverflow', cr.error_message)},
                            back_link=url_for('view_reports'))

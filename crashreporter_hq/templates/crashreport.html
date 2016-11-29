@@ -13,22 +13,31 @@
     {% extends "base.html" %}
 
     {% block content %}
-        <md-content style="padding: 10px; width: 80%;">
+        <md-content style="margin: 0% 3%;">
 
-            <div layout="row" layout-align="space-between stretch">
+            <div layout="row" layout-align="space-between stretch" style="padding: 10px;">
+                <div layout="column" layout-align="space-between stretch">
 
-                <h3>
+                <h2 style="line-height: 0%">
                     {% if report.application.name != None %}
-                        {% if report.application.version_string != None %}
-                            {{report.application.name}} (v{{report.application.version_string}})
-                        {% else %}
-                            {{report.application.name}}
-                        {% endif %}
-
+                        {{report.application.name}}
                     {% else %}
                         Crash Report
                     {% endif %}
-                </h3>
+                </h2>
+
+                <h4 style="line-height: 110%; margin: 0 0;">
+
+                    {% if report.application.version_string != None %}
+                        Version: {{report.application.version_string}}
+                    {% endif %}
+{#                </h4>#}
+{#                <h4>#}
+                <br>
+                    {{report['Date'].strftime('%d %B %Y')}} at {{report['Date'].strftime('%H:%M %p')}} from user {{ alias or report['User'].user_identifier }}
+                </h4>
+                </div>
+
 
                 <div layout="row" layout-align="end stretch">
                     <md-content>
@@ -51,10 +60,10 @@
                 </div>
 
             </div>
-            <p>A crash was detected on {{report['Date'].strftime('%d %B %Y')}} at {{report['Date'].strftime('%H:%M %p')}} from user {{ alias or report['User'].user_identifier }}.</p>
+
         </md-content>
 
-        <div style="width: 80%;">
+        <div style="margin: 0% 3%;">
 
             <h4>Traceback (most recent call last):</h4>
 
@@ -156,20 +165,20 @@
             </div>
 
 
-        <form action="{{ url_for('youtrack_submit', report_number=report.id) }}" method="post" name="youtrack_submit">
-            {{ form.hidden_tag() }}
-            <fieldset>
-                <legend>YouTrack</legend>
-                <p>{{ form.server.label }} {{ form.server}}</p>
-                <p>{{ form.assignee.label }} {{ form.assignee }}</p>
-                <p>{{ form.password.label }}{{ form.password }}</p>
-                <p>{{ form.project.label }}{{ form.project}}</p>
-                <p>{{ form.summary.label }} {{ form.summary}}</p>
-                <p>{{ form.description.label }} {{ form.description }}</p>
-                <p>{{ form.submit }}</p>
-
-            </fieldset>
-        </form>
+{#        <form action="{{ url_for('youtrack_submit', report_number=report.id) }}" method="post" name="youtrack_submit">#}
+{#            {{ form.hidden_tag() }}#}
+{#            <fieldset>#}
+{#                <legend>YouTrack</legend>#}
+{#                <p>{{ form.server.label }} {{ form.server}}</p>#}
+{#                <p>{{ form.assignee.label }} {{ form.assignee }}</p>#}
+{#                <p>{{ form.password.label }}{{ form.password }}</p>#}
+{#                <p>{{ form.project.label }}{{ form.project}}</p>#}
+{#                <p>{{ form.summary.label }} {{ form.summary}}</p>#}
+{#                <p>{{ form.description.label }} {{ form.description }}</p>#}
+{#                <p>{{ form.submit }}</p>#}
+{##}
+{#            </fieldset>#}
+{#        </form>#}
 
     {% endblock %}
 
