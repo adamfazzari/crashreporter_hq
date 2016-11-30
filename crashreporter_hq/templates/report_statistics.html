@@ -20,7 +20,7 @@
 
                             <h1 class="md-title">{{ name }} - {{ top_reports[0][0].application.version_string }}</h1>
                             <div style="height: 160px;">
-                                <table border="1" class="sortable", style="width:100%;">
+                                <table border="1" class="reporttable sortable", style="width:100%;">
                                     <tr>
                                         {% for header in ('Number of Reports', 'Error Type', 'Error Message', 'Date/Time', '') %}
                                             <td class="tableheader">{{ header }}</td>

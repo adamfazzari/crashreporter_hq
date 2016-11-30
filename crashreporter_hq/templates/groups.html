@@ -79,7 +79,7 @@
                                 </form>
                             {% endif %}
                             {% if user.group_id == group.id %}
-                                <table border="1" class="sortable", style="width:100%">
+                                <table border="1" class="reporttable sortable", style="width:100%">
                                     <tr>
 
                                         {% for header in ('User', 'Group Admin', 'Actions') %}
@@ -104,7 +104,7 @@
                         <div>
                             <h3> Invitations </h3>
                             {% if group.join_requests %}
-                            <table border="1" class="sortable", style="width:100%">
+                            <table border="1" class="reporttable sortable", style="width:100%">
                                 <tr>
 
                                     {% for header in ('User', 'Company', 'Action') %}
@@ -142,7 +142,7 @@
             <md-tab label="Application Releases" ng-disabled={{ "false" if user.group else "true" }}>
                 <md-content>
                     <div layout="column">
-                        <table border="1" class="sortable", style="width:100%">
+                        <table border="1" class="reporttable sortable", style="width:100%">
                             <tr class="tableheader">
 
                                 {% for header in ('Application Name', 'Application Version', '') %}
@@ -177,7 +177,7 @@
 
             <md-tab label="Application Users" ng-disabled={{ "false" if user.group else "true" }}>
                 <md-content>
-                    <table border="1" class="sortable", style="width:100%">
+                    <table border="1" class="reporttable sortable", style="width:100%">
                         <tr class="tableheader">
 
                             {% for header in ('UUID', 'Usage Stats', 'Crash Reports', '') %}
@@ -213,7 +213,7 @@
 
             <md-tab label="Aliases" ng-disabled={{ "false" if user.group else "true" }}>
                 <md-content>
-                    <table border="1" class="sortable", style="width:100%">
+                    <table border="1" class="reporttable sortable", style="width:100%">
                         <tr class="tableheader">
 
                             {% for header in ('Alias', 'UUID', '') %}
@@ -255,7 +255,7 @@
                             {% for trackable in ('Statistics', 'States', 'Timers', 'Sequences') %}
                                 <md-tab label="{{ trackable }} Trackable">
 
-                                    <table border="1" class="sortable", style="width:100%">
+                                    <table border="1" class="reporttable sortable", style="width:100%">
                                         <tr class="tableheader">
                                             {% for header in ('Name', 'Number of Users Reported', '') %}
                                                 <td class="tableheader">{{ header }}</td>
@@ -280,7 +280,7 @@
             <md-tab label="Plots" ng-disabled={{ "false" if user.group else "true" }}>
                 <md-content>
                     <div layout="column" style="min-height: 400px;">
-                        <table border="1" class="sortable", style="width:100%">
+                        <table border="1" class="reporttable sortable", style="width:100%">
                             <tr class="tableheader">
 
                                 {% for header in ('Plot Name', 'Fields', '') %}
