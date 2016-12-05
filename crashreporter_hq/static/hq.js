@@ -109,7 +109,7 @@ app.controller('HQController', function($scope, $http, $mdSidenav) {
 
 });
 
-app.controller('SearchController', function($scope, $http){
+app.controller('SearchController', function($scope, $http, $mdDialog){
     $scope.reports = [];
     $scope.n_affected_users = null;
     $scope.is_searching = false;
@@ -148,6 +148,12 @@ app.controller('SearchController', function($scope, $http){
                          alias_filter: 'any',
                          release_filter: 'any',
                         };
+
+    var originatorEv;
+    $scope.openMenu = function($mdOpenMenu, ev) {
+      originatorEv = ev;
+      $mdOpenMenu(ev);
+    };
 
     $scope.init = function(searchparams) {
         if (searchparams == undefined) {
