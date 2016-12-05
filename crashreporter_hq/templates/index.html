@@ -197,7 +197,7 @@
                       </md-button>
                       <md-menu-content width="2">
                         <md-menu-item>
-                          <md-button href="/reports/{a r.report_number a}">
+                          <md-button ng-click="openReport($event, r.report_number)">
                             <md-icon md-svg-src="/static/images/ic_open_in_new_black_24px.svg" md-menu-align-target></md-icon>
                             Open
                           </md-button>

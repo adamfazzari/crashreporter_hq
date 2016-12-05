@@ -176,6 +176,43 @@ app.controller('SearchController', function($scope, $http, $mdDialog){
         $scope.searchform.filters.splice($scope.searchform.filters.indexOf(criteria), 1);
     };
 
+    $scope.openReport = function(ev, report_number) {
+
+        $http.get('/reports/' + report_number).success(function (body) {
+            $mdDialog.show({
+                controller: ReportController,
+                template: body,
+                fullscreen: true,
+                parent: angular.element(document.body),
+                targetEvent: ev,
+                clickOutsideToClose: true
+            });
+        });
+
+        function ReportController($scope, $mdDialog) {
+            
+          $scope.toggleTraceback = function (tb_id) {
+            ele = document.getElementById('tb' + tb_id);
+              if (ele.style.display == '') {
+                  ele.style.display = 'inline';
+              } else {
+                  ele.style.display = '';
+              }
+          }; 
+          $scope.hide = function() {
+            $mdDialog.hide();
+          };
+                 $scope.cancel = function() {
+            $mdDialog.cancel();
+          };
+                 $scope.answer = function(answer) {
+            $mdDialog.hide(answer);
+          };
+        }
+
+
+    };
+
     $scope.deleteReport = function(ev, report_number) {
 
           var confirm = $mdDialog.confirm()

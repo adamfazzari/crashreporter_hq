@@ -2,14 +2,13 @@ import json
 from datetime import datetime
 
 from flask import Response
-from flask.ext.paginate import Pagination
 from pygments import highlight
 from pygments.formatters import HtmlFormatter
 from pygments.lexers import PythonLexer
 from sqlalchemy import asc
 
 from groups import *
-from ..forms import YoutrackSubmitForm
+
 from ..models import CrashReport, UUID, Traceback, Application
 from ..tools import save_report, delete_report as _delete_report
 from ..extensions import search
@@ -30,15 +29,12 @@ def view_report(report_number):
                                       hl_lines=highlighted_line)
         highlighted_source.append(highlight(tb['Source Code'], pylexer, htmlformatter))
 
-    # form = YoutrackSubmitForm()
     alias = Alias.query.filter(Alias.uuid_id==cr.uuid_id).first()
     html = render_template('crashreport.html',
                            report=cr,
                            source_code=highlighted_source,
                            inspection_level=10000,
-                           user=flask_login.current_user,
                            alias=alias,
-                           # form=form,
                            search_links={'Google': search.get_search_link('google', cr.error_message),
                                          'StackOverflow': search.get_search_link('stackoverflow', cr.error_message)},
                            back_link=url_for('view_reports'))

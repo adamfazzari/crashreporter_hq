@@ -1,5 +1,3 @@
-<!DOCTYPE html>
-<html>
 <head lang="en">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='crashreport.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='syntax.css') }}">
@@ -8,179 +6,156 @@
     <meta charset="UTF-8">
     <title></title>
 </head>
-<body>
 
-    {% extends "base.html" %}
+<div class="reportdialog">
+<md-content style="margin: 0% 0%;">
 
-    {% block content %}
-        <md-content style="margin: 0% 3%;">
+    <div layout="row" layout-align="space-between stretch" style="padding: 10px;">
+        <div layout="column" layout-align="space-between stretch">
 
-            <div layout="row" layout-align="space-between stretch" style="padding: 10px;">
-                <div layout="column" layout-align="space-between stretch">
+        <h2 style="line-height: 0%">
+            {% if report.application.name != None %}
+                {{report.application.name}}
+            {% else %}
+                Crash Report
+            {% endif %}
+        </h2>
 
-                <h2 style="line-height: 0%">
-                    {% if report.application.name != None %}
-                        {{report.application.name}}
-                    {% else %}
-                        Crash Report
-                    {% endif %}
-                </h2>
+        <h4 style="line-height: 110%; margin: 0 0;">
 
-                <h4 style="line-height: 110%; margin: 0 0;">
+            {% if report.application.version_string != None %}
+                Version: {{report.application.version_string}}
+            {% endif %}
 
-                    {% if report.application.version_string != None %}
-                        Version: {{report.application.version_string}}
-                    {% endif %}
-{#                </h4>#}
-{#                <h4>#}
-                <br>
-                    {{report['Date'].strftime('%d %B %Y')}} at {{report['Date'].strftime('%H:%M %p')}} from user {{ alias or report['User'].user_identifier }}
-                </h4>
-                </div>
+        <br>
+            {{report['Date'].strftime('%d %B %Y')}} at {{report['Date'].strftime('%H:%M %p')}} from user {{ alias or report['User'].user_identifier }}
+        </h4>
+        </div>
 
 
-                <div layout="row" layout-align="end stretch">
-                    <md-content>
-                        {% if report.related_reports|length - 1 > 0 %}
-                            <md-button href="{{ url_for('view_related_reports', report_id=report.id) }}" class="md-warn">
-                                <md-tooltip>See other reports with similar traceback</md-tooltip>
-                                {{ report.related_reports|length - 1 }} Related Reports
-                            </md-button>
-                        {% endif %}
-                        <md-button href="{{ search_links['Google'] }}">
-                            <md-tooltip>Search on Google</md-tooltip>
-                            <md-icon style="height: 45px; width: 45px;" md-svg-src="/static/images/google_icon.svg"></md-icon>
-                        </md-button>
+        <div layout="row" layout-align="end stretch">
+            <md-content>
+                {% if report.related_reports|length - 1 > 0 %}
+                    <md-button href="{{ url_for('view_related_reports', report_id=report.id) }}" class="md-warn">
+                        <md-tooltip>See other reports with similar traceback</md-tooltip>
+                        {{ report.related_reports|length - 1 }} Related Reports
+                    </md-button>
+                {% endif %}
+                <md-button href="{{ search_links['Google'] }}">
+                    <md-tooltip>Search on Google</md-tooltip>
+                    <md-icon style="height: 45px; width: 45px;" md-svg-src="/static/images/google_icon.svg"></md-icon>
+                </md-button>
 
-                        <md-button href="{{ search_links['StackOverflow'] }}">
-                            <md-tooltip>Search on StackOverflow</md-tooltip>
-                            <md-icon style="height: 45px; width: 45px;" md-svg-src="/static/images/stackoverflow_icon.svg"></md-icon>
-                        </md-button>
-                    </md-content>
-                </div>
+                <md-button href="{{ search_links['StackOverflow'] }}">
+                    <md-tooltip>Search on StackOverflow</md-tooltip>
+                    <md-icon style="height: 45px; width: 45px;" md-svg-src="/static/images/stackoverflow_icon.svg"></md-icon>
+                </md-button>
+            </md-content>
+        </div>
 
-            </div>
+    </div>
 
-        </md-content>
+</md-content>
 
-        <div style="margin: 0% 3%;">
+<div style="margin: 0% 3%;">
 
-            <h4>Traceback (most recent call last):</h4>
+    <h4>Traceback (most recent call last):</h4>
 
-            {% for tb in report['Traceback'] %}
+    {% for tb in report['Traceback'] %}
 
-                <div class="container">
+        <div class="container" ng-click="toggleTraceback({{ loop.index }})">
 
-                    <DL class="header">
-                        File: {{tb['File']|e}} , line {{tb['Error Line Number']|e}}, in module {{tb['Module']|e}}
-                        <DD>
-                            {{tb['Error Line']|e}}
-                        </DD>
-                    </DL>
+            <DL class="header">
+                File: {{tb['File']|e}} , line {{tb['Error Line Number']|e}}, in module {{tb['Module']|e}}
+                <DD>
+                    {{tb['Error Line']|e}}
+                </DD>
+            </DL>
 
 
-                    {% if loop.revindex <= inspection_level %}
-                        <div class="content">
+            {% if loop.revindex <= inspection_level %}
+                <div class="content" id="tb{{ loop.index }}">
 
-                            <h4>Source Code:</h4>
+                    <h4>Source Code:</h4>
+                    <div class="contentitem">
+                        <div class="codeblock">
+                            {{ source_code[loop.index0] | safe }}
+                        </div>
+                    </div>
+
+                    {#            LOCAL VARIABLES                #}
+                    {% if tb['Local Variables'] %}
+                        <h4>Local Variables:</h4>
                             <div class="contentitem">
-                                <div class="codeblock">
-                                    {{ source_code[loop.index0] | safe }}
-                                </div>
+                                <table border="1" class="reporttable variabletable">
+                                    <tr class="tableheader">
+                                        <td>Variable</td>
+                                        <td>Value</td>
+                                    </tr>
+                                    {% for field, value in tb['Local Variables'] %}
+                                        <tr>
+                                            <td class="varcolumn">{{ field|e }}</td>
+                                            <td class="valcolumn">{{ value|e }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </table>
                             </div>
-
-                            {#            LOCAL VARIABLES                #}
-                            {% if tb['Local Variables'] %}
-                                <h4>Local Variables:</h4>
-                                    <div class="contentitem">
-                                        <table border="1" class="reporttable variabletable">
-                                            <tr class="tableheader">
-                                                <td>Variable</td>
-                                                <td>Value</td>
-                                            </tr>
-                                            {% for field, value in tb['Local Variables'] %}
-                                                <tr>
-                                                    <td class="varcolumn">{{ field|e }}</td>
-                                                    <td class="valcolumn">{{ value|e }}</td>
-                                                </tr>
-                                            {% endfor %}
-                                        </table>
-                                    </div>
-                            {% endif %}
-
-                            {#            OBJECT VARIABLES                #}
-                            {% if tb['Object Variables'] %}
-                                <h4>Object Inspection:</h4>
-                                    <div class="contentitem">
-                                        <table border="1" class="reporttable variabletable">
-                                            <tr class="tableheader">
-                                                <td>Variable</td>
-                                                <td>Value</td>
-                                            </tr>
-                                            {% for field, value in tb['Object Variables'] %}
-                                                <tr>
-                                                    <td class="varcolumn">{{ field|e }}</td>
-                                                    <td class="valcolumn">{{ value|e }}</td>
-                                                </tr>
-                                            {% endfor %}
-                                        </table>
-                                    </div>
-                            {% endif %}
-
-                            {#            ADDITIONAL INFORMATION                #}
-                            {% if tb['Custom Inspection'] %}
-                                {% for header, additional_info in tb['Custom Inspection'].iteritems() %}
-                                    <h4>{{ header }}</h4>
-                                    <div class="contentitem">
-                                        <table border="1" class="reporttable variabletable">
-                                            <tr class="tableheader">
-                                                <td>Variable</td>
-                                                <td>Value</td>
-                                            </tr>
-                                            {% for field, value in additional_info.iteritems() %}
-                                                <tr>
-                                                    <td class="varcolumn">{{ field|e }}</td>
-                                                    <td class="valcolumn">{{ value|e }}</td>
-                                                </tr>
-                                            {% endfor %}
-                                        </table>
-                                    </div>
-                                {% endfor %}
-                            {% endif %}
-
-
-                        </div> {# End of content #}
                     {% endif %}
-                </div>
-            {% endfor %}
+
+                    {#            OBJECT VARIABLES                #}
+                    {% if tb['Object Variables'] %}
+                        <h4>Object Inspection:</h4>
+                            <div class="contentitem">
+                                <table border="1" class="reporttable variabletable">
+                                    <tr class="tableheader">
+                                        <td>Variable</td>
+                                        <td>Value</td>
+                                    </tr>
+                                    {% for field, value in tb['Object Variables'] %}
+                                        <tr>
+                                            <td class="varcolumn">{{ field|e }}</td>
+                                            <td class="valcolumn">{{ value|e }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </table>
+                            </div>
+                    {% endif %}
+
+                    {#            ADDITIONAL INFORMATION                #}
+                    {% if tb['Custom Inspection'] %}
+                        {% for header, additional_info in tb['Custom Inspection'].iteritems() %}
+                            <h4>{{ header }}</h4>
+                            <div class="contentitem">
+                                <table border="1" class="reporttable variabletable">
+                                    <tr class="tableheader">
+                                        <td>Variable</td>
+                                        <td>Value</td>
+                                    </tr>
+                                    {% for field, value in additional_info.iteritems() %}
+                                        <tr>
+                                            <td class="varcolumn">{{ field|e }}</td>
+                                            <td class="valcolumn">{{ value|e }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </table>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
 
 
-            <div class="container">
-                <DL class="header">
-                    {{report['Error Type']|e}}:
-                    <DD>
-                        {{report['Error Message']|e}}
-                    </DD>
-                </DL>
-            </div>
+                </div> {# End of content #}
+            {% endif %}
+        </div>
+    {% endfor %}
 
 
-{#        <form action="{{ url_for('youtrack_submit', report_number=report.id) }}" method="post" name="youtrack_submit">#}
-{#            {{ form.hidden_tag() }}#}
-{#            <fieldset>#}
-{#                <legend>YouTrack</legend>#}
-{#                <p>{{ form.server.label }} {{ form.server}}</p>#}
-{#                <p>{{ form.assignee.label }} {{ form.assignee }}</p>#}
-{#                <p>{{ form.password.label }}{{ form.password }}</p>#}
-{#                <p>{{ form.project.label }}{{ form.project}}</p>#}
-{#                <p>{{ form.summary.label }} {{ form.summary}}</p>#}
-{#                <p>{{ form.description.label }} {{ form.description }}</p>#}
-{#                <p>{{ form.submit }}</p>#}
-{##}
-{#            </fieldset>#}
-{#        </form>#}
-
-    {% endblock %}
-
-</body>
-</html>
+    <div class="container">
+        <DL class="header">
+            {{report['Error Type']|e}}:
+            <DD>
+                {{report['Error Message']|e}}
+            </DD>
+        </DL>
+    </div>
+</div>
+</div>
