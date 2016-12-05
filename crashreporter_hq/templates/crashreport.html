@@ -63,9 +63,9 @@
 
     {% for tb in report['Traceback'] %}
 
-        <div class="container" ng-click="toggleTraceback({{ loop.index }})">
+        <div class="container">
 
-            <DL class="header">
+            <DL class="header" ng-click="toggleTraceback({{ loop.index }})">
                 File: {{tb['File']|e}} , line {{tb['Error Line Number']|e}}, in module {{tb['Module']|e}}
                 <DD>
                     {{tb['Error Line']|e}}
