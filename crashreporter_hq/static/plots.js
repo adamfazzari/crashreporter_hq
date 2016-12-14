@@ -5,7 +5,7 @@ var app = angular.module('hq-app');
 
 app.controller('ReportPlotsController', function($scope, $interval) {
     $scope.selectedAppTabIndex = 0;
-
+    
     var cycleTabs = function() {
         console.log('Interval has passed!');
         var tabmanager= document.getElementById("TopAppReportsTabs");
@@ -24,12 +24,16 @@ app.controller('ReportPlotsController', function($scope, $interval) {
 
     $scope.startTabCycler = $interval(cycleTabs, 10000, 0);
 
-    $scope.hide_aliased = true;
+    $scope.showaliasSelection = 'any';
     $scope.released_only = false;
 });
 
 app.controller('UsagePlotsController', function($scope, $http) {
-    
+    $scope.alias_levels = [{value: 'any', name: 'All'},
+                           {value: 'none', name: 'No Aliases'},
+                           {value: 'only', name: 'Only Aliases'}
+                          ];
+
     $http.get('/plots/statistics').success(function(data) {
         $scope.statistic_plots = data;
     }).error(function() {});
@@ -187,12 +191,12 @@ app.directive('statisticchart', function($http) {
 
                         var update = function(value){
                             // Make a request to get the chart data
-                            var alias = (attr.showaliases=='') ? "0": attr.showaliases;
-                            $http.get('/plots/statistics/data?id=' + attr.plotid + '&hide_aliases=' + alias ).then(done, fail);
+                            var alias = (attr.aliaslevel=='') ? "0": attr.aliaslevel;
+                            $http.get('/plots/statistics/data?id=' + attr.plotid + '&alias_level=' + alias ).then(done, fail);
                             };
 
                         attr.$observe('plotid', update);
-                        attr.$observe('showaliases', update);
+                        attr.$observe('aliaslevel', update);
 
                             }
             }
@@ -229,14 +233,14 @@ app.directive('statechart', function($http) {
 
                     var update = function(value){
                         // Make a request to get the chart data
-                        var alias = (attr.showaliases=='') ? "0": attr.showaliases;
+                        var alias = (attr.aliaslevel=='') ? "0": attr.aliaslevel;
                         if (attr.state != '') {
-                            $http.get('/plots/states/data?name=' + attr.state + '&hide_aliases=' + alias).then(done, fail);
+                            $http.get('/plots/states/data?name=' + attr.state + '&alias_level=' + alias).then(done, fail);
                             }
                         };
               
                     attr.$observe('state', update);
-                    attr.$observe('showaliases', update);
+                    attr.$observe('aliaslevel', update);
 
                     }
             }

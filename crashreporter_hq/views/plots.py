@@ -25,9 +25,9 @@ def get_statistic_plot_data():
 
         stats = zip(*db.session.query(Statistic.name.distinct()).filter(Statistic.name.in_(plot.statistics)).all())[0]
 
-        if int(request.args.get('hide_aliases', ANY)) == NONE:
+        if request.args.get('alias_level', ANY) == NONE:
             uuids = UUID.query.outerjoin(Alias).filter(UUID.group_id == plot.group_id, Alias.id == None).all()
-        elif int(request.args.get('hide_aliases', ANY)) == ONLY:
+        elif request.args.get('alias_level', ANY) == ONLY:
             uuids = UUID.query.join(Alias).filter(UUID.group_id == plot.group_id).all()
         else:
             uuids = plot.group.uuids
@@ -92,13 +92,14 @@ def remove_statistic_plot():
 @flask_login.login_required
 def get_state_plot_data():
     alias = aliased(State.uuid)
-    if int(request.args.get('hide_aliases', 0)) == NONE:
+    if request.args.get('alias_level', False) == NONE:
         _aliases_id = set(u.uuid.id for u in flask_login.current_user.group.aliases)
         alias_filter = alias.id.notin_(_aliases_id)
-    elif int(request.args.get('hide_aliases', 0)) == ONLY:
+    elif request.args.get('alias_level', False) == ONLY:
         _aliases_id = set(u.uuid.id for u in flask_login.current_user.group.aliases)
         alias_filter = alias.id.in_(_aliases_id)
     else:
+        # ANY
         alias_filter = True # Do nothing
     data = {'name': request.args.get('name'),
             'counts': db.session.query(State.state, func.count(State.id)).join(alias)\

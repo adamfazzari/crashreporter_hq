@@ -12,10 +12,10 @@
 
         <md-input-container>
             <label>User Filter:</label>
-            <md-select id='show_alias_selector' ng-model="showaliasSelection" style="width:100%" placeholder="Select Alias Level">
-                <md-option value="0" selected>All</md-option>
-                <md-option value="1" selected>Aliased Only</md-option>
-                <md-option value="2" selected>No Aliases</md-option>
+            <md-select ng-model="showaliasSelection" style="width:100%" placeholder="Select Alias Level">
+                <md-option ng-repeat="option in alias_levels" ng-value="option.value" ng-selected="{a option.value == 'any' a}">
+                    {a option.name a}
+                </md-option>
             </md-select>
         </md-input-container>
 
@@ -31,7 +31,7 @@
 
                 </md-input-container>
 
-                <div style="width: 400px; height: 300px;" statisticchart plotid="{a createdplotid.plotid a}" showaliases="{a showaliasSelection a}" style="height:100%;">
+                <div style="width: 400px; height: 300px;" statisticchart plotid="{a createdplotid.plotid a}" aliaslevel="{a showaliasSelection a}" style="height:100%;">
                 </div>
             </div>
         </div>
@@ -48,7 +48,7 @@
                     <md-button ng-click="deleteStatePlot(createdstate)">X</md-button>
                 </md-input-container>
 
-                <div style="width: 400px; height: 300px;" statechart state="{a createdstate.state a}" showaliases="{a showaliasSelection a}" style="height:100%;">
+                <div style="width: 400px; height: 300px;" statechart state="{a createdstate.state a}" aliaslevel="{a showaliasSelection a}" style="height:100%;">
                 </div>
             </div>
         </div>
