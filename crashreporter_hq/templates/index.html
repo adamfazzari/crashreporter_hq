@@ -54,7 +54,7 @@
 
                     <section layout="row" layout-sm="column" layout-align="end start" style="width:90%;">
 
-                        <md-button class="md-warn" style="line-height: 125%" ng-show="search_performed">
+                        <md-button class="md-warn" style="line-height: 125%" ng-show="search_performed" ng-click="deleteReport($event, reports)">
                             <md-tooltip md-direction="top">
                                 Delete all search results
                             </md-tooltip>
@@ -210,7 +210,7 @@
                           </md-button>
                         </md-menu-item>
                         <md-menu-item>
-                          <md-button ng-click="deleteReport($event, r.report_number)">
+                          <md-button ng-click="deleteReport($event, [r])">
                             <md-icon md-svg-src="/static/images/ic_clear_black_24px.svg"></md-icon>
                             Delete
                           </md-button>

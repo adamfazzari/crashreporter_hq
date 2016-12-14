@@ -215,34 +215,58 @@ app.controller('SearchController', function($scope, $http, $mdDialog){
 
     };
 
-    $scope.deleteReport = function(ev, report_number) {
+    $scope.deleteReport = function(ev, reports) {
+          var report_numbers = [];
+          for (var i = 0; i < reports.length; i++) {
+            report_numbers.push(reports[i].report_number);
+          }
+          if (report_numbers.length > 1) {
+              var msg = 'Are you sure you want to delete all ' + report_numbers.length + ' reports?'
+              var url = '/reports/delete';
+              var data = {'report_numbers': report_numbers};
 
+          } else {
+              var msg = 'Are you sure you want to delete crash report #' + report_numbers[0] + '?';
+              var url = '/reports/' + report_numbers[0] + '/delete';
+              var data = null;
+          }
           var confirm = $mdDialog.confirm()
-              .textContent('Are you sure you want to delete crash report #' + report_number + '?')
+              .textContent(msg)
               .targetEvent(ev)
               .ok('Yes')
               .cancel('No');
 
           $mdDialog.show(confirm).then(function() {
-              $http.post('/reports/' + report_number + '/delete').success(function () {
-                  var r = null;
-                  for (var i=0; i < $scope.reports.length; i++) {
-                      r = $scope.reports[i];
-                      if (r.report_number == report_number) {
-                          if (r.related_report_numbers.length == 1) {
-                              $scope.reports.splice(i, 1);
-                              break;
-                          } else if (r.related_report_numbers.length > 1) {
-                              // Remove the deleted report from the list of similar reports
-                              r.related_report_numbers.splice(r.related_report_numbers.indexOf(r), 1);
-                              // Set the visible report to another report in the list of similar reports
-                              var next_related_report_id = r.related_report_numbers[r.related_report_numbers.length-1];
-                              $http.get('/reports/' + next_related_report_id + '/info').success(function (report){
-                                  $scope.reports[i] = report;
-                              });
-                              break;
-                          }
+              $http.post(url, data).success(function () {
+                  if (report_numbers.length > 1) {
+                      $scope.reports = [];
+                  }
+                  else {
+                      var r = null;
+                      for (var i = 0; i < $scope.reports.length; i++) {
+                          r = $scope.reports[i];
 
+                          if (r.report_number == report_numbers[0]) {
+                              // Find the report in question
+                              if (r.related_report_numbers.length == 1 || $scope.searchform.related_to_id != null) {
+                                  // If there is only one of this kind of report, remove it from the list
+                                  $scope.reports.splice(i, 1);
+                                  break;
+
+                              } else if (r.related_report_numbers.length > 1) {
+                                  // If there are multiple reports related to this remove the
+                                  // deleted report from the list of similar reports
+                                  r.related_report_numbers.splice(r.related_report_numbers.indexOf(r), 1);
+
+                                  // Set the visible report to another report in the list of similar reports
+                                  var next_related_report_id = r.related_report_numbers[r.related_report_numbers.length - 1];
+
+                                  $http.get('/reports/' + next_related_report_id + '/info').success(function (report) {
+                                      $scope.reports[i] = report;
+                                  });
+                                  break;
+                              }
+                          }
                       }
                   }
                   $scope.pagination.total_reports -=1;

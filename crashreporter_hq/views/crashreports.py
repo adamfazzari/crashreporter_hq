@@ -79,7 +79,7 @@ def report_to_json(report, aliases=None):
 @app.route('/reports/delete', methods=['POST'])
 @flask_login.login_required
 def delete_many_reports():
-    report_numbers = map(int, request.args.get('report_numbers').split(','))
+    report_numbers = request.get_json().get('report_numbers')
     delete_similar = request.args.get('delete_similar') == 'True'
     success = _delete_report(delete_similar, *report_numbers)
     if success:
