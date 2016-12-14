@@ -137,7 +137,7 @@ def view_report_stats():
 
     top_reports = {}
     for v0, v1, v2 in latest_applications:
-        r = db.session.query(CrashReport, func.count(CrashReport.id).label('total'))\
+        r = db.session.query(CrashReport, func.count(CrashReport.id).label('total'), func.count(CrashReport.uuid_id.distinct()))\
                       .group_by(CrashReport.related_group_id) \
                       .filter(CrashReport.group_id==group.id,
                               CrashReport.application.has(version_0=v0, version_1=v1, version_2=v2)) \
