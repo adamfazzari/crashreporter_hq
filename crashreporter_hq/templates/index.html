@@ -54,6 +54,13 @@
 
                     <section layout="row" layout-sm="column" layout-align="end start" style="width:90%;">
 
+                        <md-button class="md-warn" style="line-height: 125%" ng-show="search_performed">
+                            <md-tooltip md-direction="top">
+                                Delete all search results
+                            </md-tooltip>
+                            Delete All
+                        </md-button>
+
                         <md-button class="md-warn" style="line-height: 125%" ng-show="searchform.related_to_id" ng-click="removeRelatedGroup()">
                             <md-tooltip md-direction="top">
                                 Remove

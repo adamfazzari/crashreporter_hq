@@ -139,15 +139,18 @@ app.controller('SearchController', function($scope, $http, $mdDialog){
     ];
 
 
-    $scope.searchform = {filters: [['', '']],
+    $scope.initial_searchform = {filters: [['', '']],
                          page: 1, 
                          before_date: null,
                          after_date: null,
                          reports_per_page : 25,
                          related_to_id: null,
                          alias_filter: 'any',
-                         release_filter: 'any',
+                         release_filter: 'any'
                         };
+
+
+    $scope.searchform = JSON.parse(JSON.stringify($scope.initial_searchform));
 
     var originatorEv;
     $scope.openMenu = function($mdOpenMenu, ev) {
@@ -170,7 +173,6 @@ app.controller('SearchController', function($scope, $http, $mdDialog){
     $scope.addFilter = function() {
         $scope.searchform.filters.push(['', '']);
     };
-    
 
     $scope.removeFilter = function(criteria) {
         $scope.searchform.filters.splice($scope.searchform.filters.indexOf(criteria), 1);
@@ -286,9 +288,31 @@ app.controller('SearchController', function($scope, $http, $mdDialog){
             $scope.n_affected_users = data.n_users_affected;
             $scope.is_searching = false;
 
+            // Determine if a search has been performed by comparing the initial
+            // search form with the current search form. A straight up comparison
+            // cannot be done due to filters list changing from the initial even if
+            // the search criteria is later removed.
+            var search_performed = false;
+            for (key in $scope.initial_searchform) {
+                if (key == 'filters') {
+                    for (var ii = 0; ii <  $scope.searchform.filters.length; ii++) {
+                        if ($scope.searchform.filters[ii][1] != '') {
+                            search_performed = true;
+                        }
+                    }
+                } else {
+                    if ($scope.initial_searchform[key] != $scope.searchform[key]) {
+                        search_performed = true;
+                        break
+                    }
+                }
+            }
+            $scope.search_performed = search_performed
+
         }).error(function() {
             $scope.is_searching = false;
         })
+
     };
 
     $scope.setRelatedGroup = function(related_to_id) {
