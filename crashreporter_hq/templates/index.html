@@ -189,7 +189,7 @@
 
             <tr ng-repeat="r in reports" ng-show="!is_searching">
                 <td>{a r.report_number a}</td>
-                <td ng-show="!searchform.related_to_id">{a r.related_report_numbers.length a}</td>
+                <td ng-show="!searchform.related_to_id">{a r.related_report_numbers.length + 1 a}</td>
                 <td>{a r.application_name a}</td>
                 <td>{a r.application_version a}</td>
                 <td style="width: 10%">{a r.user a}</td>
