@@ -79,8 +79,9 @@ def report_to_json(report, aliases=None):
 @app.route('/reports/delete', methods=['POST'])
 @flask_login.login_required
 def delete_many_reports():
-    report_numbers = request.get_json().get('report_numbers')
-    delete_similar = request.args.get('delete_similar') == 'True'
+    data = request.get_json()
+    report_numbers = data.get('report_numbers')
+    delete_similar = request.args.get('delete_similar') == 'True' or data.get('delete_similar', False)
     success = _delete_report(delete_similar, *report_numbers)
     if success:
         response = 'Success. Crash report #%s deleted' % request.args.get('report_numbers')
@@ -92,8 +93,11 @@ def delete_many_reports():
 
 @app.route('/reports/<int:report_id>/delete', methods=['POST'])
 @flask_login.login_required
-def delete_single_report(report_id):
-    delete_similar = False
+def delete_single_report(report_id, delete_similar=False):
+    if request.data:
+        data = request.get_json()
+        delete_similar = data.get('delete_similar', delete_similar)
+    delete_similar |= request.args.get('delete_similar') == 'True'
     success = _delete_report(delete_similar, report_id)
     if success:
         return 'Success. Crash report #%d deleted' % report_id
