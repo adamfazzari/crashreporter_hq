@@ -42,14 +42,16 @@ class CrashReport(db.Model):
                     'Date': 'date'}
 
     def __init__(self, **report_fields):
-        version_0, version_1, version_2 = report_fields['Application Version']
+        version = report_fields['Application Version']
 
         application = Application.query.filter(Application.name == report_fields['Application Name'],
-                                               Application.version_0 == version_0,
-                                               Application.version_1 == version_1,
-                                               Application.version_2 == version_2).first()
+                                               Application.version_0 == version[0],
+                                               Application.version_1 == version[1],
+                                               Application.version_2 == version[2]).first()
         if application is None:
-            application = Application(report_fields['Application Name'], report_fields['Application Version'])
+            application = Application(report_fields['Application Name'], version=version)
+            db.session.add(application)
+            db.session.commit()
         self.application = application
         self.error_message = report_fields['Error Message']
         self.error_type = report_fields['Error Type']
