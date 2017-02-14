@@ -23,4 +23,11 @@ class Group(db.Model):
 
     def add_report(self, report):
         self.reports.append(report)
+        self.applications.append(report.application)
         self.uuids.append(report.uuid)
+
+    def add_application(self, app):
+        self.applications.append(app)
+        self.reports.extend(app.reports)
+        for report in app.reports:
+            self.uuids.append(report.uuid)
