@@ -136,33 +136,21 @@ def view_report_stats():
     apps = db.session.query(Application.name)\
                      .filter(Application.group_id==group.id, Application.is_release == True)\
                      .group_by(Application.name).all()
-    latest_applications = {}
-    for (app,) in apps:
-        (max_v0,) = db.session.query(func.max(Application.version_0)).filter(Application.name==app,
-                                                                             Application.group_id == group.id,
-                                                                             Application.is_release == True
-                                                                             ).first()
-        (max_v1,) = db.session.query(func.max(Application.version_1)).filter(Application.name==app,
-                                                                             Application.group_id == group.id,
-                                                                             Application.is_release == True,
-                                                                             Application.version_0 == max_v0).first()
-        _app, max_v2 = db.session.query(Application, func.max(Application.version_2))\
-                                 .filter(Application.name==app,
-                                         Application.group_id == group.id,
-                                         Application.is_release == True,
-                                         Application.version_0 == max_v0,
-                                         Application.version_1 == max_v1).first()
-        latest_applications[app] = max_v0, max_v1, max_v2
-
     top_reports = {}
-    for app, (v0, v1, v2) in latest_applications.iteritems():
-        r = db.session.query(CrashReport, func.count(CrashReport.id).label('total'), func.count(CrashReport.uuid_id.distinct()))\
-                      .group_by(CrashReport.related_group_id) \
-                      .filter(CrashReport.group_id==group.id,
-                              CrashReport.application.has(version_0=v0, version_1=v1, version_2=v2)) \
-                      .order_by('total DESC').limit(5).all()
-        if r:
-            top_reports[app] = r
+    for (app,) in apps:
+        releases = db.session.query(Application, Application.version_0, Application.version_1, Application.version_2) \
+                             .filter(Application.name==app,
+                                     Application.group_id == group.id,
+                                     Application.is_release == True).all()
+        top_reports[app] = {}
+        for released_app, v0, v1, v2 in releases:
+            r = db.session.query(CrashReport, func.count(CrashReport.id).label('total'), func.count(CrashReport.uuid_id.distinct()))\
+                          .group_by(CrashReport.related_group_id) \
+                          .filter(CrashReport.group_id==group.id,
+                                  CrashReport.application.has(version_0=v0, version_1=v1, version_2=v2)) \
+                          .order_by('total DESC').limit(5).all()
+
+            top_reports[app][(v0, v1, v2)] = r
 
     html = render_template('report_statistics.html', user=flask_login.current_user, top_reports=top_reports)
     return html

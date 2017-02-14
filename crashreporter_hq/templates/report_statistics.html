@@ -13,38 +13,49 @@
 
       <md-content>
           <md-tabs id="TopAppReportsTabs" md-dynamic-height md-border-bottom md-selected="selectedAppTabIndex">
-            {% for name, top_reports in top_reports.iteritems() %}
+            {% for name, app_version in top_reports.iteritems() %}
 
-                    <md-tab label="{{ name }}" ng-click="stopTabCycler()">
-                        <md-content class="md-padding">
+                <md-tab label="{{ name }}" ng-click="stopTabCycler()">
+                    <md-content>
+                    <md-tabs>
+                    {% for (v0, v1, v2), reports in app_version.iteritems() %}
 
-                            <h1 class="md-title">{{ name }} - {{ top_reports[0][0].application.version_string }}</h1>
-                            <div style="height: 160px;">
-                                <table border="1" class="reporttable sortable", style="width:100%;">
-                                    <tr>
-                                        {% for header in ('Number of Reports', 'Users Affected', 'Error Type', 'Error Message', 'Date/Time', '') %}
-                                            <td class="tableheader">{{ header }}</td>
-                                        {% endfor %}
-                                    </tr>
+                        <md-tab label="v{{ v0 }}.{{ v1 }}.{{ v2 }}">
+                            <md-content class="md-padding">
 
-                                    {% for (r, n_similar, users_affected) in top_reports %}
+                                <h1 class="md-title">{{ name }} - {{v0}}.{{ v1 }}.{{ v2 }}</h1>
+                                <div style="height: 260px;">
+                                    <table border="1" class="reporttable sortable", style="width:100%;">
                                         <tr>
-                                                <td style="text-align: center"> <a href="{{ url_for('view_related_reports', report_id=r.id) }}">{{ n_similar}}</a></td>
-                                                <td style="text-align: center"> <a href="{{ url_for('view_related_reports', report_id=r.id) }}">{{ users_affected }}</a></td>
-                                                <td style="text-align: center"> {{ r['Error Type'] }} </td>
-                                                <td style="padding-left: 10px"> {{ r['Error Message'] }} </td>
-                                                <td style="text-align: center"> {{ r['Date'].strftime('%d %B %Y -- %I:%M %p') }} </td>
-                                            <td>
-                                                <form method='GET' action="{{ url_for('view_report', report_number=r['Report Number']) }}">
-                                                    <input type="submit" value="Open" >
-                                                </form>
-                                            </td>
+                                            {% for header in ('Number of Reports', 'Users Affected', 'Error Type', 'Error Message', 'Date/Time', '') %}
+                                                <td class="tableheader">{{ header }}</td>
+                                            {% endfor %}
                                         </tr>
-                                    {% endfor %}
-                                </table>
-                            </div>
-                        </md-content>
-                    </md-tab>
+
+                                        {% for (r, n_similar, users_affected) in reports %}
+                                            <tr>
+                                                    <td style="text-align: center"> <a href="{{ url_for('view_related_reports', report_id=r.id) }}">{{ n_similar}}</a></td>
+                                                    <td style="text-align: center"> <a href="{{ url_for('view_related_reports', report_id=r.id) }}">{{ users_affected }}</a></td>
+                                                    <td style="text-align: center"> {{ r['Error Type'] }} </td>
+                                                    <td style="padding-left: 10px"> {{ r['Error Message'] }} </td>
+                                                    <td style="text-align: center"> {{ r['Date'].strftime('%d %B %Y -- %I:%M %p') }} </td>
+                                                <td>
+                                                    <form method='GET' action="{{ url_for('view_report', report_number=r['Report Number']) }}">
+                                                        <input type="submit" value="Open" >
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </table>
+                                </div>
+                            </md-content>
+                        </md-tab>
+
+                    {% endfor %}
+                    </md-tabs>
+
+                    </md-content>
+                </md-tab>
             {% endfor %}
           </md-tabs>
       </md-content>
