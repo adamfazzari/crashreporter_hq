@@ -43,6 +43,14 @@ def save_report(payload):
         if time_diff > 24 * 60 * 60:
             payload['Date'] = now.strftime('%d %B %Y')
 
+        try:
+            payload['Application Version'] = map(int, payload['Application Version'].split('.'))
+        except Exception as e:
+            return None, str(e)
+
+        if not isinstance(payload['Application Name'], basestring):
+            return None, 'Invalid application name %s' % payload['Application Name']
+
         cr = CrashReport(**payload)
         if user.group:
             user.group.add_report(cr)

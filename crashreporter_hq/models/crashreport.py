@@ -42,7 +42,7 @@ class CrashReport(db.Model):
                     'Date': 'date'}
 
     def __init__(self, **report_fields):
-        version_0, version_1, version_2 = map(int, report_fields['Application Version'].split('.'))
+        version_0, version_1, version_2 = report_fields['Application Version']
 
         application = Application.query.filter(Application.name == report_fields['Application Name'],
                                                Application.version_0 == version_0,
