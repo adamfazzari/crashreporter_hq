@@ -49,10 +49,12 @@ def add_application_release():
                                            Application.version_2 == v2, ).first()
     if application:
         application.is_release = True
-        db.session.commit()
-        return 'Application {a.name} version {a.version_string} has been added'.format(a=application)
     else:
-        return 'Failed to add Application: {a.name} version {a.version_string}'.format(a=application)
+        application = Application(name=request.args['name'], version=(v0, v1, v2), is_release=True)
+        db.session.add(application)
+        group.add_application(application)
+    db.session.commit()
+    return 'Application {a.name} version {a.version_string} has been added'.format(a=application)
 
 
 @app.route('/applications/releases/remove', methods=['POST'])
