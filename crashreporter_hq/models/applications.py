@@ -20,7 +20,7 @@ class Application(db.Model):
     def __init__(self, name, version, description='', is_release=False, uuids=None):
         self.name = name
         self.description = description
-        self.version_0, self.version_1, self.version_2 = map(int, version.split('.'))
+        self.version_0, self.version_1, self.version_2 = map(int, version)
         self.is_release = is_release
 
         if uuids is not None:
