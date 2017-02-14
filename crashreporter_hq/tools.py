@@ -1,5 +1,5 @@
 import re
-
+import datetime
 from models import CrashReport, Group, User, Traceback
 from . import db
 
@@ -36,6 +36,13 @@ def save_report(payload):
     api_key = params.get('api_key', None)
     user = User.query.filter(User.api_key == api_key).first()
     if user is not None:
+        # If the date comes in from the future (> 1 day), set the date to today's date
+        crash_date = datetime.datetime.strptime(payload['Date'], '%d %B %Y')
+        now = datetime.datetime.now()
+        time_diff = (crash_date-now).total_seconds()
+        if time_diff > 24 * 60 * 60:
+            payload['Date'] = now.strftime('%d %B %Y')
+
         cr = CrashReport(**payload)
         if user.group:
             user.group.add_report(cr)
