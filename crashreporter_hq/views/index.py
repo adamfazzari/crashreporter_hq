@@ -70,7 +70,12 @@ def filter_reports(criteria):
                 q = q.filter(op(Application.version_0, v0),
                              op(Application.version_1, v1),
                              op(Application.version_2, v2))
-
+            elif field == 'report_count_gt':
+                if related_to_id is None:
+                    q = q.having(func.count(CrashReport.related_group_id) >= int(value))
+            elif field == 'report_count_lt':
+                if related_to_id is None:
+                    q = q.having(func.count(CrashReport.related_group_id) <= int(value))
             else:
                 attr = getattr(CrashReport, field)
                 q = q.filter(attr.contains(str(value)))

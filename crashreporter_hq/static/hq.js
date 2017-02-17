@@ -133,6 +133,8 @@ app.controller('SearchController', function($scope, $http, $mdDialog){
                           {field: 'Application Version', value: 'application_version'},
                           {field: 'After Version', value: 'after_version'},
                           {field: 'Before Version', value: 'before_version'},
+                          {field: 'Report Count >=', value: 'report_count_gt'},
+                          {field: 'Report Count <=', value: 'report_count_lt'},
                           {field: 'Report Number', value: 'id'},
                           {field: 'Error Message', value: 'error_message'},
                           {field: 'Error Type', value: 'error_type'},
