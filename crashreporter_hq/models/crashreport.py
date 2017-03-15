@@ -9,8 +9,8 @@ from sqlalchemy.orm import relationship
 from applications import Application
 
 SimilarReports = Table("SimilarReports", db.metadata,
-                       Column("related_to_id", Integer, ForeignKey("crashreport.id")),
-                       Column("related_by_id", Integer, ForeignKey("crashreport.id")))
+                       Column("related_to_id", Integer, ForeignKey("crashreport.id"), index=True),
+                       Column("related_by_id", Integer, ForeignKey("crashreport.id"), index=True))
 
 
 class CrashReport(db.Model):
