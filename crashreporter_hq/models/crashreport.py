@@ -85,7 +85,7 @@ class CrashReport(db.Model):
     @staticmethod
     def get_related_hash(report):
         signature = tuple([(tb.module, tb.error_line) for tb in report.traceback])
-        return hash(signature)
+        return hash((report.error_type, signature))
 
     def get_similar_reports(self):
         related_id = CrashReport.get_related_hash(self)
