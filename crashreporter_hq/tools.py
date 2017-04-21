@@ -51,6 +51,19 @@ def save_report(payload):
         if not isinstance(payload['Application Name'], basestring):
             return None, 'Invalid application name %s' % payload['Application Name']
 
+        # Check to see if this error is due to infinite recursion and if so
+        # prune the list of tracebacks so the database doesn't get filled with redundant information
+        if 'maximum recursion' in payload['Error Message']:
+            # Prune the redundant tracebacks to save space
+            repeated_traceback = payload['Traceback'][-1]['Module']
+            max_redundancy = 5
+            count = 0
+            for tb in reversed(payload['Traceback']):
+                if tb['Module'] == repeated_traceback:
+                    count += 1
+                    if count > max_redundancy:
+                        payload['Traceback'].remove(tb)
+
         cr = CrashReport(**payload)
         if user.group:
             user.group.add_report(cr)
