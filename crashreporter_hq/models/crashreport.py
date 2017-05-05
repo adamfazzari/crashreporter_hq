@@ -49,7 +49,7 @@ class CrashReport(db.Model):
                                                Application.version_1 == version[1],
                                                Application.version_2 == version[2]).first()
         if application is None:
-            application = Application(report_fields['Application Name'], version=version)
+            application = Application(name=report_fields['Application Name'], version=version)
             db.session.add(application)
             db.session.commit()
         self.application = application

@@ -12,12 +12,11 @@ class TrackableBase(object):
     """
     Base class for trackables. Each row represents a trackable for a particular user and application
     """
-    def __init__(self, name, uuid, application_name, application_version, group):
+    def __init__(self, name, uuid, application, group):
         super(TrackableBase, self).__init__()
         self.name = name
         self.uuid = uuid
-        self.application_name = application_name
-        self.application_version = application_version
+        self.application = application
         self.group_id = group.id
         self.group = group
         getattr(self.group, self.__class__.__name__.lower()).append(self)
@@ -36,8 +35,8 @@ class Statistic(TrackableBase, db.Model):
     description = Column(String(150), unique=False)
     uuid_id = Column(Integer, ForeignKey('uuid.id'), unique=False)
     uuid = relationship('UUID', backref='usage_statistics', foreign_keys=[uuid_id])
-    application_name = Column(String(50), unique=False)
-    application_version = Column(Integer, unique=False)
+    application_id = Column(Integer, ForeignKey('application.id'), unique=False)
+    application = relationship('Application', backref='usage_statistics', foreign_keys=[application_id])
     group_id = Column(Integer, ForeignKey('group.id'))
     group = relationship('Group', backref='statistic', foreign_keys=[group_id])
     UniqueConstraint('group_id', 'name', 'user_identified', 'application_name', 'application_version')
@@ -55,8 +54,8 @@ class State(TrackableBase, db.Model):
     description = Column(String(150), unique=False)
     uuid_id = Column(Integer, ForeignKey('uuid.id'), unique=False)
     uuid = relationship('UUID', backref='usage_states', foreign_keys=[uuid_id])
-    application_name = Column(String(50), unique=False)
-    application_version = Column(Integer, unique=False)
+    application_id = Column(Integer, ForeignKey('application.id'), unique=False)
+    application = relationship('Application', backref='usage_states', foreign_keys=[application_id])
     group_id = Column(Integer, ForeignKey('group.id'))
     group = relationship('Group', backref='state', foreign_keys=[group_id])
     UniqueConstraint('group_id', 'name', 'user_identified', 'application_name', 'application_version')
@@ -75,8 +74,8 @@ class Timer(TrackableBase, db.Model):
     description = Column(String(150), unique=False)
     uuid_id = Column(Integer, ForeignKey('uuid.id'), unique=False)
     uuid = relationship('UUID', backref='usage_timers', foreign_keys=[uuid_id])
-    application_name = Column(String(50), unique=False)
-    application_version = Column(Integer, unique=False)
+    application_id = Column(Integer, ForeignKey('application.id'), unique=False)
+    application = relationship('Application', backref='usage_timers', foreign_keys=[application_id])
     group_id = Column(Integer, ForeignKey('group.id'))
     group = relationship('Group', backref='timer', foreign_keys=[group_id])
     UniqueConstraint('group_id', 'name', 'user_identified', 'application_name', 'application_version')
@@ -94,8 +93,8 @@ class Sequence(TrackableBase, db.Model):
     description = Column(String(150), unique=False)
     uuid_id = Column(Integer, ForeignKey('uuid.id'), unique=False)
     uuid = relationship('UUID', backref='usage_sequences', foreign_keys=[uuid_id])
-    application_name = Column(String(50), unique=False)
-    application_version = Column(Integer, unique=False)
+    application_id = Column(Integer, ForeignKey('application.id'), unique=False)
+    application = relationship('Application', backref='usage_sequences', foreign_keys=[application_id])
     group_id = Column(Integer, ForeignKey('group.id'))
     group = relationship('Group', backref='sequence', foreign_keys=[group_id])
     UniqueConstraint('group_id', 'name', 'user_identified', 'application_name', 'application_version')
