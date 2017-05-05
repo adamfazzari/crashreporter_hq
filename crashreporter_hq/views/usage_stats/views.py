@@ -4,9 +4,9 @@ from ...models import Statistic, State, Timer, Sequence, UUID, StatisticBarPlot
 TRACKABLES = {'Statistic': Statistic, 'State': State, 'Timer': Timer, 'Sequence': Sequence}
 
 
-@app.route('/usage/view_stats', methods=['GET', 'POST'])
+@app.route('/usage/plots', methods=['GET', 'POST'])
 @flask_login.login_required
-def view_usage_stats():
+def usage_plots():
     group = flask_login.current_user.group
     if group is None:
         return 'You are not in a group.'
@@ -17,24 +17,3 @@ def view_usage_stats():
                            statistics=statistic_trackables, states=state_trackables)
     return html
 
-
-@app.route('/usage/trackables', methods=['GET'])
-@flask_login.login_required
-def get_trackable_list():
-    data = {'states': [q.name for q in db.session.query(State.name.distinct().label('name'))],
-            'statistics': [q.name for q in db.session.query(Statistic.name.distinct().label('name'))]}
-
-    return flask.jsonify(data)
-
-
-@app.route('/usage/states', methods=['GET'])
-@flask_login.login_required
-def get_states():
-    state_trackables = [q.name for q in db.session.query(State.name.distinct().label('name')) \
-                                                  .filter(State.group_id == flask_login.current_user.group.id)\
-                                                  .all()]
-    return flask.jsonify({'states': state_trackables})
-
-@app.route('/usage', methods=['GET'])
-def get_usage_data():
-    pass

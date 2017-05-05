@@ -43,7 +43,7 @@
                                        ('Groups', url_for('groups')),
                                        ('Users', url_for('users')),
                                        ('Crash Statistics', url_for('view_report_stats')),
-                                       ('Usage Statistics', url_for('view_usage_stats'))] %}
+                                       ('Usage Statistics', url_for('usage_plots'))] %}
 
                     {% for (name, url) in menuitems %}
                         <md-button href="{{ url }}" ng-href="{{ url }}">
