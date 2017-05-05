@@ -105,55 +105,63 @@ def get_trackables():
     return flask.jsonify(data)
 
 
-@app.route('/usage/trackables/statistics', methods=['GET'])
+@app.route('/usage/trackables/<trackable_type>', methods=['GET'])
 @flask_login.login_required
-def get_statistics():
+def get_statistics(trackable_type):
     sortby = request.args.get('sortby', None)
     trackable = request.args.get('trackable', None)
 
-    data = {}
-    if sortby == 'application':
-        for app_name, in db.session.query(Application.name)\
-                                    .distinct()\
-                                    .filter(Application.group_id==flask_login.current_user.group_id):
+    cls = {'statistics': Statistic, 'timers': Timer, 'sequences': Sequence}.get(trackable_type)
+    if cls is None:
+        flask.abort(400)
 
-            q = db.session.query(Statistic.name, func.sum(Statistic.count)) \
-                          .join(Statistic.application) \
+    group_id = flask_login.current_user.group_id
+    data = {}
+
+    if sortby == 'application':
+        sort_query = db.session.query(Application.name)\
+                                .distinct()\
+                                .filter(Application.group_id==group_id)
+        for app_name, in sort_query:
+
+            q = db.session.query(cls.name, func.sum(cls.count)) \
+                          .join(cls.application) \
                           .filter(Application.name==app_name) \
-                          .group_by(Statistic.name)\
+                          .group_by(cls.name)\
 
             if trackable:
-                q = q.filter(Statistic.name==trackable)
+                q = q.filter(cls.name==trackable)
             data[app_name] = q.all()
 
-        return flask.jsonify(data)
     elif sortby == 'uuid':
-        for user_id, in db.session.query(UUID.user_identifier)\
-                                    .distinct()\
-                                    .filter(UUID.group_id==flask_login.current_user.group_id):
+        sort_query = db.session.query(UUID.user_identifier)\
+                               .distinct()\
+                               .filter(UUID.group_id==group_id)
 
-            q = db.session.query(Statistic.name, func.sum(Statistic.count)) \
-                          .join(Statistic.uuid) \
+        for user_id, in sort_query:
+            q = db.session.query(cls.name, func.sum(cls.count)) \
+                          .join(cls.uuid) \
                           .filter(UUID.user_identifier==user_id) \
 
             if trackable:
-                q = q.filter(Statistic.name==trackable)
+                q = q.filter(cls.name==trackable)
             data[user_id] = q.all()
 
-        return flask.jsonify(data)
     else:
+        if trackable is not None:
+            sort_query = [(trackable,)]
+        else:
+            sort_query = db.session.query(cls.name) \
+                                   .distinct() \
+                                   .filter(cls.group_id == group_id)
 
-        for tr, in ([(trackable,)] if trackable else []) or \
-                    db.session.query(Statistic.name)\
-                              .distinct()\
-                              .filter(Statistic.group_id==flask_login.current_user.group_id):
-
-            data[tr] = db.session.query(Application.name, func.sum(Statistic.count)) \
-                               .join(Statistic.application) \
-                               .filter(Statistic.name==tr) \
-                               .group_by(Application.name)\
-                               .all()
-        return flask.jsonify(data)
+        for tr, in sort_query:
+            data[tr] = db.session.query(Application.name, func.sum(cls.count)) \
+                                 .join(cls.application) \
+                                 .filter(cls.name==tr) \
+                                 .group_by(Application.name)\
+                                 .all()
+    return flask.jsonify(data)
 
 
 @app.route('/usage/trackables/states', methods=['GET'])
