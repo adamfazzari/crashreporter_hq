@@ -119,6 +119,7 @@ def get_statistics(trackable_type):
     data = {}
 
     if sortby == 'application':
+        # return list of (trackable name, cummulative value) keyed by application name
         sort_query = db.session.query(Application.name)\
                                 .distinct()\
                                 .filter(Application.group_id==group_id)
@@ -134,6 +135,7 @@ def get_statistics(trackable_type):
             data[app_name] = q.all()
 
     elif sortby == 'uuid':
+        # return list of (trackable name, cummulative value) keyed by UUID
         sort_query = db.session.query(UUID.user_identifier)\
                                .distinct()\
                                .filter(UUID.group_id==group_id)
@@ -148,6 +150,7 @@ def get_statistics(trackable_type):
             data[user_id] = q.all()
 
     else:
+        # return list of (application name, cummulative value) keyed by trackable name
         if trackable is not None:
             sort_query = [(trackable,)]
         else:
@@ -169,12 +172,15 @@ def get_statistics(trackable_type):
 def get_states():
     sortby = request.args.get('sortby', None)
     trackable = request.args.get('trackable', None)
+    group_id = flask_login.current_user.group_id
 
     data = {}
     if sortby == 'application':
-        for app_name, in db.session.query(Application.name) \
-                                   .distinct() \
-                                   .filter(Application.group_id == flask_login.current_user.group_id):
+        # return list of (trackable name, state value, number of users) keyed by application name
+        sort_query = db.session.query(Application.name) \
+                               .distinct() \
+                               .filter(Application.group_id == group_id)
+        for app_name, in sort_query:
 
             q = db.session.query(State.name, State.state, func.count(State.state)) \
                           .join(State.application) \
@@ -185,11 +191,12 @@ def get_states():
                 q = q.filter(State.name == trackable)
             data[app_name] = q.all()
 
-        return flask.jsonify(data)
     elif sortby == 'uuid':
-        for user_id, in db.session.query(UUID.user_identifier) \
-                          .distinct() \
-                          .filter(UUID.group_id == flask_login.current_user.group_id):
+        # return list of (trackable name, application name, state value) keyed by application name
+        sort_query = db.session.query(UUID.user_identifier) \
+                               .distinct() \
+                               .filter(UUID.group_id == group_id)
+        for user_id, in sort_query:
 
             q = db.session.query(State.name, Application.name, State.state) \
                           .join(State.uuid, State.application) \
@@ -198,17 +205,16 @@ def get_states():
                 q = q.filter(State.name == trackable)
             data[user_id] = q.all()
 
-        return flask.jsonify(data)
     elif sortby == 'state':
+        # return list of (trackable name, application name, number of users) keyed by state value
         if trackable is None:
             flask.abort(flask.Response('Must specify "trackable" when sorting by state', status=400))
 
-        loop_query = db.session.query(State.state) \
-                          .distinct() \
-                          .filter(UUID.group_id == flask_login.current_user.group_id)
-        loop_query = loop_query.filter(State.name == trackable)
+        sort_query = db.session.query(State.state) \
+                               .distinct() \
+                               .filter(UUID.group_id == group_id, State.name == trackable)
 
-        for state, in loop_query:
+        for state, in sort_query:
 
             q = db.session.query(State.name, Application.name, func.count(State.state)) \
                           .join(State.uuid, State.application) \
@@ -216,16 +222,20 @@ def get_states():
 
             data[state] = q.all()
 
-        return flask.jsonify(data)
     elif sortby in (None, 'trackable'):
+        # return list of (state value, application name, number of users) keyed by trackable name
+        if trackable is not None:
+            sort_query = [(trackable,)]
+        else:
+            sort_query = db.session.query(State.name) \
+                                   .distinct() \
+                                   .filter(State.group_id == group_id)
 
-        for tr, in ([(trackable,)] if trackable else []) or \
-                db.session.query(State.name) \
-                          .distinct() \
-                          .filter(State.group_id == flask_login.current_user.group_id):
-            data[tr] = db.session.query(State.state, func.count(State.state)) \
+        for tr, in sort_query:
+            data[tr] = db.session.query(State.state, Application.name, func.count(State.state)) \
                 .join(State.application) \
                 .filter(State.name == tr) \
-                .group_by(State.state) \
+                .group_by(Application.name, State.state) \
                 .all()
-        return flask.jsonify(data)
+
+    return flask.jsonify(data)
