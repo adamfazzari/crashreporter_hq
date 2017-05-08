@@ -4,7 +4,7 @@ import flask
 from flask import request
 from sqlalchemy import func
 
-from ...models import Statistic, State, Timer, Sequence, UUID, User, Application
+from ...models import Statistic, State, Timer, Sequence, UUID, User, Application, Group
 from ... import app, db
 
 
@@ -83,9 +83,13 @@ def _filter_trackables(q, trackable_class, **filters):
     return q
 
 @app.route('/usage/trackables', methods=['GET'])
-@flask_login.login_required
 def get_trackables():
     types = request.args.get('type', None)
+    api_key = request.args.get('api_key', None)
+    if api_key is None:
+        flask.abort(flask.Response('You must provide a value for api_key', status=400))
+    else:
+        group_id, = db.session.query(User.group_id).filter(User.api_key == api_key).first()
 
     data = {}
     if types is None:
@@ -99,23 +103,26 @@ def get_trackables():
         attr = TRACKABLE_ATTRS[t.capitalize()]['value']
         q = db.session.query(cls.name, Application.name, UUID.user_identifier, attr).join(UUID, Application)
         q = _filter_trackables(q, cls, **{k: v for k, v in request.args.iteritems()})
-        q.filter(cls.group_id==flask_login.current_user.group_id)
+        q.filter(cls.group_id==group_id)
         data[t] = q.all()
 
     return flask.jsonify(data)
 
 
 @app.route('/usage/trackables/<trackable_type>', methods=['GET'])
-@flask_login.login_required
 def get_statistics(trackable_type):
     sortby = request.args.get('sortby', None)
     trackable = request.args.get('trackable', None)
+    api_key = request.args.get('api_key', None)
+    if api_key is None:
+        flask.abort(flask.Response('You must provide a value for api_key', status=400))
+    else:
+        group_id, = db.session.query(User.group_id).filter(User.api_key == api_key).first()
 
     cls = {'statistics': Statistic, 'timers': Timer, 'sequences': Sequence}.get(trackable_type)
     if cls is None:
         flask.abort(400)
 
-    group_id = flask_login.current_user.group_id
     data = {}
 
     if sortby == 'application':
@@ -168,11 +175,14 @@ def get_statistics(trackable_type):
 
 
 @app.route('/usage/trackables/states', methods=['GET'])
-@flask_login.login_required
 def get_states():
     sortby = request.args.get('sortby', None)
     trackable = request.args.get('trackable', None)
-    group_id = flask_login.current_user.group_id
+    api_key = request.args.get('api_key', None)
+    if api_key is None:
+        flask.abort(flask.Response('You must provide a value for api_key', status=400))
+    else:
+        group_id, = db.session.query(User.group_id).filter(User.api_key == api_key).first()
 
     data = {}
     if sortby == 'application':
