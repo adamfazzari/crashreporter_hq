@@ -1,5 +1,5 @@
 import json
-import flask_login
+import re
 import flask
 from flask import request
 from sqlalchemy import func
@@ -44,9 +44,11 @@ def upload_stats():
                 db.session.add(uuid)
 
             # Parse the application version into a tuple
-            app_version = payload['Application Version'].split('.')
+            app_version = re.findall("(\d)[\.A-z]*(\d)[\.A-z]*(\d?)[\.A-z]*", payload['Application Version'])
             q = Application.query.filter(Application.name == payload['Application Name'])
-            for ii, v in enumerate(app_version):
+            for ii, v in enumerate(app_version[0]):
+                if v == '':
+                    v = 0
                 q.filter(getattr(Application, 'version_%d' % ii) == int(v))
             application = q.first()
 
