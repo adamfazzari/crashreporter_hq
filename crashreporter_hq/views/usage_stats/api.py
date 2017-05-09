@@ -44,17 +44,17 @@ def upload_stats():
                 db.session.add(uuid)
 
             # Parse the application version into a tuple
-            app_version = re.findall("(\d)[\.A-z]*(\d)[\.A-z]*(\d?)[\.A-z]*", payload['Application Version'])
+            app_version = re.findall("(\d+)[\.A-z]*(\d+)[\.A-z]*(\d+?)[\.A-z]*", payload['Application Version'])
             q = Application.query.filter(Application.name == payload['Application Name'])
             for ii, v in enumerate(app_version[0]):
                 if v == '':
                     v = 0
-                q.filter(getattr(Application, 'version_%d' % ii) == int(v))
+                q = q.filter(getattr(Application, 'version_%d' % ii) == int(v))
             application = q.first()
 
             if application is None:
                 # Create the Application row if it doesn't already exist
-                application = Application(payload['Application Name'], app_version, user.group)
+                application = Application(payload['Application Name'], app_version[0], user.group)
                 db.session.add(application)
                 db.session.commit()
 

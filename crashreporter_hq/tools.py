@@ -35,7 +35,7 @@ def save_report(payload):
     # If that group exists, add the report to the group
     api_key = params.get('api_key', None)
     user = User.query.filter(User.api_key == api_key).first()
-    if user is not None:
+    if user is not None and user.group:
         # If the date comes in from the future (> 1 day), set the date to today's date
         crash_date = datetime.datetime.strptime(payload['Date'], '%d %B %Y')
         now = datetime.datetime.now()
@@ -64,9 +64,8 @@ def save_report(payload):
                     if count > max_redundancy:
                         payload['Traceback'].remove(tb)
 
-        cr = CrashReport(**payload)
-        if user.group:
-            user.group.add_report(cr)
+        cr = CrashReport(user.group, **payload)
+
 
         cr.commit()
 

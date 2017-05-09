@@ -41,7 +41,7 @@ class CrashReport(db.Model):
                     'Traceback': 'traceback',
                     'Date': 'date'}
 
-    def __init__(self, **report_fields):
+    def __init__(self, group, **report_fields):
         version = report_fields['Application Version']
 
         application = Application.query.filter(Application.name == report_fields['Application Name'],
@@ -49,7 +49,7 @@ class CrashReport(db.Model):
                                                Application.version_1 == version[1],
                                                Application.version_2 == version[2]).first()
         if application is None:
-            application = Application(name=report_fields['Application Name'], version=version)
+            application = Application(name=report_fields['Application Name'], version=version, group=group)
             db.session.add(application)
             db.session.commit()
         self.application = application
@@ -77,6 +77,7 @@ class CrashReport(db.Model):
         else:
             self.related_group_id = CrashReport.get_related_hash(self)
 
+        group.add_report(self)
         self.commit()
 
     def __getitem__(self, item):

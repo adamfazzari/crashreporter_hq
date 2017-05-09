@@ -50,7 +50,7 @@ def add_application_release():
     if application:
         application.is_release = True
     else:
-        application = Application(name=request.args['name'], version=(v0, v1, v2), is_release=True)
+        application = Application(name=request.args['name'], version=(v0, v1, v2), group=group, is_release=True)
         db.session.add(application)
         group.add_application(application)
     db.session.commit()
