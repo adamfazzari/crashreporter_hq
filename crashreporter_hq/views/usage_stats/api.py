@@ -4,7 +4,7 @@ import flask
 from flask import request
 from sqlalchemy import func
 
-from ...models import Statistic, State, Timer, Sequence, UUID, User, Application, Group
+from ...models import Statistic, State, Timer, Sequence, UUID, User, Application, Alias, Group
 from ... import app, db
 
 
@@ -52,7 +52,7 @@ def upload_stats():
 
             if application is None:
                 # Create the Application row if it doesn't already exist
-                application = Application(payload['Application Name'], app_version)
+                application = Application(payload['Application Name'], app_version, user.group)
                 db.session.add(application)
                 db.session.commit()
 
@@ -76,9 +76,11 @@ def _filter_trackables(q, trackable_class, **filters):
     if 'uuid' in filters:
         q = q.filter(UUID.user_identifier==filters['uuid'])
     if 'application' in filters:
-        q = q.filter(trackable_class.application_name==filters['application'])
+        q = q.filter(Application.name==filters['application'])
     if 'trackable' in filters:
         q = q.filter(trackable_class.name == filters['trackable'])
+    if 'exclude_aliases' in filters:
+        q = q.outerjoin(Alias.uuid)
 
     return q
 
@@ -114,6 +116,8 @@ def get_statistics(trackable_type):
     sortby = request.args.get('sortby', None)
     trackable = request.args.get('trackable', None)
     api_key = request.args.get('api_key', None)
+    include_aliases = request.args.get('include_aliases', True)
+
     if api_key is None:
         flask.abort(flask.Response('You must provide a value for api_key', status=400))
     else:
@@ -135,8 +139,10 @@ def get_statistics(trackable_type):
             q = db.session.query(cls.name, func.sum(cls.count)) \
                           .join(cls.application) \
                           .filter(Application.name==app_name) \
-                          .group_by(cls.name)\
+                          .group_by(cls.name)
 
+            if include_aliases == 'false':
+                q = q.filter(cls.uuid.has(alias=None))
             if trackable:
                 q = q.filter(cls.name==trackable)
             data[app_name] = q.all()
@@ -148,10 +154,13 @@ def get_statistics(trackable_type):
                                .filter(UUID.group_id==group_id)
 
         for user_id, in sort_query:
-            q = db.session.query(cls.name, func.sum(cls.count)) \
+            q = db.session.query(cls.name, cls.count) \
                           .join(cls.uuid) \
-                          .filter(UUID.user_identifier==user_id) \
+                          .filter(UUID.user_identifier==user_id,
+                                  UUID.group_id == group_id) \
 
+            if include_aliases == 'false':
+                q = q.filter(cls.uuid.has(alias=None))
             if trackable:
                 q = q.filter(cls.name==trackable)
             data[user_id] = q.all()
@@ -166,11 +175,15 @@ def get_statistics(trackable_type):
                                    .filter(cls.group_id == group_id)
 
         for tr, in sort_query:
-            data[tr] = db.session.query(Application.name, func.sum(cls.count)) \
+            q = db.session.query(Application.name, func.count(cls.count)) \
                                  .join(cls.application) \
-                                 .filter(cls.name==tr) \
-                                 .group_by(Application.name)\
-                                 .all()
+                                 .filter(cls.name==tr,
+                                         Application.group_id == group_id
+                                         )\
+                                 .group_by(Application.name)
+            if include_aliases == 'false':
+                q = q.filter(cls.uuid.has(alias=None))
+            data[tr] = q.all()
     return flask.jsonify(data)
 
 
@@ -179,6 +192,11 @@ def get_states():
     sortby = request.args.get('sortby', None)
     trackable = request.args.get('trackable', None)
     api_key = request.args.get('api_key', None)
+    include_aliases = request.args.get('include_aliases', True)
+
+    if include_aliases not in ('false', 'true', True):
+        flask.abort(flask.Response('Invalid argument for include_aliases', status=400))
+
     if api_key is None:
         flask.abort(flask.Response('You must provide a value for api_key', status=400))
     else:
@@ -188,15 +206,18 @@ def get_states():
     if sortby == 'application':
         # return list of (trackable name, state value, number of users) keyed by application name
         sort_query = db.session.query(Application.name) \
+                               .join(State.application)\
                                .distinct() \
                                .filter(Application.group_id == group_id)
+        if include_aliases == 'false':
+            sort_query = sort_query.filter(State.uuid.has(alias=None))
+
         for app_name, in sort_query:
 
             q = db.session.query(State.name, State.state, func.count(State.state)) \
                           .join(State.application) \
                           .filter(Application.name == app_name) \
                           .group_by(State.name, State.state)
-
             if trackable:
                 q = q.filter(State.name == trackable)
             data[app_name] = q.all()
@@ -204,13 +225,19 @@ def get_states():
     elif sortby == 'uuid':
         # return list of (trackable name, application name, state value) keyed by application name
         sort_query = db.session.query(UUID.user_identifier) \
+                               .join(State.uuid)\
                                .distinct() \
                                .filter(UUID.group_id == group_id)
+
+        if include_aliases == 'false':
+            sort_query = sort_query.filter(State.uuid.has(alias=None))
+
         for user_id, in sort_query:
 
             q = db.session.query(State.name, Application.name, State.state) \
                           .join(State.uuid, State.application) \
                           .filter(UUID.user_identifier == user_id)
+
             if trackable:
                 q = q.filter(State.name == trackable)
             data[user_id] = q.all()
@@ -223,12 +250,14 @@ def get_states():
         sort_query = db.session.query(State.state) \
                                .distinct() \
                                .filter(UUID.group_id == group_id, State.name == trackable)
+        if include_aliases == 'false':
+            sort_query = sort_query.filter(State.uuid.has(alias=None))
 
         for state, in sort_query:
 
             q = db.session.query(State.name, Application.name, func.count(State.state)) \
-                          .join(State.uuid, State.application) \
-                          .filter(State.state == state)
+                          .filter(State.state == state)\
+                          .join(State.uuid, State.application)
 
             data[state] = q.all()
 
@@ -242,10 +271,13 @@ def get_states():
                                    .filter(State.group_id == group_id)
 
         for tr, in sort_query:
-            data[tr] = db.session.query(State.state, Application.name, func.count(State.state)) \
+            q = db.session.query(State.state, Application.name, func.count(State.state)) \
                 .join(State.application) \
                 .filter(State.name == tr) \
-                .group_by(Application.name, State.state) \
-                .all()
+                .group_by(Application.name, State.state)
+            if include_aliases == 'false':
+                q = q.filter(State.uuid.has(alias=None))
+
+            data[tr] = q.all()
 
     return flask.jsonify(data)

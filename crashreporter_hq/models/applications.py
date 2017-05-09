@@ -17,9 +17,10 @@ class Application(db.Model):
     version_1 = Column(Integer)
     version_2 = Column(Integer)
 
-    def __init__(self, name, version, description='', is_release=False):
+    def __init__(self, name, version, group, description='', is_release=False):
         self.name = name
         self.description = description
+        self.group = group
         self.version_0, self.version_1, self.version_2 = map(int, version)
         self.is_release = is_release
 
