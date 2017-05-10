@@ -178,7 +178,7 @@ def get_statistics(trackable_type):
                                    .filter(cls.group_id == group_id)
 
         for tr, in sort_query:
-            q = db.session.query(Application.name, func.count(cls.count)) \
+            q = db.session.query(Application.name, func.sum(cls.count)) \
                                  .join(cls.application) \
                                  .filter(cls.name==tr,
                                          Application.group_id == group_id
