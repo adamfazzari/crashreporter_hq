@@ -116,7 +116,7 @@ def get_trackables():
 
 @app.route('/usage/trackables/<trackable_type>', methods=['GET'])
 def get_statistics(trackable_type):
-    sortby = request.args.get('sortby', None)
+    sortby = request.args.get('sortby', 'trackable')
     trackable = request.args.get('trackable', None)
     api_key = request.args.get('api_key', None)
     include_aliases = request.args.get('include_aliases', True)
@@ -168,7 +168,7 @@ def get_statistics(trackable_type):
                 q = q.filter(cls.name==trackable)
             data[user_id] = q.all()
 
-    else:
+    elif sortby == 'trackable':
         # return list of (application name, cummulative value, number of users) keyed by trackable name
         if trackable is not None:
             sort_query = [(trackable,)]
@@ -187,12 +187,15 @@ def get_statistics(trackable_type):
             if include_aliases == 'false':
                 q = q.filter(cls.uuid.has(alias=None))
             data[tr] = q.all()
+    else:
+        flask.abort(400, "sortby field must be either 'application', 'uuid' or 'trackable' (default)")
+
     return flask.jsonify(data)
 
 
 @app.route('/usage/trackables/states', methods=['GET'])
 def get_states():
-    sortby = request.args.get('sortby', None)
+    sortby = request.args.get('sortby', 'trackable')
     trackable = request.args.get('trackable', None)
     api_key = request.args.get('api_key', None)
     include_aliases = request.args.get('include_aliases', True)
@@ -204,7 +207,7 @@ def get_states():
         flask.abort(flask.Response('You must provide a value for api_key', status=400))
     else:
         group_id, = db.session.query(User.group_id).filter(User.api_key == api_key).first()
-
+        
     data = {}
     if sortby == 'application':
         # return list of (trackable name, state value, number of users) keyed by application name
@@ -264,7 +267,7 @@ def get_states():
 
             data[state] = q.all()
 
-    elif sortby in (None, 'trackable'):
+    elif sortby == 'trackable':
         # return list of (state value, application name, number of users) keyed by trackable name
         if trackable is not None:
             sort_query = [(trackable,)]
@@ -282,5 +285,7 @@ def get_states():
                 q = q.filter(State.uuid.has(alias=None))
 
             data[tr] = q.all()
+    else:
+        flask.abort(400, "sortby field must be either 'application', 'state', 'uuid' or 'trackable' (default)")
 
     return flask.jsonify(data)
