@@ -94,7 +94,7 @@ def get_trackables():
 
     data = {t.capitalize(): {} for t in types}
 
-    applications = db.session.query(Application.name)\
+    applications = db.session.query(Application.name, Application.id)\
                              .distinct()\
                              .filter(Application.group_id==group_id)
     if application_name:
@@ -103,8 +103,9 @@ def get_trackables():
         t = t.capitalize()
         cls = TRACKABLES[t.capitalize()]
 
-        for app, in applications:
-            q = db.session.query(cls.name.distinct()).join(Application).filter(cls.group_id==group_id)
+        for app, app_id in applications:
+            q = db.session.query(cls.name.distinct()).join(Application).filter(Application.id==app_id,
+                                                                               cls.group_id==group_id)
             data[t][app] = [s for s, in q.all()]
 
     return flask.jsonify(data)
