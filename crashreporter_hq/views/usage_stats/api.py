@@ -75,41 +75,37 @@ def upload_stats():
         return 'Success'
 
 
-def _filter_trackables(q, trackable_class, **filters):
-    if 'uuid' in filters:
-        q = q.filter(UUID.user_identifier==filters['uuid'])
-    if 'application' in filters:
-        q = q.filter(Application.name==filters['application'])
-    if 'trackable' in filters:
-        q = q.filter(trackable_class.name == filters['trackable'])
-    if 'exclude_aliases' in filters:
-        q = q.outerjoin(Alias.uuid)
-
-    return q
 
 @app.route('/usage/trackables', methods=['GET'])
 def get_trackables():
     types = request.args.get('type', None)
     api_key = request.args.get('api_key', None)
+    application_name = request.args.get('application', None)
+
     if api_key is None:
         flask.abort(flask.Response('You must provide a value for api_key', status=400))
     else:
         group_id, = db.session.query(User.group_id).filter(User.api_key == api_key).first()
 
-    data = {}
     if types is None:
         types = TRACKABLES.keys()
     else:
         types = types.split(',')
 
+    data = {t.capitalize(): {} for t in types}
+
+    applications = db.session.query(Application.name)\
+                             .distinct()\
+                             .filter(Application.group_id==group_id)
+    if application_name:
+        applications = applications.filter(Application.name == application_name)
     for t in types:
         t = t.capitalize()
         cls = TRACKABLES[t.capitalize()]
-        attr = TRACKABLE_ATTRS[t.capitalize()]['value']
-        q = db.session.query(cls.name, Application.name, UUID.user_identifier, attr).join(UUID, Application)
-        q = _filter_trackables(q, cls, **{k: v for k, v in request.args.iteritems()})
-        q.filter(cls.group_id==group_id)
-        data[t] = q.all()
+
+        for app, in applications:
+            q = db.session.query(cls.name.distinct()).join(Application).filter(cls.group_id==group_id)
+            data[t][app] = [s for s, in q.all()]
 
     return flask.jsonify(data)
 
