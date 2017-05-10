@@ -124,7 +124,11 @@ def get_statistics(trackable_type):
     if api_key is None:
         flask.abort(flask.Response('You must provide a value for api_key', status=400))
     else:
-        group_id, = db.session.query(User.group_id).filter(User.api_key == api_key).first()
+        group_id = db.session.query(User.group_id).filter(User.api_key == api_key).first()
+        if group_id is None:
+            flask.abort(flask.Response('Invalid api_key', status=400))
+        else:
+            group_id = group_id[0]
 
     cls = {'statistics': Statistic, 'timers': Timer, 'sequences': Sequence}.get(trackable_type)
     if cls is None:
@@ -188,7 +192,7 @@ def get_statistics(trackable_type):
                 q = q.filter(cls.uuid.has(alias=None))
             data[tr] = q.all()
     else:
-        flask.abort(400, "sortby field must be either 'application', 'uuid' or 'trackable' (default)")
+        flask.abort(flask.Response("sortby field must be either 'application', 'uuid' or 'trackable' (default)", status=400))
 
     return flask.jsonify(data)
 
@@ -206,8 +210,12 @@ def get_states():
     if api_key is None:
         flask.abort(flask.Response('You must provide a value for api_key', status=400))
     else:
-        group_id, = db.session.query(User.group_id).filter(User.api_key == api_key).first()
-        
+        group_id = db.session.query(User.group_id).filter(User.api_key == api_key).first()
+        if group_id is None:
+            flask.abort(flask.Response('Invalid api_key', status=400))
+        else:
+            group_id = group_id[0]
+
     data = {}
     if sortby == 'application':
         # return list of (trackable name, state value, number of users) keyed by application name
@@ -286,6 +294,6 @@ def get_states():
 
             data[tr] = q.all()
     else:
-        flask.abort(400, "sortby field must be either 'application', 'state', 'uuid' or 'trackable' (default)")
+        flask.abort(flask.Response("sortby field must be either 'application', 'state', 'uuid' or 'trackable' (default)", status=400))
 
     return flask.jsonify(data)
