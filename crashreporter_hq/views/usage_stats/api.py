@@ -7,6 +7,7 @@ from sqlalchemy import func
 from ...models import Statistic, State, Timer, Sequence, UUID, User, Application, Alias, Group
 from ... import app, db
 
+version_regex = re.compile("(\d+)[\s\.A-z]*(\d+)[\s\.A-z]*(?:(\d+)[\s\.A-z]*)?")
 
 TRACKABLES = {'Statistic': Statistic,
               'State': State,
@@ -44,12 +45,7 @@ def upload_stats():
                 db.session.add(uuid)
 
             # Parse the application version into a tuple
-
-            # Needs to be here because of EKKO Project version string being malformated. Remove once new EP is released.
-            app_version = re.findall("V(\d+) R(\d+) (d\+)?", payload['Application Version'])
-
-            if len(app_version) == 0:
-                app_version = re.findall("(\d+)[\.A-z]*(\d+)[\.A-z]*(\d+?)[\.A-z]*", payload['Application Version'])
+            app_version = re.findall(version_regex, payload['Application Version'])
             q = Application.query.filter(Application.name == payload['Application Name'])
             for ii, v in enumerate(app_version[0]):
                 if v == '':
