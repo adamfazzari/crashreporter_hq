@@ -133,13 +133,13 @@ def get_statistics(trackable_type):
     data = {}
 
     if sortby == 'application':
-        # return list of (trackable name, cummulative value) keyed by application name
+        # return list of (trackable name, cummulative value, number of users) keyed by application name
         sort_query = db.session.query(Application.name)\
                                 .distinct()\
                                 .filter(Application.group_id==group_id)
         for app_name, in sort_query:
 
-            q = db.session.query(cls.name, func.sum(cls.count)) \
+            q = db.session.query(cls.name, func.sum(cls.count), func.count(cls.id)) \
                           .join(cls.application) \
                           .filter(Application.name==app_name) \
                           .group_by(cls.name)
@@ -169,7 +169,7 @@ def get_statistics(trackable_type):
             data[user_id] = q.all()
 
     else:
-        # return list of (application name, cummulative value) keyed by trackable name
+        # return list of (application name, cummulative value, number of users) keyed by trackable name
         if trackable is not None:
             sort_query = [(trackable,)]
         else:
@@ -178,7 +178,7 @@ def get_statistics(trackable_type):
                                    .filter(cls.group_id == group_id)
 
         for tr, in sort_query:
-            q = db.session.query(Application.name, func.sum(cls.count)) \
+            q = db.session.query(Application.name, func.sum(cls.count), func.count(cls.id)) \
                                  .join(cls.application) \
                                  .filter(cls.name==tr,
                                          Application.group_id == group_id
