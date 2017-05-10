@@ -148,7 +148,8 @@ def get_statistics(trackable_type):
                 q = q.filter(cls.uuid.has(alias=None))
             if trackable:
                 q = q.filter(cls.name==trackable)
-            data[app_name] = q.all()
+            if q.count():
+                data[app_name] = q.all()
 
     elif sortby == 'uuid':
         # return list of (trackable name, cummulative value) keyed by UUID
@@ -166,7 +167,8 @@ def get_statistics(trackable_type):
                 q = q.filter(cls.uuid.has(alias=None))
             if trackable:
                 q = q.filter(cls.name==trackable)
-            data[user_id] = q.all()
+            if q.count():
+                data[user_id] = q.all()
 
     elif sortby == 'trackable':
         # return list of (application name, cummulative value, number of users) keyed by trackable name
@@ -186,7 +188,8 @@ def get_statistics(trackable_type):
                                  .group_by(Application.name)
             if include_aliases == 'false':
                 q = q.filter(cls.uuid.has(alias=None))
-            data[tr] = q.all()
+            if q.count():
+                data[tr] = q.all()
     else:
         flask.abort(flask.Response("sortby field must be either 'application', 'uuid' or 'trackable' (default)", status=400))
 
@@ -230,7 +233,8 @@ def get_states():
                           .group_by(State.name, State.state)
             if trackable:
                 q = q.filter(State.name == trackable)
-            data[app_name] = q.all()
+            if q.count():
+                data[app_name] = q.all()
 
     elif sortby == 'uuid':
         # return list of (trackable name, application name, state value) keyed by application name
@@ -250,7 +254,8 @@ def get_states():
 
             if trackable:
                 q = q.filter(State.name == trackable)
-            data[user_id] = q.all()
+            if q.count():
+                data[user_id] = q.all()
 
     elif sortby == 'state':
         # return list of (trackable name, application name, number of users) keyed by state value
@@ -268,8 +273,8 @@ def get_states():
             q = db.session.query(State.name, Application.name, func.count(State.state)) \
                           .filter(State.state == state)\
                           .join(State.uuid, State.application)
-
-            data[state] = q.all()
+            if q.count():
+                data[state] = q.all()
 
     elif sortby == 'trackable':
         # return list of (state value, application name, number of users) keyed by trackable name
@@ -288,7 +293,8 @@ def get_states():
             if include_aliases == 'false':
                 q = q.filter(State.uuid.has(alias=None))
 
-            data[tr] = q.all()
+            if q.count():
+                data[tr] = q.all()
     else:
         flask.abort(flask.Response("sortby field must be either 'application', 'state', 'uuid' or 'trackable' (default)", status=400))
 
