@@ -300,3 +300,43 @@ def get_states():
         flask.abort(flask.Response("sortby field must be either 'application', 'state', 'uuid' or 'trackable' (default)", status=400))
 
     return flask.jsonify(data)
+
+
+@app.route('/usage/users', methods=['GET'])
+def get_users():
+    api_key = request.args.get('api_key', None)
+    include_aliases = request.args.get('include_aliases', True)
+
+    if include_aliases not in ('false', 'true', True):
+        flask.abort(flask.Response('Invalid argument for include_aliases', status=400))
+
+    if api_key is None:
+        flask.abort(flask.Response('You must provide a value for api_key', status=400))
+    else:
+        group_id = db.session.query(User.group_id).filter(User.api_key == api_key).first()
+        if group_id is None:
+            flask.abort(flask.Response('Invalid api_key', status=400))
+        else:
+            group_id = group_id[0]
+
+    sort_query = db.session.query(Application.name) \
+        .join(State.application) \
+        .distinct() \
+        .filter(Application.group_id == group_id)
+
+    data = {}
+    for app_name, in sort_query:
+        for cls in TRACKABLES.itervalues():
+            q = db.session.query(func.count(cls.id).label('total'))\
+                                       .join(Application)\
+                                       .filter(Application.name==app_name)\
+                                       .group_by(cls.name)\
+                                       .order_by('total DESC')
+
+            if include_aliases == 'false':
+                q = q.filter(cls.uuid.has(alias=None))
+
+            if q.count():
+                data[app_name] = q.first()[0]
+
+    return flask.jsonify(data)
