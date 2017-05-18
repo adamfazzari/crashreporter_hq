@@ -12,7 +12,7 @@ class UUID(db.Model):
     user_identifier = Column(String(100), unique=True)
     crashreport_black_listed = Column(Boolean(False), default=False)
     usagestats_black_listed = Column(Boolean(False), default=False)
-    alias = relationship('Alias', back_populates='uuid', uselist=False)
+    alias = relationship('Alias', back_populates='uuid', uselist=True)
     group_id = Column(Integer, ForeignKey('group.id'))
     group = relationship('Group', uselist=True, foreign_keys=[group_id])
 
