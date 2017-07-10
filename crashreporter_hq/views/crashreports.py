@@ -102,28 +102,25 @@ def delete_single_report(report_id, delete_similar=False):
     if success:
         return 'Success. Crash report #%d deleted' % report_id
     else:
-        return 'Failed. Crash report #%d does not exist.' % report_id
-
+        flask.abort(400)
 
 @app.route('/reports/upload', methods=['POST'])
 def upload_single_report():
-    if request.method == 'POST':
-        payload = json.loads(request.data)
-        cr, response = save_report(payload)
-        return response
-    else:
-        return 'Upload failed'
+    payload = json.loads(request.data)
+    cr, response = save_report(payload)
+    if cr is None:
+        flask.abort(401)
+    return response
 
 
 @app.route('/reports/upload_many', methods=['POST'])
 def upload_many_reports():
-    if request.method == 'POST':
-        payload = json.loads(request.data)
-        for package in payload:
-            cr, response = save_report(package)
-        return response
-    else:
-        return 'Upload failed'
+    payload = json.loads(request.data)
+    for package in payload:
+        cr, response = save_report(package)
+    if cr is None:
+        flask.abort(401)
+    return response
 
 
 @app.route('/reports/view_stats', methods=['GET', 'POST'])
