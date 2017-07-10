@@ -42,14 +42,13 @@ class CrashReport(db.Model):
                     'Date': 'date'}
 
     def __init__(self, group, **report_fields):
+        name = report_fields['Application Name']
         version = report_fields['Application Version']
 
-        application = Application.query.filter(Application.name == report_fields['Application Name'],
-                                               Application.version_0 == version[0],
-                                               Application.version_1 == version[1],
-                                               Application.version_2 == version[2]).first()
+        application = Application.get_application(name, version)
+        version_parsed = Application.parse_version_string(version)
         if application is None:
-            application = Application(name=report_fields['Application Name'], version=version, group=group)
+            application = Application(name=name, version=version_parsed, group=group)
             db.session.add(application)
             db.session.commit()
         self.application = application

@@ -1,14 +1,11 @@
 import json
-import re
 import flask
-from itertools import izip_longest
 from flask import request
 from sqlalchemy import func
 
 from ...models import Statistic, State, Timer, Sequence, UUID, User, Application, Alias, Group
 from ... import app, db
 
-version_regex = re.compile("(\d+)[\s\.A-z]*(\d+)[\s\.A-z]*(?:(\d+)[\s\.A-z]*)?")
 
 TRACKABLES = {'Statistic': Statistic,
               'State': State,
@@ -45,17 +42,12 @@ def upload_stats():
                 uuid.group.append(user.group)
                 db.session.add(uuid)
 
-            # Parse the application version into a tuple
-            app_version_parse = re.findall(version_regex, payload['Application Version'])
-            q = Application.query.filter(Application.name == payload['Application Name'])
-            app_version = [a or b for (a, b) in izip_longest(app_version_parse[0], ('0', '0', '0'))]
-            for ii, v in enumerate(app_version):
-                q = q.filter(getattr(Application, 'version_%d' % ii) == int(v))
-            application = q.first()
+            application = Application.get_application(payload['Application Name'], payload['Application Version'])
+            version_parsed = Application.parse_version_string(payload['Application Version'])
 
             if application is None:
                 # Create the Application row if it doesn't already exist
-                application = Application(payload['Application Name'], app_version, user.group)
+                application = Application(payload['Application Name'], version_parsed, user.group)
                 db.session.add(application)
                 db.session.commit()
 
