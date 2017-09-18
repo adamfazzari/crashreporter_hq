@@ -98,7 +98,13 @@ def get_trackables():
         for app, app_id in applications:
             q = db.session.query(cls.name.distinct()).join(Application).filter(Application.id==app_id,
                                                                                cls.group_id==group_id)
-            data[t][app] = [s for s, in q.all()]
+            if app not in data[t]:
+                data[t][app] = set()
+            data[t][app].update(set(s for s, in q.all()))
+
+    for t in types:
+        for app in data[t]:
+            data[t][app] = list(data[t][app])
 
     return flask.jsonify(data)
 
