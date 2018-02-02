@@ -11,59 +11,59 @@ app.config(['$interpolateProvider', function($interpolateProvider) {
 app.controller('GroupController', function($scope, $http) {
 
     $scope.getReleases = function() {
-        $http.get('/applications/releases').success(function (data) {
-            $scope.application_releases = data;
+        $http.get('/applications/releases').then(function (response) {
+            $scope.application_releases = response.data;
         });
     };
     
     $scope.removeRelease = function(id) {
-        $http.post('/applications/releases/remove?id=' + id).success(function() {
+        $http.post('/applications/releases/remove?id=' + id).then(function() {
               $scope.getReleases();
         });
     };
 
     $scope.addRelease = function(name, version) {
-        $http.post('/applications/releases/add?name=' + name + '&version='+ version).success(function() {
+        $http.post('/applications/releases/add?name=' + name + '&version='+ version).then(function() {
               $scope.getReleases();
         });
     };    
     
     
     $scope.getAliases = function() {
-        $http.get('/aliases').success(function (data) {
-            $scope.aliases = data;
+        $http.get('/aliases').then(function (response) {
+            $scope.aliases = response.data;
         });
     };
     
     $scope.removeAlias = function(id) {
-        $http.post('/aliases/remove?id=' + id).success(function() {
+        $http.post('/aliases/remove?id=' + id).then(function() {
               $scope.getAliases();
         });
     };
 
     $scope.addAlias = function(uuid, alias) {
-        $http.post('/aliases/add?uuid=' + uuid+ '&alias='+ alias).success(function() {
+        $http.post('/aliases/add?uuid=' + uuid+ '&alias='+ alias).then(function() {
               $scope.getAliases();
         });
     };
 
 
     $scope.getPlots = function() {
-        $http.get('/plots/statistics').success(function (data) {
-            $scope.statistic_plots = data;
+        $http.get('/plots/statistics').then(function (response) {
+            $scope.statistic_plots = response.data;
         });
     };
 
     $scope.addPlot = function(plotform) {
         stats = [].concat.apply([],plotform.statistics);
         data = {'name': plotform.name, 'statistics': stats};
-        $http.post('/plots/statistics/add', data).success(function() {
+        $http.post('/plots/statistics/add', data).then(function() {
             $scope.getPlots();
         });
     };
 
     $scope.removePlot = function(id) {
-        $http.post('/plots/statistics/remove?id=' + id).success(function() {
+        $http.post('/plots/statistics/remove?id=' + id).then(function() {
               $scope.getPlots();
         });
     };
@@ -73,13 +73,13 @@ app.controller('GroupController', function($scope, $http) {
     };
 
     $scope.getMembers = function() {
-        $http.get('/groups/members').success(function (data) {
-            $scope.group_members = data;
+        $http.get('/groups/members').then(function (response) {
+            $scope.group_members = response.data;
         });
     };
     
     $scope.manageMembers = function(user_id, action) {
-        $http.post('/groups/members/'+ user_id + '?action='+ action).success(function() {
+        $http.post('/groups/members/'+ user_id + '?action='+ action).then(function() {
             $scope.getMembers();
         });
     };
@@ -182,7 +182,7 @@ app.controller('SearchController', function($scope, $http, $mdDialog){
 
     $scope.openReport = function(ev, report_number) {
 
-        $http.get('/reports/' + report_number).success(function (body) {
+        $http.get('/reports/' + report_number).then(function (body) {
             $mdDialog.show({
                 controller: ReportController,
                 template: body,
@@ -246,7 +246,7 @@ app.controller('SearchController', function($scope, $http, $mdDialog){
               .cancel('No');
 
           $mdDialog.show(confirm).then(function() {
-              $http.post(url, data).success(function () {
+              $http.post(url, data).then(function () {
                   if (report_numbers.length > 1) {
                       $scope.reports = [];
                   }
@@ -288,8 +288,9 @@ app.controller('SearchController', function($scope, $http, $mdDialog){
             $scope.searchform.after_date = sdate;
         }
 
-        $http.post('/search', JSON.stringify($scope.searchform)).success(function(data){
+        $http.post('/search', JSON.stringify($scope.searchform)).then(function(response){
             // Determine which pages to show in the pagination links
+            var data = response.data;
             pages = [];
             pagination_pages_to_show = 3;
             var leftpagestart = Math.max(data.page - pagination_pages_to_show, 1);
@@ -326,7 +327,7 @@ app.controller('SearchController', function($scope, $http, $mdDialog){
             }
             $scope.search_performed = search_performed
 
-        }).error(function() {
+        }, function() {
             $scope.is_searching = false;
         })
 

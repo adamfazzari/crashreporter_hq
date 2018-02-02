@@ -34,13 +34,13 @@ app.controller('UsagePlotsController', function($scope, $http) {
                            {value: 'only', name: 'Only Aliases'}
                           ];
 
-    $http.get('/plots/statistics').success(function(data) {
-        $scope.statistic_plots = data;
-    }).error(function() {});
+    $http.get('/plots/statistics').then(function(response) {
+        $scope.statistic_plots = response.data;
+    }, function() {});
     
-    $http.get('/usage/states').success(function(data) {
-        $scope.state_trackables = data.states;
-    }).error(function() {});
+    $http.get('/usage/states').then(function(response) {
+        $scope.state_trackables = response.data.states;
+    }, function() {});
     
     $scope.createdPlots = {'statistics': [], 'states': []};
 
