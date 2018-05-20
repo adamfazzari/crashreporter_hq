@@ -1,7 +1,7 @@
-from ..models import CrashReport, Application
+from crashreporter_hq.models import CrashReport, Application
 
-from users import *
-from .. import db
+from crashreporter_hq.views.users import *
+from crashreporter_hq import db
 
 
 @app.route('/admin/recompute_related_reports')

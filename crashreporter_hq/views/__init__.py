@@ -1,6 +1,7 @@
 from login import *
 from users import *
 from groups import *
+from admin import *
 from usage_stats import *
 from crashreports import *
 from index import *
