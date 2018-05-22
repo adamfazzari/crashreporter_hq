@@ -30,7 +30,6 @@ def delete_report(delete_similar=False, *numbers):
 
 
 def log_upload_request(ip_address, type_to_track, increment_by=1):
-    ip_address = "174.112.0.3"
     upload_request = UploadRequest.get_by_ip_address(str(ip_address))
     if upload_request is None:
         # Create the upload requests row if it doesn't exist
