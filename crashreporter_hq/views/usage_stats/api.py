@@ -3,7 +3,9 @@ import flask
 from flask import request
 from sqlalchemy import func
 
-from ...models import Statistic, State, Timer, Sequence, UUID, User, Application, Alias, Group
+from ...tools import log_upload_request
+
+from ...models import Statistic, State, Timer, Sequence, UUID, User, Application
 from ... import app, db
 
 
@@ -22,6 +24,7 @@ TRACKABLE_ATTRS = {'Statistic': {'value': Statistic.count, 'sum': func.sum(Stati
 @app.route('/usagestats/upload', methods=['POST'])
 def upload_stats():
     payload = json.loads(request.data)
+    ip_address = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
     api_key = payload.get('API Key')
 
     if api_key is None:
@@ -32,6 +35,8 @@ def upload_stats():
     elif user.group is None:
         return 'User does not belong to a group.'
     else:
+        log_upload_request(ip_address, 'usage_stats')
+
         for trackable_name, data in payload.get('Data', {}).iteritems():
             cls = TRACKABLES.get(data['type'])
             # Get the UUID row or create one if it doesn't exist

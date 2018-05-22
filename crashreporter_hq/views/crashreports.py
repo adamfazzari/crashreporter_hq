@@ -10,7 +10,7 @@ from sqlalchemy import asc
 from groups import *
 
 from ..models import CrashReport, UUID, Traceback, Application
-from ..tools import save_report, delete_report as _delete_report
+from ..tools import save_report, log_upload_request, delete_report as _delete_report
 from ..extensions import search
 
 
@@ -106,20 +106,24 @@ def delete_single_report(report_id, delete_similar=False):
 
 @app.route('/reports/upload', methods=['POST'])
 def upload_single_report():
+    ip_address = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
     payload = json.loads(request.data)
     cr, response = save_report(payload)
     if cr is None:
         flask.abort(401)
+    log_upload_request(ip_address, 'crash_reports')
     return response
 
 
 @app.route('/reports/upload_many', methods=['POST'])
 def upload_many_reports():
+    ip_address = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
     payload = json.loads(request.data)
     for package in payload:
         cr, response = save_report(package)
     if cr is None:
         flask.abort(401)
+    log_upload_request(ip_address, 'crash_reports', len(payload))
     return response
 
 

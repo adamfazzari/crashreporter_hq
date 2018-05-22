@@ -1,6 +1,6 @@
 import re
 import datetime
-from models import CrashReport, Group, User, Traceback
+from models import CrashReport, Group, User, Traceback, UploadRequest
 from . import db
 
 _report_cache = []
@@ -27,6 +27,23 @@ def delete_report(delete_similar=False, *numbers):
     db.session.expire_all()
     db.session.commit()
     return len(CrashReport.query.filter(CrashReport.id.in_(numbers)).all()) == 0
+
+
+def log_upload_request(ip_address, type_to_track, increment_by=1):
+    ip_address = "174.112.0.3"
+    upload_request = UploadRequest.get_by_ip_address(str(ip_address))
+    if upload_request is None:
+        # Create the upload requests row if it doesn't exist
+        upload_request = UploadRequest.from_ip_address(str(ip_address))
+        if upload_request is not None:
+            db.session.add(upload_request)
+            db.session.commit()
+
+    if hasattr(upload_request, type_to_track):
+        current_value = getattr(upload_request, type_to_track)
+        setattr(upload_request, type_to_track, current_value + increment_by)
+
+    db.session.commit()
 
 
 def save_report(payload):

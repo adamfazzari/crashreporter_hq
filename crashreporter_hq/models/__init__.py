@@ -6,5 +6,6 @@ from plots import StatisticBarPlot, Stat2BarPlot
 from traceback import Traceback
 from users import User
 from uuid import UUID
+from upload_requests import UploadRequest
 
 from trackables import *
