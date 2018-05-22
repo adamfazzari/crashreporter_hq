@@ -31,6 +31,8 @@ def delete_report(delete_similar=False, *numbers):
 
 def log_upload_request(ip_address, type_to_track, increment_by=1):
     geoh = UploadRequest.from_ip_address(str(ip_address))
+    if geoh is None:
+        return
     upload_request = UploadRequest.get_by_geohash(geoh)
     if upload_request is None:
         # Create the upload requests row if it doesn't exist
