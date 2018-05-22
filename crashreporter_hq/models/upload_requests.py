@@ -3,7 +3,7 @@ import geohash
 import requests
 from sqlalchemy import Column, Integer, String
 
-from .. import db
+from .. import db, app
 
 GEOHASH_PRECISION = 5
 
@@ -20,7 +20,10 @@ class UploadRequest(db.Model):
 
     @staticmethod
     def convert_ip_to_location(ip_address):
-        r = requests.get("https://www.iplocate.io/api/lookup/{}".format(ip_address))
+        api_key = app.config.get("IP_STACK_API_KEY", None)
+        if api_key is None:
+            return None
+        r = requests.get("http://api.ipstack.com/{}?access_key={}".format(ip_address, api_key))
         if r.status_code == 200:
             j = json.loads(r.content)
             lat, lon = j.get('latitude', None), j.get('longitude', None)

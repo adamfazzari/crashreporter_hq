@@ -30,10 +30,11 @@ def delete_report(delete_similar=False, *numbers):
 
 
 def log_upload_request(ip_address, type_to_track, increment_by=1):
-    upload_request = UploadRequest.get_by_ip_address(str(ip_address))
+    geoh = UploadRequest.from_ip_address(str(ip_address))
+    upload_request = UploadRequest.get_by_geohash(geoh)
     if upload_request is None:
         # Create the upload requests row if it doesn't exist
-        upload_request = UploadRequest.from_ip_address(str(ip_address))
+        upload_request = UploadRequest(geoh)
         if upload_request is not None:
             db.session.add(upload_request)
             db.session.commit()

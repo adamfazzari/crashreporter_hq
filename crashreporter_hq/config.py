@@ -19,3 +19,6 @@ if not os.path.isdir(TMP_FOLDER):
 # Cross-Site Request Forgery prevention
 WTF_CSRF_ENABLED = True
 SECRET_KEY = 'chocolate-sauce'
+
+# Put your IP_STACK_API_KEY here
+IP_STACK_API_KEY = None
