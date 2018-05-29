@@ -15,7 +15,7 @@ app.controller('GroupController', function($scope, $http) {
             $scope.application_releases = response.data;
         });
     };
-    
+
     $scope.removeRelease = function(id) {
         $http.post('/applications/releases/remove?id=' + id).then(function() {
               $scope.getReleases();
@@ -26,15 +26,15 @@ app.controller('GroupController', function($scope, $http) {
         $http.post('/applications/releases/add?name=' + name + '&version='+ version).then(function() {
               $scope.getReleases();
         });
-    };    
-    
-    
+    };
+
+
     $scope.getAliases = function() {
         $http.get('/aliases').then(function (response) {
             $scope.aliases = response.data;
         });
     };
-    
+
     $scope.removeAlias = function(id) {
         $http.post('/aliases/remove?id=' + id).then(function() {
               $scope.getAliases();
@@ -67,7 +67,7 @@ app.controller('GroupController', function($scope, $http) {
               $scope.getPlots();
         });
     };
-    
+
     $scope.addStatisticField = function() {
         $scope.PlotForm.statistics.push(['']);
     };
@@ -77,13 +77,13 @@ app.controller('GroupController', function($scope, $http) {
             $scope.group_members = response.data;
         });
     };
-    
+
     $scope.manageMembers = function(user_id, action) {
         $http.post('/groups/members/'+ user_id + '?action='+ action).then(function() {
             $scope.getMembers();
         });
     };
-    
+
     $scope.application_releases = [];
     $scope.aliases = [];
     $scope.statistic_plots = [];
@@ -95,7 +95,7 @@ app.controller('GroupController', function($scope, $http) {
     $scope.PlotForm = {'name': '', 'statistics': [['']], 'application': '', 'version': ''};
     $scope.AppReleaseForm = {'name': '', 'version': ''};
     $scope.currentNavItem = 'Plots';
-    
+
 });
 
 app.controller('HQController', function($scope, $http, $mdSidenav) {
@@ -142,7 +142,7 @@ app.controller('SearchController', function($scope, $http, $mdDialog){
 
 
     $scope.initial_searchform = {filters: [['', '']],
-                         page: 1, 
+                         page: 1,
                          before_date: null,
                          after_date: null,
                          reports_per_page : 25,
@@ -185,7 +185,7 @@ app.controller('SearchController', function($scope, $http, $mdDialog){
         $http.get('/reports/' + report_number).then(function (body) {
             $mdDialog.show({
                 controller: ReportController,
-                template: body,
+                template: body.data,
                 fullscreen: true,
                 parent: angular.element(document.body),
                 targetEvent: ev,
@@ -194,7 +194,7 @@ app.controller('SearchController', function($scope, $http, $mdDialog){
         });
 
         function ReportController($scope, $mdDialog) {
-            
+
           $scope.toggleTraceback = function (tb_id) {
             ele = document.getElementById('tb' + tb_id);
               if (ele.style.display == '') {
@@ -202,7 +202,7 @@ app.controller('SearchController', function($scope, $http, $mdDialog){
               } else {
                   ele.style.display = '';
               }
-          }; 
+          };
           $scope.hide = function() {
             $mdDialog.hide();
           };
